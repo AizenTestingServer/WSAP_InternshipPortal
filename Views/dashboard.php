@@ -1,0 +1,284 @@
+<?php
+    session_start();
+    require_once "../Controllers/Functions.php";
+
+    if (!isset($_SESSION["intern_id"])) {
+        redirect("../index");
+        exit();
+    }
+
+    require_once "../Controllers/Database.php";
+    require_once "../Controllers/Date.php";
+
+    $db = new Database();
+    $date = new Date();
+
+    $db->query("SELECT * FROM intern_wsap_information
+    WHERE id=:intern_id");
+    $db->setInternId($_SESSION["intern_id"]);
+    $db->execute();
+
+    $intern_wsap_info = $db->fetch();
+
+    $db->query("SELECT COUNT(*) as total_interns FROM intern_wsap_information");
+    $db->execute();
+
+    $total_interns = 0;
+    if ($value = $db->fetch()) {
+        $total_interns = $value["total_interns"];
+    }
+
+    $db->query("SELECT COUNT(*) as active_interns FROM intern_wsap_information WHERE status = 1");
+    $db->execute();
+
+    $active_interns = 0;
+    if ($value = $db->fetch()) {
+        $active_interns = $value["active_interns"];
+    }
+
+    $db->query("SELECT COUNT(*) as brand_count FROM brands");
+    $db->execute();
+
+    $brand_count = 0;
+    if ($value = $db->fetch()) {
+        $brand_count = $value["brand_count"];
+    }
+
+    if (isset($_POST["timeIn"])) {
+        redirect('attendance');
+        exit();
+    }
+
+    require_once "../Templates/header_view.php";
+    setTitle("WSAP IP Dashboard");
+?> 
+<div class="my-container"> 
+    <?php
+        include_once "nav_side_bar.php";
+        navSideBar("dashboard");
+    ?>
+    <div class="main-section p-4">
+        <div class="aside">
+            <?php include_once "profile_settings.php"; ?>
+        </div>
+        
+        <div class="row mb-3">
+            <div class="col-md-12">
+                <h3>Dashboard</h3>
+            </div>
+            <div class="summary">
+                <a class="clickable-card" href="attendance.php">
+                    <div class="summary-boxes">
+                        <div class="top">
+                            <div class="left">
+                                <div class="subheader mt-2">
+                                    Rendered Hours
+                                </div>
+                                <div class="summary-total">
+                                    <h3><?= $intern_wsap_info["rendered_hours"].'/'.
+                                    $intern_wsap_info["target_rendering_hours"] ?></h3>
+                                </div>
+                            </div>
+                            <div class="right">
+                                <i class="fa-solid fa-clock bg-primary text-light circle"></i>
+                            </div>
+                        </div>
+                        <div class="bottom">
+
+                        </div>
+                    </div>
+                </a>
+                
+                <a class="clickable-card" href="profile.php">
+                    <div class="summary-boxes">
+                        <div class="top">
+                            <div class="left">
+                                <div class="subheader mt-2">
+                                    Days in WSAP
+                                </div>
+                                <div class="summary-total">
+                                    <h3><?php
+                                        $date1 = date_create(date("Y-m-d", strtotime($value["onboard_date"])));
+                                        $date2 = date_create(date("Y-m-d"));
+                                        $diff = date_diff($date1,$date2);
+                                        $days_in_wsap = $diff->format("%a");
+                                        echo $days_in_wsap; ?>
+                                    </h3>
+                                </div>
+                            </div>
+                            <div class="right">
+                                <i class="fa-solid fa-calendar bg-secondary text-light circle"></i>
+                            </div>
+                        </div>
+                        <div class="bottom">
+
+                        </div>
+                    </div>
+                </a>
+                
+                <a class="clickable-card" href="profile.php">
+                    <div class="summary-boxes">
+                        <div class="top">
+                            <div class="left">
+                                <div class="subheader mt-2">
+                                    Weeks in WSAP
+                                </div>
+                                <div class="summary-total">
+                                    <h3><?= intval($days_in_wsap/7); ?>
+                                    </h3>
+                                </div>
+                            </div>
+                            <div class="right">
+                                <i class="fa-solid fa-calendar bg-success text-light circle"></i>
+                            </div>
+                        </div>
+                        <div class="bottom">
+
+                        </div>
+                    </div>
+                </a>
+
+                <a class="clickable-card" href="profile.php">
+                    <div class="summary-boxes">
+                        <div class="top">
+                            <div class="left">
+                                <div class="subheader mt-2">
+                                    Est. Offboard Date
+                                </div>
+                                <div class="summary-total">
+                                    <h3><?php
+                                    $rendering_days = round(($value["target_rendering_hours"]-$value["rendered_hours"])/8);
+                                    $estimated_weekends = ceil(($rendering_days/5) * 2);
+                                    $rendering_days += $estimated_weekends;
+                                    
+                                    echo date('M j', strtotime($date->getDate().' + '.$rendering_days.' days')); ?></h3>
+                                </div>
+                            </div>
+                            <div class="right">
+                                <i class="fa-solid fa-graduation-cap bg-red-pallete text-light circle"></i>
+                            </div>
+                        </div>
+                        <div class="bottom">
+
+                        </div>
+                    </div>
+                </a>
+
+                <a class="clickable-card" href="brands.php">
+                    <div class="summary-boxes">
+                        <div class="top">
+                            <div class="left">
+                                <div class="subheader mt-2">
+                                    Total Websites
+                                </div>
+                                <div class="summary-total">
+                                    <h3><?= $brand_count ?></h3>
+                                </div>
+                            </div>
+                            <div class="right">
+                                <i class="fa-solid fa-globe bg-secondary text-light circle"></i>
+                            </div>
+                        </div>
+                        <div class="bottom">
+
+                        </div>
+                    </div>
+                </a>
+
+                <a class="clickable-card" href="interns.php">
+                    <div class="summary-boxes">
+                        <div class="top">
+                            <div class="left">
+                                <div class="subheader mt-2">
+                                    Total Interns
+                                </div>
+                                <div class="summary-total">
+                                    <h3><?= $total_interns ?></h3>
+                                </div>
+                            </div>
+                            <div class="right">
+                                <i class="fa-solid fa-user-group bg-red-pallete text-light circle"></i>
+                            </div>
+                        </div>
+                        <div class="bottom">
+
+                        </div>
+                    </div>
+                </a>
+
+                <a class="clickable-card" href="interns.php">
+                    <div class="summary-boxes">
+                        <div class="top">
+                            <div class="left">
+                                <div class="subheader mt-2">
+                                    Active Interns
+                                </div>
+                                <div class="summary-total">
+                                    <h3><?= $active_interns ?></h3>
+                                </div>
+                            </div>
+                            <div class="right">
+                                <i class="fa-solid fa-user-tie bg-primary text-light circle"></i>
+                            </div>
+                        </div>
+                        <div class="bottom">
+
+                        </div>
+                    </div>
+                </a>
+            </div>
+            
+            <div class="section-content">
+                <div class="col-md-12 p-4" id="dat">
+                    <div class="d-flex justify-content-between align-items-center mb-2">
+                        <h4 class="mt-4 fw-bold">Tasks and Reminders</h4>
+                        <div>
+                            <button class="btn btn-outline-dark fs-c">
+                                <i class="fa-solid fa-plus"></i> Add New
+                            </button>
+                        </div>
+
+                    </div>
+
+                    <?php $record_count = 0; ?>
+                    <div class="daily_task"> <?php
+                        if (($date->getStringDateTime() >= $date->time_in_start() && 
+                        $date->getStringDateTime() < $date->time_in_end()) ||
+                        ($date->getStringDateTime() > $date->morning_shift_out() &&
+                        $date->getStringDateTime() < $date->afternoon_shift_start())) {
+                            $record_count++; ?>
+                            <div class="task-box">
+                                <div class="task-box-status">
+                                    <div class="d-flex justify-content-between">
+                                        <h6 class="task-title fw-bold">
+                                            Time in
+                                        </h6>
+                                    </div>
+                                    <div class="col-md-12 text-center">
+                                        <iframe sandbox="allow-same-origin allow-scripts allow-popups allow-forms"
+                                        src="https://www.zeitverschiebung.net/clock-widget-iframe-v2?language=en&size=small&timezone=Asia%2FManila"
+                                        width="200" height="90" frameborder="0" seamless>
+                                        </iframe>
+                                    </div>
+                                </div>
+                                <div class="task-box-action mt-2 d-flex justify-content-end align-items-center">
+                                    <form action="<?= htmlspecialchars($_SERVER["PHP_SELF"]);?>" method="post">
+                                        <button type="submit" name="timeIn" class="btn btn-success">Time in</button>
+                                    </form>
+                                </div>
+                            </div> <?php
+                        } ?>
+                    </div>
+                    <?php if ($record_count == 0) { ?>
+                        <div class="w-100 text-center">
+                            <h3>Empty</h3>
+                        </div> <?php
+                    } ?>
+                </div>
+            </div>
+        </div>
+    </div>
+</div>
+<?php
+    require_once "../Templates/footer.php";
+?>

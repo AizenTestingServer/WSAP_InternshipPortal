@@ -1,0 +1,88 @@
+<?php
+    session_start();
+
+    require_once "./Controllers/Functions.php";
+
+    if (isset($_SESSION["intern_id"])) {
+        redirect("./Views/Dashboard");
+        exit();
+    }
+
+    require_once "./Controllers/Database.php";
+
+    if (isset($_POST["signIn"])) {
+        if (!empty($_POST["intern_id"]) && !empty($_POST["password"])) {            
+            $db = new Database();
+
+            $db->query("SELECT intern_accounts.*, intern_personal_information.*, intern_wsap_information.*
+            FROM intern_accounts, intern_personal_information, intern_wsap_information
+            WHERE intern_accounts.id=:intern_id AND intern_accounts.id=intern_personal_information.id AND
+            intern_accounts.id=intern_wsap_information.id");
+            $db->setInternId($_POST["intern_id"]);
+            $db->execute();
+
+            $signedIn = false;
+            while ($row = $db->fetch()) {
+                if ($row["id"] == strtoupper($_POST["intern_id"]) && $row["password"] == $_POST["password"]) {
+                    $signedIn = true;
+                    break;
+                }
+            }
+
+            if ($signedIn) {
+                $_SESSION["intern_id"] = $_POST["intern_id"];
+                redirect('./Views/dashboard');
+                exit();
+            } else {
+                $_SESSION['sign_in_failed'] = "Unregistered account!";
+                redirect('index');
+                exit();
+            }
+        } else {
+            $_SESSION['sign_in_failed'] = "Please enter your credentials.";
+            redirect('index');
+            exit();
+        }
+    }
+
+    require_once "./Templates/header.php";
+    setTitle("WSAP IP Login");
+?>
+<div class="login-container">
+    <div class="login-outside">
+        <div class="login-form rounded shadow-lg p-4">
+            <div class="text-center">
+                <img height="120" width="120" src="./Assets/img/Brand_Logo/WSAP.png" alt="">
+                <div class="p-1 pb-0">
+                    <h4 class="title">INTERNSHIP PORTAL</h4>
+                </div>
+                <?php
+                    if (isset($_SESSION['sign_in_failed'])) { ?>
+                        <div class="alert alert-danger text-danger">
+                            <?php
+                                echo $_SESSION['sign_in_failed'];
+                                unset($_SESSION['sign_in_failed']);
+                            ?>
+                        </div> <?php
+                    }
+                ?>
+            </div>
+            <!-- form-login -->
+            <form class="d-flex flex-column pt-2 px-1" action="<?= htmlspecialchars($_SERVER["PHP_SELF"]);?>" method="post">
+                <div>
+                    <input name="intern_id" type="text" class="form-control text-uppercase" placeholder="Intern ID" maxLength="10">
+                </div>
+                <div class="mt-2">
+                    <input name="password" type="password" class="form-control" placeholder="Password">
+                </div>
+                <div class="text-center mt-4">
+                    <button name="signIn" class="btn btn-warning w-100">Sign in</button>
+                </div>
+            </form>
+        </div>
+    </div>
+</div>
+<?php
+    require_once "./Templates/footer.php";
+?>
+
