@@ -3,5 +3,5 @@
     session_start();
     session_unset();
     session_destroy();
-    redirect("../index");
+    redirect("../index.php");
 ?>

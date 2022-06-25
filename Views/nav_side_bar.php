@@ -1,6 +1,6 @@
 <?php
     function navSideBar($targetActive) { ?>
-        <div class="side-nav border-end p-1">
+        <div class="side-nav border-end p-1 vh-100 position-fixed">
             <div class="d-flex align-items-center flex-column">
                 <img class="img-responsive" src="../Assets/img/Brand_Logo/WSAP.png" alt="">
                 <span class="fw-bold">WSAP IP</span>

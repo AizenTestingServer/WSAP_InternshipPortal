@@ -116,7 +116,7 @@ body {
     background: #fff;
 }
 
-.btn.btn-bottom-right {
+.bottom-right {
     position: absolute;
     right: 16px;
     bottom: 16px;
@@ -125,22 +125,21 @@ body {
 .btn-indigo {
     background: var(--text-indigo);
     color: #fff;
-    padding: 0.55em 1rem;
-    border-radius: 12px;
 }
 
 .btn-indigo:hover {
     background: #462b9f;
-
     color: #fff;
 }
 
 .btn-smoke {
     background: #fff;
+    color: var(--text-custom-dark);
 }
 
 .btn-smoke:hover {
     background: var(--white-smoke);
+    color: var(--text-custom-dark);
 }
 
 /* default container */
@@ -202,11 +201,13 @@ body {
     position: relative;
     background: var(--white-smoke);
     background: #fff;
+    z-index: 1;
 }
 
 .main-section {
+    margin-left: 100px;
     width: 100%;
-    background: rgb(245, 249, 252);
+    min-height: 100vh;
 }
 
 .aside {
@@ -332,6 +333,17 @@ body {
     object-fit: contain;
 }
 
+.img-intern {
+    width: 150px;
+    height: 150px;
+    object-fit: contain;
+}
+
+.img-nav {
+    width: 32px;
+    height: 32px;
+}
+
 .tasks {
     display: flex;
     width: 100%;
@@ -406,7 +418,7 @@ div.clock.small div.date {
     font-weight: bold;
 }
 
-.profile_settings {
+.profile_nav {
     display: flex;
     margin-bottom: 0;
     justify-content: end;
@@ -414,17 +426,17 @@ div.clock.small div.date {
     padding: 0.35em 1rem;
 }
 
-.profile_settings li {
+.profile_nav li {
     list-style: none;
 }
 
-.profile_settings li a {
+.profile_nav li a {
     text-decoration: none;
     display: flex;
     align-items: center;
 }
 
-.profile_settings li:hover .profile_list {
+.profile_nav li:hover .profile_list {
     display: block;
 }
 
@@ -505,6 +517,7 @@ a.dt-button {
 
 .clickable-card {
     text-decoration: none;
+    cursor: pointer;
 }
 
 .summary {
@@ -669,6 +682,88 @@ a.dt-button {
     width: calc(100% - 310px);
 }
 
+.width-fit {
+    width: fit-content;
+}
+
+.interns-attendance {
+    display: grid;
+    gap: 1rem;
+}
+
+.interns-attendance .attendance {
+    border-radius: 0.75rem;
+    border: 0 solid #eceef3;
+    box-shadow: 0 3px 3px -1px rgb(10 22 70 / 10%), 0 0 1px 0 rgb(10 22 70 / 6%);
+    word-wrap: break-word;
+    padding: 1.5rem;
+    font-family: 'Inter', sans-serif;
+    color: var(--text-2);
+    background: var(--white);
+}
+
+.interns-attendance .attendance .top {
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+    width: 100%;
+    height: 75%;
+}
+
+.interns-attendance .attendance .top .left {
+    line-height: 1.75em;
+}
+
+.interns-attendance .attendance .top .left .subheader {
+    font-size: 12px;
+    font-weight: 600;
+    color: #6B7B93;
+}
+
+.interns-attendance .attendance .top .left .summary-total {
+    font-weight: 600 !important;
+    color: #16192C;
+    font-size: 22px;
+    letter-spacing: -2px !important;
+}
+
+.interns-attendance .attendance .bottom {
+    width: 100%;
+    height: 25%;
+}
+
+@media (min-width: 576px) {
+    .interns-attendance {
+        grid-template-columns: repeat(1, 1fr);
+    }
+}
+
+@media (min-width: 768px) {
+    .interns-attendance {
+        grid-template-columns: repeat(2, 1fr);
+    }
+
+    .width-md-100 {
+        width: 100%;
+    }
+}
+
+@media (min-width: 992px) {
+    .interns-attendance {
+        grid-template-columns: repeat(3, 1fr);
+    }
+
+    .width-lg-fit {
+        width: fit-content;
+    }
+}
+
+@media (min-width: 1400px) {
+    .interns-attendance {
+        grid-template-columns: repeat(4, 1fr);
+    }
+}
+
 @media (max-width: 1200px) {
     .summary,
     .brand_grid {
@@ -716,7 +811,6 @@ a.dt-button {
 }
 
 @media (max-width: 550px) {
-
     .summary {
         padding-left: 3rem;
         padding-right: 3rem;

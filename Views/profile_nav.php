@@ -3,34 +3,37 @@
 
     $dbProfile = new Database();
 
-    $dbProfile->query("SELECT intern_wsap_information.*, intern_personal_information.*
-    FROM intern_wsap_information, intern_personal_information
-    WHERE intern_wsap_information.id=:intern_id AND intern_personal_information.id=:intern_id");
+    $dbProfile->query("SELECT intern_wsap_information.*, intern_personal_information.*, intern_educational_information.*, intern_accounts.*
+    FROM intern_wsap_information, intern_personal_information, intern_educational_information, intern_accounts
+    WHERE intern_wsap_information.id=:intern_id AND
+    intern_personal_information.id=:intern_id AND
+    intern_educational_information.id=:intern_id AND
+    intern_accounts.id=:intern_id");
     $dbProfile->setInternId($_SESSION["intern_id"]);
     $dbProfile->execute();
     
-    $value = $dbProfile->fetch();
+    $profileValue = $dbProfile->fetch();
 ?>
 
-<ul class="profile_settings">
+<ul class="profile_nav">
     <li class="user_toggler">
         <a class="fs-e text-secondary fw-bold" href="#">
-            <img width="35" class="me-2 fs-inter" style="border-radius: 50%;"
-            height="100%" src="<?php {
-                if ($value["img"] == null || strlen($value["img"]) == 0) {
-                    if ($value["gender"] == 0) {
+            <img class="img-nav me-2 fs-inter" style="border-radius: 50%;"
+            src="<?php {
+                if ($profileValue["image"] == null || strlen($profileValue["image"]) == 0) {
+                    if ($profileValue["gender"] == 0) {
                         echo "../Assets/img/profile_imgs/default_male.png";
                     } else {
                         echo "../Assets/img/profile_imgs/default_female.png";
                     }
                 } else {
-                    echo $value["img"];
+                    echo $profileValue["image"];
                 }
             } ?>" alt="">
             <span>
                 <?php 
                     if (isset($_SESSION["intern_id"])) {
-                        echo $value["last_name"].", ".$value["first_name"]." ".$value["middle_name"];
+                        echo $profileValue["last_name"].", ".$profileValue["first_name"]." ".$profileValue["middle_name"];
                     }
                 ?>
             </span>

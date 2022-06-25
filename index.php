@@ -3,17 +3,22 @@
 
     require_once "./Controllers/Functions.php";
 
-    if (isset($_SESSION["intern_id"])) {
-        redirect("./Views/Dashboard");
+    if (isset($_SESSION["intern_id"]) && isset($_SESSION["password"])) {
+        redirect("./Views/dashboard.php");
+        exit();
+    } else if (isset($_SESSION["intern_id"])) {
+        redirect("./Views/profile_setup.php");
         exit();
     }
 
-    require_once "./Controllers/Database.php";
+    require_once "./Controllers/Database.php";   
+
+    $db = new Database();
 
     if (isset($_POST["signIn"])) {
-        if (!empty($_POST["intern_id"]) && !empty($_POST["password"])) {            
-            $db = new Database();
-
+        if (!empty($_POST["intern_id"]) && !empty($_POST["password"])) {
+            $_SESSION["intern_id_temp"] = $_POST["intern_id"];
+            
             $db->query("SELECT intern_accounts.*, intern_personal_information.*, intern_wsap_information.*
             FROM intern_accounts, intern_personal_information, intern_wsap_information
             WHERE intern_accounts.id=:intern_id AND intern_accounts.id=intern_personal_information.id AND
@@ -23,7 +28,7 @@
 
             $signedIn = false;
             while ($row = $db->fetch()) {
-                if ($row["id"] == strtoupper($_POST["intern_id"]) && $row["password"] == $_POST["password"]) {
+                if ($row["id"] == strtoupper($_POST["intern_id"]) && $row["password"] == md5($_POST["password"])) {
                     $signedIn = true;
                     break;
                 }
@@ -31,18 +36,34 @@
 
             if ($signedIn) {
                 $_SESSION["intern_id"] = $_POST["intern_id"];
-                redirect('./Views/dashboard');
+                $_SESSION["password"] = $_POST["password"];
+                unset($_SESSION["intern_id_temp"]);
+                redirect('./Views/dashboard.php');
                 exit();
             } else {
                 $_SESSION['sign_in_failed'] = "Unregistered account!";
-                redirect('index');
-                exit();
             }
-        } else {
+        } else if (empty($_POST["intern_id"]) && empty($_POST["password"])) {
             $_SESSION['sign_in_failed'] = "Please enter your credentials.";
-            redirect('index');
-            exit();
+        } else {
+            $_SESSION["intern_id_temp"] = $_POST["intern_id"];
+
+            $db->query("SELECT * FROM intern_personal_information WHERE id=:intern_id AND
+            (SELECT COUNT(*) FROM intern_accounts WHERE id=:intern_id) = 0");
+            $db->setInternId($_POST["intern_id"]);
+            $db->execute();
+
+            if ($db->rowCount() != 0) {
+                $_SESSION["intern_id"] = $_POST["intern_id"];
+                unset($_SESSION["intern_id_temp"]);
+                redirect('./Views/profile_setup.php');
+                exit();
+            } else {
+                $_SESSION['sign_in_failed'] = "Please enter your credentials.";
+            }
         }
+        redirect('index.php');
+        exit();
     }
 
     require_once "./Templates/header.php";
@@ -70,7 +91,10 @@
             <!-- form-login -->
             <form class="d-flex flex-column pt-2 px-1" action="<?= htmlspecialchars($_SERVER["PHP_SELF"]);?>" method="post">
                 <div>
-                    <input name="intern_id" type="text" class="form-control text-uppercase" placeholder="Intern ID" maxLength="10">
+                    <input name="intern_id" type="text" class="form-control text-uppercase" placeholder="Intern ID"
+                    value="<?php if (isset($_SESSION["intern_id_temp"])) {
+                        echo $_SESSION["intern_id_temp"];
+                    } ?>" maxLength="10">
                 </div>
                 <div class="mt-2">
                     <input name="password" type="password" class="form-control" placeholder="Password">

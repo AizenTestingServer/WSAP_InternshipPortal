@@ -24,11 +24,11 @@
             return date('d');
         }
 
-        function getStringDate() {
+        function getDateValue() {
             return strtotime(date('F j, Y'));
         }
 
-        function getStringDateTime() {
+        function getDateTimeValue() {
             return strtotime(date('F j, Y g:i a'));
         }
 
@@ -42,10 +42,10 @@
         }
 
         function time_in_end(){
-            return strtotime(date('F j, Y').'8:15 am'); //  8:15 am
+            return strtotime(date('F j, Y').'8:25 am'); //  8:25 am
         }
 
-        function morning_shift_out() {
+        function morning_shift_end() {
             return strtotime(date('F j, Y').'12:00 pm'); //  12:00 pm
         }
 
@@ -58,35 +58,35 @@
         }
 
         function time_out_end() {
-            return strtotime(date('F j, Y').'6:00 pm'); //  6:00 pm
+            return strtotime(date('F j, Y').'5:25 pm'); //  5:25 pm
         }
 
         function time_out_overtime_start() {
-            return strtotime(date('F j, Y').'7:00 pm'); //  7:00 pm
+            return strtotime(date('F j, Y').'6:00 pm'); //  6:00 pm
         }
 
         function time_out_overtime_end() {
-            return strtotime(date('F j, Y').'10:00 pm'); //  7:00 pm
+            return strtotime(date('F j, Y').'9:25 pm'); //  9:25 pm
         }
 
         function time_in_enabled() { ?>
             <button type="button" class="btn btn-success me-2" data-bs-toggle="modal" 
-            data-bs-target="#timeinModal">Time in</button> <?php
+            data-bs-target="#timeInModal">Time in</button> <?php
         }  
 
         function time_in_disabled() { ?>
              <button type="button" class="btn btn-success me-2" data-bs-toggle="modal" 
-            data-bs-target="#timeinModal" disabled>Time in</button> <?php
+            data-bs-target="#timeInModal" disabled>Time in</button> <?php
         }    
 
         function time_out_enabled() { ?>
             <button type="button" class="btn btn-danger" data-bs-toggle="modal" 
-            data-bs-target="#timeoutModal">Time out</button> <?php
+            data-bs-target="#timeOutModal">Time out</button> <?php
         }
 
         function time_out_disabled() { ?>
             <button type="button" class="btn btn-danger" data-bs-toggle="modal" 
-            data-bs-target="#timeoutModal" disabled>Time out</button> <?php
+            data-bs-target="#timeOutModal" disabled>Time out</button> <?php
         }
     }
 

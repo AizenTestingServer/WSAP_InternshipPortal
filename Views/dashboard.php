@@ -2,8 +2,8 @@
     session_start();
     require_once "../Controllers/Functions.php";
 
-    if (!isset($_SESSION["intern_id"])) {
-        redirect("../index");
+    if (!isset($_SESSION["intern_id"]) || !isset($_SESSION["password"])) {
+        redirect("../index.php");
         exit();
     }
 
@@ -44,8 +44,29 @@
         $brand_count = $value["brand_count"];
     }
 
-    if (isset($_POST["timeIn"])) {
-        redirect('attendance');
+    $db->query("SELECT * FROM attendance WHERE intern_id=:intern_id ORDER BY id DESC LIMIT 1;");
+    $db->setInternId($_SESSION["intern_id"]);
+    $db->execute();
+    $lts_att = $db->fetch();
+
+    $remind_time_in = false;
+    $remind_time_out = false;
+    if ($db->rowCount() != 0 && $date->getDateValue() == strtotime($lts_att["att_date"])) {
+        if (!empty($lts_att["time_out"]) || atMorningShift() || atAfternoonShift() ||
+        atOvertime() || atEndOfDay() || atAfternoonTimeIn($lts_att["time_in"])) {
+            $remind_time_out = false;
+        } else {
+            $remind_time_out = true;
+        }
+    } else {
+        if (($date->getDateTimeValue() >= $date->time_in_start() &&  $date->getDateTimeValue() < $date->time_in_end()) ||
+        ($date->getDateTimeValue() >= $date->morning_shift_end() && $date->getDateTimeValue() < $date->afternoon_shift_start())) {
+            $remind_time_in = true;
+        }
+    }
+
+    if (isset($_POST["goToAttendance"])) {
+        redirect('attendance.php');
         exit();
     }
 
@@ -59,15 +80,25 @@
     ?>
     <div class="main-section p-4">
         <div class="aside">
-            <?php include_once "profile_settings.php"; ?>
+            <?php include_once "profile_nav.php"; ?>
         </div>
         
         <div class="row mb-3">
             <div class="col-md-12">
                 <h3>Dashboard</h3>
-            </div>
+            </div> <?php
+
+            if (isset($_SESSION['setup_success'])) { ?>
+                <div class="alert alert-success text-success">
+                    <?php
+                        echo $_SESSION['setup_success'];
+                        unset($_SESSION['setup_success']);
+                    ?>
+                </div> <?php
+            } ?>
+            
             <div class="summary">
-                <a class="clickable-card" href="attendance.php">
+                <a class="clickable-card" href="attendance.php" draggable="false">
                     <div class="summary-boxes">
                         <div class="top">
                             <div class="left">
@@ -89,7 +120,7 @@
                     </div>
                 </a>
                 
-                <a class="clickable-card" href="profile.php">
+                <a class="clickable-card" href="profile.php" draggable="false">
                     <div class="summary-boxes">
                         <div class="top">
                             <div class="left">
@@ -98,7 +129,7 @@
                                 </div>
                                 <div class="summary-total">
                                     <h3><?php
-                                        $date1 = date_create(date("Y-m-d", strtotime($value["onboard_date"])));
+                                        $date1 = date_create(date("Y-m-d", strtotime($intern_wsap_info["onboard_date"])));
                                         $date2 = date_create(date("Y-m-d"));
                                         $diff = date_diff($date1,$date2);
                                         $days_in_wsap = $diff->format("%a");
@@ -116,7 +147,7 @@
                     </div>
                 </a>
                 
-                <a class="clickable-card" href="profile.php">
+                <a class="clickable-card" href="profile.php" draggable="false">
                     <div class="summary-boxes">
                         <div class="top">
                             <div class="left">
@@ -138,7 +169,7 @@
                     </div>
                 </a>
 
-                <a class="clickable-card" href="profile.php">
+                <a class="clickable-card" href="profile.php" draggable="false">
                     <div class="summary-boxes">
                         <div class="top">
                             <div class="left">
@@ -147,9 +178,9 @@
                                 </div>
                                 <div class="summary-total">
                                     <h3><?php
-                                    $rendering_days = round(($value["target_rendering_hours"]-$value["rendered_hours"])/8);
+                                    $rendering_days = round(($intern_wsap_info["target_rendering_hours"]-$intern_wsap_info["rendered_hours"])/8);
                                     $estimated_weekends = ceil(($rendering_days/5) * 2);
-                                    $rendering_days += $estimated_weekends;
+                                    $rendering_days += $estimated_weekends + 1;
                                     
                                     echo date('M j', strtotime($date->getDate().' + '.$rendering_days.' days')); ?></h3>
                                 </div>
@@ -164,7 +195,7 @@
                     </div>
                 </a>
 
-                <a class="clickable-card" href="brands.php">
+                <a class="clickable-card" href="brands.php" draggable="false">
                     <div class="summary-boxes">
                         <div class="top">
                             <div class="left">
@@ -185,7 +216,7 @@
                     </div>
                 </a>
 
-                <a class="clickable-card" href="interns.php">
+                <a class="clickable-card" href="interns.php" draggable="false">
                     <div class="summary-boxes">
                         <div class="top">
                             <div class="left">
@@ -206,7 +237,7 @@
                     </div>
                 </a>
 
-                <a class="clickable-card" href="interns.php">
+                <a class="clickable-card" href="interns.php" draggable="false">
                     <div class="summary-boxes">
                         <div class="top">
                             <div class="left">
@@ -228,7 +259,7 @@
                 </a>
             </div>
             
-            <div class="section-content">
+            <div class="section-content mt-2">
                 <div class="col-md-12 p-4" id="dat">
                     <div class="d-flex justify-content-between align-items-center mb-2">
                         <h4 class="mt-4 fw-bold">Tasks and Reminders</h4>
@@ -242,11 +273,7 @@
 
                     <?php $record_count = 0; ?>
                     <div class="daily_task"> <?php
-                        if (($date->getStringDateTime() >= $date->time_in_start() && 
-                        $date->getStringDateTime() < $date->time_in_end()) ||
-                        ($date->getStringDateTime() > $date->morning_shift_out() &&
-                        $date->getStringDateTime() < $date->afternoon_shift_start())) {
-                            $record_count++; ?>
+                        if ($remind_time_in) { $record_count++; ?>
                             <div class="task-box">
                                 <div class="task-box-status">
                                     <div class="d-flex justify-content-between">
@@ -263,13 +290,36 @@
                                 </div>
                                 <div class="task-box-action mt-2 d-flex justify-content-end align-items-center">
                                     <form action="<?= htmlspecialchars($_SERVER["PHP_SELF"]);?>" method="post">
-                                        <button type="submit" name="timeIn" class="btn btn-success">Time in</button>
+                                        <button type="submit" name="goToAttendance" class="btn btn-success">Time in</button>
                                     </form>
                                 </div>
                             </div> <?php
+                        }
+                        
+                        if ($remind_time_out) { $record_count++; ?>
+                            <div class="task-box">
+                                <div class="task-box-status">
+                                    <div class="d-flex justify-content-between">
+                                        <h6 class="task-title fw-bold">
+                                            Time out
+                                        </h6>
+                                    </div>
+                                    <div class="col-md-12 text-center">
+                                        <iframe sandbox="allow-same-origin allow-scripts allow-popups allow-forms"
+                                        src="https://www.zeitverschiebung.net/clock-widget-iframe-v2?language=en&size=small&timezone=Asia%2FManila"
+                                        width="200" height="90" frameborder="0" seamless>
+                                        </iframe>
+                                    </div>
+                                </div>
+                                <div class="task-box-action mt-2 d-flex justify-content-end align-items-center">
+                                    <form action="<?= htmlspecialchars($_SERVER["PHP_SELF"]);?>" method="post">
+                                        <button type="submit" name="goToAttendance" class="btn btn-danger">Time out</button>
+                                    </form>
+                                </div>
+                            </div> <?php 
                         } ?>
-                    </div>
-                    <?php if ($record_count == 0) { ?>
+                    </div> <?php
+                    if ($record_count == 0) { ?>
                         <div class="w-100 text-center">
                             <h3>Empty</h3>
                         </div> <?php

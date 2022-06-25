@@ -3,8 +3,8 @@
 
     require_once "../Controllers/Functions.php";
 
-    if (!isset($_SESSION["intern_id"])) {
-        redirect("../index");
+    if (!isset($_SESSION["intern_id"]) || !isset($_SESSION["password"])) {
+        redirect("../index.php");
         exit();
     }
     
@@ -25,7 +25,7 @@
     ?>
     <div class="main-section p-4">
         <div class="aside">
-            <?php include_once "profile_settings.php"; ?>
+            <?php include_once "profile_nav.php"; ?>
         </div>
         
         <h3 class="fw-bold">Brands</h3>
@@ -46,7 +46,7 @@
                     </div>
                     <div class="logo">
                         <a href="<?= $row["web_link"] ?>" target="window">
-                            <img class="img-fluid" src="<?= $row["img"] ?>" alt="">
+                            <img class="img-fluid" src="<?= $row["image"] ?>" alt="">
                         </a>
                     </div>
                 </div> <?php
