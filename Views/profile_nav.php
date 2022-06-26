@@ -42,7 +42,6 @@
         <ul class="profile_list">
             <li><a href="profile.php"><i class="fa-solid fa-user me-2"></i>My Profile</a></li>
             <li><a href="attendance.php"><i class="fa-solid fa-stopwatch me-2"></i>My Attendance</a></li>
-            <li><a href="#"><i class="fa-solid fa-calendar-days me-2"></i>My Schedule</a></li>
             <li><a href="sign_out.php"><i class="fa-solid fa-arrow-right-from-bracket me-2"></i>Sign out</a></li>
         </ul>
     </li>

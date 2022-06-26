@@ -13,42 +13,57 @@
 
     $db = new Database();
     $date = new Date();
+    
+    $db->query("SELECT intern_personal_information.*, intern_roles.*, roles.*
+    FROM intern_personal_information, intern_roles, roles
+    WHERE intern_personal_information.id=intern_roles.intern_id AND
+    intern_roles.role_id=roles.id AND roles.admin=1 AND
+    intern_personal_information.id=:intern_id");
+    $db->setInternId($_SESSION["intern_id"]);
+    $db->execute();
+    $admin_roles_count = $db->rowCount();
+
+    $selected_date = $date->getDate();
+    if (!empty($_GET["date"])) {
+        $selected_date = $_GET["date"];
+    }
 
     if (isset($_POST["search"])) {
+        $parameters = "?";
         if (!empty($_POST["search_intern"])) {
-            if (!empty($_GET["department"])) {
-                if (!empty($_GET["sort"])) {
-                    redirect("interns_attendance.php?search=".$_POST["search_intern"]."&department=".$_GET["department"]."&sort=".$_GET["sort"]);
-                } else {
-                    redirect("interns_attendance.php?search=".$_POST["search_intern"]."&department=".$_GET["department"]);
-                }
-            } else {
-                if (!empty($_GET["sort"])) {
-                    redirect("interns_attendance.php?search=".$_POST["search_intern"]."&sort=".$_GET["sort"]);
-                } else {
-                    redirect("interns_attendance.php?search=".$_POST["search_intern"]);
-                }
-            }
-        } else {
-            if (!empty($_GET["department"])) {
-                if (!empty($_GET["sort"])) {
-                    redirect("interns_attendance.php?department=".$_GET["department"]."&sort=".$_GET["sort"]);
-                } else {
-                    redirect("interns_attendance.php?department=".$_GET["department"]);
-                }
-            } else {
-                if (!empty($_GET["sort"])) {
-                    redirect("interns_attendance.php?sort=".$_GET["sort"]);
-                } else {
-                    redirect("interns_attendance.php");
-                }
-            }
+            $parameters = $parameters."search=".$_POST["search_intern"];
         }
+
+        if (!empty($_GET["department"])) {
+            if (strlen($parameters) > 1) { $parameters = $parameters."&"; }
+            $parameters = $parameters."department=".$_GET["department"];
+        }
+        
+        if (!empty($_GET["sort"])) {
+            if (strlen($parameters) > 1) { $parameters = $parameters."&"; }
+            $parameters = $parameters."sort=".$_GET["sort"];
+        }
+
+        if (!empty($selected_date)) {
+            if (strlen($parameters) > 1) { $parameters = $parameters."&"; }
+            $parameters = $parameters."date=".$selected_date;
+        }
+
+        if (strlen($parameters) > 1) {
+            redirect("interns_attendance.php".$parameters);
+        } else {
+            redirect("interns_attendance.php");
+        }
+
         exit();
     }
 
     if (isset($_POST["reset"])) {
-        redirect("interns_attendance.php");
+        if (!empty($selected_date)) {
+            redirect("interns_attendance.php?date=".$selected_date);
+        } else {  
+            redirect("interns_attendance.php");
+        }
         exit();
     }
 
@@ -71,7 +86,7 @@
             </div>
         </div>
         
-        <div class="control-header">
+        <div>
             <form method="post">
                 <div class="row">
                     <!--SEARCH BUTTON/TEXT-->
@@ -89,16 +104,16 @@
                     </div>
                     <!--DEPARTMENT DROPDOWN-->
                     <div class="col-12 d-md-flex d-sm-inline-block">
-                        <div class="width-lg-fit width-md-100 d-flex align-items-center my-2 me-2">
+                        <div class="w-lg-fit w-md-100 d-flex align-items-center my-2 me-lg-2 me-md-0">
                             <div class="input-group">
-                                <input type="text" class="form-control" value="<?= $date->getDate() ?>" disabled>
+                                <input type="text" class="form-control" value="<?= $selected_date ?>" disabled>
                                 <div class="input-group-append">
-                                    <a><button class="btn btn-smoke border-dark">Select Date</button></a>
+                                    <a class="btn btn-smoke border-dark" href="calendar.php">Select Date</a>
                                 </div>
                             </div>                        
                         </div>
 
-                        <div class="width-fit d-flex my-2">
+                        <div class="w-fit d-flex my-2">
                             <div class="dropdown align-center me-2">
                                 <button class="btn btn-light border-dark dropdown-toggle" type="button" id="dropdownMenuButton1"
                                 data-bs-toggle="dropdown" aria-expanded="false" name="department"> <?php
@@ -110,18 +125,25 @@
                                 </button>
                                 <ul class="dropdown-menu" aria-labelledby="dropdownMenuButton1">
                                     <li><a class="dropdown-item btn-smoke" <?php
+                                        $parameters = "?";
                                         if (!empty($_GET["search"])) {
-                                            if (!empty($_GET["sort"])) { ?>
-                                                href="interns_attendance.php?search=<?= $_GET["search"] ?>&sort=<?= $_GET["sort"] ?>" <?php
-                                            } else { ?>
-                                                href="interns_attendance.php?search=<?= $_GET["search"] ?>" <?php
-                                            }
-                                        } else {
-                                            if (!empty($_GET["sort"])) { ?>
-                                                href="interns_attendance.php?sort=<?= $_GET["sort"] ?>" <?php
-                                            } else { ?>
-                                                href="interns_attendance.php" <?php
-                                            }
+                                            $parameters = $parameters."search=".$_GET["search"];
+                                        }
+                                        
+                                        if (!empty($_GET["sort"])) {
+                                            if (strlen($parameters) > 1) { $parameters = $parameters."&"; }
+                                            $parameters = $parameters."sort=".$_GET["sort"];
+                                        }
+
+                                        if (!empty($selected_date)) {
+                                            if (strlen($parameters) > 1) { $parameters = $parameters."&"; }
+                                            $parameters = $parameters."date=".$selected_date;
+                                        }
+
+                                        if (strlen($parameters) > 1) { ?>
+                                            href="<?= "interns_attendance.php".$parameters ?>" <?php
+                                        } else { ?>
+                                            href="<?= "interns_attendance.php" ?>" <?php
                                         } ?>> All Departments </a></li> <?php
                                     
                                     $db->query("SELECT * FROM departments ORDER BY name");
@@ -129,19 +151,31 @@
                                     
                                     while ($row = $db->fetch()) { ?>
                                         <li><a class="dropdown-item btn-smoke" <?php
+                                            $parameters = "?";
                                             if (!empty($_GET["search"])) {
-                                                if (!empty($_GET["sort"])) { ?>
-                                                    href="interns_attendance.php?search=<?= $_GET["search"] ?>&department=<?= $row["name"] ?>&sort=<?= $_GET["sort"] ?>" <?php
-                                                } else { ?>
-                                                    href="interns_attendance.php?search=<?= $_GET["search"] ?>&department=<?= $row["name"] ?>" <?php
-                                                }
-                                            } else {
-                                                if (!empty($_GET["sort"])) { ?>
-                                                    href="interns_attendance.php?department=<?= $row["name"] ?>&sort=<?= $_GET["sort"] ?>" <?php
-                                                } else { ?>
-                                                    href="interns_attendance.php?department=<?= $row["name"] ?>" <?php
-                                                }
-                                            } ?> > <?= $row["name"] ?>
+                                                $parameters = $parameters."search=".$_GET["search"];
+                                            }
+
+                                            if (!empty($row["name"])) {
+                                                if (strlen($parameters) > 1) { $parameters = $parameters."&"; }
+                                                $parameters = $parameters."department=".$row["name"];
+                                            }
+                                            
+                                            if (!empty($_GET["sort"])) {
+                                                if (strlen($parameters) > 1) { $parameters = $parameters."&"; }
+                                                $parameters = $parameters."sort=".$_GET["sort"];
+                                            }
+
+                                            if (!empty($selected_date)) {
+                                                if (strlen($parameters) > 1) { $parameters = $parameters."&"; }
+                                                $parameters = $parameters."date=".$selected_date;
+                                            }
+
+                                            if (strlen($parameters) > 1) { ?>
+                                                href="<?= "interns_attendance.php".$parameters ?>" <?php
+                                            } else { ?>
+                                                href="<?= "interns_attendance.php" ?>" <?php
+                                            } ?>> <?= $row["name"] ?>
                                         </a></li> <?php
                                     } ?>
                                 </ul>
@@ -171,74 +205,121 @@
                                 </button>
                                 <ul class="dropdown-menu" aria-labelledby="dropdownMenuButton1" name="sort">
                                     <li><a class="dropdown-item btn-smoke" <?php
+                                        $parameters = "?";
                                         if (!empty($_GET["search"])) {
-                                            if (!empty($_GET["department"])) { ?>
-                                                href="interns_attendance.php?search=<?= $_GET["search"] ?>&department=<?= $_GET["department"] ?>" <?php
-                                            } else { ?>
-                                                href="interns_attendance.php?search=<?= $_GET["search"] ?>" <?php
-                                            }
-                                        } else {
-                                            if (!empty($_GET["department"])) { ?>
-                                                href="interns_attendance.php?department=<?= $_GET["department"] ?>" <?php
-                                            } else { ?>
-                                                href="interns_attendance.php" <?php
-                                            }
+                                            $parameters = $parameters."search=".$_GET["search"];
+                                        }
+
+                                        if (!empty($_GET["department"])) {
+                                            if (strlen($parameters) > 1) { $parameters = $parameters."&"; }
+                                            $parameters = $parameters."department=".$_GET["department"];
+                                        }
+
+                                        if (!empty($selected_date)) {
+                                            if (strlen($parameters) > 1) { $parameters = $parameters."&"; }
+                                            $parameters = $parameters."date=".$selected_date;
+                                        }
+
+                                        if (strlen($parameters) > 1) { ?>
+                                            href="<?= "interns_attendance.php".$parameters ?>" <?php
+                                        } else { ?>
+                                            href="<?= "interns_attendance.php" ?>" <?php
                                         } ?>>Default</a></li>
                                     <li><a class="dropdown-item btn-smoke" <?php
+                                        $parameters = "?";
                                         if (!empty($_GET["search"])) {
-                                            if (!empty($_GET["department"])) { ?>
-                                                href="interns_attendance.php?search=<?= $_GET["search"] ?>&department=<?= $_GET["nadepartmentme"] ?>&sort=1" <?php
-                                            } else { ?>
-                                                href="interns_attendance.php?search=<?= $_GET["search"] ?>&sort=1" <?php
-                                            }
-                                        } else {
-                                            if (!empty($_GET["department"])) { ?>
-                                                href="interns_attendance.php?department=<?= $_GET["department"] ?>&sort=1" <?php
-                                            } else { ?>
-                                                href="interns_attendance.php?&sort=1" <?php
-                                            }
+                                            $parameters = $parameters."search=".$_GET["search"];
+                                        }
+
+                                        if (!empty($_GET["department"])) {
+                                            if (strlen($parameters) > 1) { $parameters = $parameters."&"; }
+                                            $parameters = $parameters."department=".$_GET["department"];
+                                        }
+
+                                        if (strlen($parameters) > 1) { $parameters = $parameters."&"; }
+                                        $parameters = $parameters."sort=1";
+
+                                        if (!empty($selected_date)) {
+                                            if (strlen($parameters) > 1) { $parameters = $parameters."&"; }
+                                            $parameters = $parameters."date=".$selected_date;
+                                        }
+
+                                        if (strlen($parameters) > 1) { ?>
+                                            href="<?= "interns_attendance.php".$parameters ?>" <?php
+                                        } else { ?>
+                                            href="<?= "interns_attendance.php" ?>" <?php
                                         } ?>>A-Z</a></li>
                                     <li><a class="dropdown-item btn-smoke" <?php
+                                        $parameters = "?";
                                         if (!empty($_GET["search"])) {
-                                            if (!empty($_GET["department"])) { ?>
-                                                href="interns_attendance.php?search=<?= $_GET["search"] ?>&department=<?= $_GET["department"] ?>&sort=2" <?php
-                                            } else { ?>
-                                                href="interns_attendance.php?search=<?= $_GET["search"] ?>&sort=2" <?php
-                                            }
-                                        } else {
-                                            if (!empty($_GET["department"])) { ?>
-                                                href="interns_attendance.php?department=<?= $_GET["department"] ?>&sort=2" <?php
-                                            } else { ?>
-                                                href="interns_attendance.php?&sort=2" <?php
-                                            }
+                                            $parameters = $parameters."search=".$_GET["search"];
+                                        }
+
+                                        if (!empty($_GET["department"])) {
+                                            if (strlen($parameters) > 1) { $parameters = $parameters."&"; }
+                                            $parameters = $parameters."department=".$_GET["department"];
+                                        }
+                                        
+                                        if (strlen($parameters) > 1) { $parameters = $parameters."&"; }
+                                        $parameters = $parameters."sort=2";
+
+                                        if (!empty($selected_date)) {
+                                            if (strlen($parameters) > 1) { $parameters = $parameters."&"; }
+                                            $parameters = $parameters."date=".$selected_date;
+                                        }
+
+                                        if (strlen($parameters) > 1) { ?>
+                                            href="<?= "interns_attendance.php".$parameters ?>" <?php
+                                        } else { ?>
+                                            href="<?= "interns_attendance.php" ?>" <?php
                                         } ?>>Z-A</a></li>
                                     <li><a class="dropdown-item btn-smoke" <?php
+                                        $parameters = "?";
                                         if (!empty($_GET["search"])) {
-                                            if (!empty($_GET["department"])) { ?>
-                                                href="interns_attendance.php?search=<?= $_GET["search"] ?>&department=<?= $_GET["department"] ?>&sort=3" <?php
-                                            } else { ?>
-                                                href="interns_attendance.php?search=<?= $_GET["search"] ?>&sort=3" <?php
-                                            }
-                                        } else {
-                                            if (!empty($_GET["department"])) { ?>
-                                                href="interns_attendance.php?department=<?= $_GET["department"] ?>&sort=3" <?php
-                                            } else { ?>
-                                                href="interns_attendance.php?&sort=3" <?php
-                                            }
+                                            $parameters = $parameters."search=".$_GET["search"];
+                                        }
+
+                                        if (!empty($_GET["department"])) {
+                                            if (strlen($parameters) > 1) { $parameters = $parameters."&"; }
+                                            $parameters = $parameters."department=".$_GET["department"];
+                                        }
+                                        
+                                        if (strlen($parameters) > 1) { $parameters = $parameters."&"; }
+                                        $parameters = $parameters."sort=3";
+
+                                        if (!empty($selected_date)) {
+                                            if (strlen($parameters) > 1) { $parameters = $parameters."&"; }
+                                            $parameters = $parameters."date=".$selected_date;
+                                        }
+
+                                        if (strlen($parameters) > 1) { ?>
+                                            href="<?= "interns_attendance.php".$parameters ?>" <?php
+                                        } else { ?>
+                                            href="<?= "interns_attendance.php" ?>" <?php
                                         } ?>>Latest</a></li>
                                     <li><a class="dropdown-item btn-smoke" <?php
+                                        $parameters = "?";
                                         if (!empty($_GET["search"])) {
-                                            if (!empty($_GET["department"])) { ?>
-                                                href="interns_attendance.php?search=<?= $_GET["search"] ?>&department=<?= $_GET["department"] ?>&sort=4" <?php
-                                            } else { ?>
-                                                href="interns_attendance.php?search=<?= $_GET["search"] ?>&sort=4" <?php
-                                            }
-                                        } else {
-                                            if (!empty($_GET["department"])) { ?>
-                                                href="interns_attendance.php?department=<?= $_GET["department"] ?>&sort=4" <?php
-                                            } else { ?>
-                                                href="interns_attendance.php?&sort=4" <?php
-                                            }
+                                            $parameters = $parameters."search=".$_GET["search"];
+                                        }
+
+                                        if (!empty($_GET["department"])) {
+                                            if (strlen($parameters) > 1) { $parameters = $parameters."&"; }
+                                            $parameters = $parameters."department=".$_GET["department"];
+                                        }
+                                        
+                                        if (strlen($parameters) > 1) { $parameters = $parameters."&"; }
+                                        $parameters = $parameters."sort=4";
+
+                                        if (!empty($selected_date)) {
+                                            if (strlen($parameters) > 1) { $parameters = $parameters."&"; }
+                                            $parameters = $parameters."date=".$selected_date;
+                                        }
+
+                                        if (strlen($parameters) > 1) { ?>
+                                            href="<?= "interns_attendance.php".$parameters ?>" <?php
+                                        } else { ?>
+                                            href="<?= "interns_attendance.php" ?>" <?php
                                         } ?>>Earliest</a></li>
                                 </ul>
                             </div>
@@ -270,7 +351,7 @@
 
 
                     if (!empty($_GET["department"]) && !empty($_GET["search"])) {
-                        $interns_attendance = array($date->getDate(), $_GET["department"], $_GET["search"]);
+                        $interns_attendance = array($selected_date, $_GET["department"], $_GET["search"]);
                         
                         $db->query("SELECT intern_personal_information.*, intern_wsap_information.*, departments.*, attendance.* 
                         FROM intern_personal_information, intern_wsap_information, departments, attendance
@@ -282,7 +363,7 @@
                         CONCAT(first_name, ' ', last_name) LIKE CONCAT( '%', :intern_name, '%'))".$sort);
                         $db->selectInternsAttendance3($interns_attendance);
                     } else if (!empty($_GET["department"])) {
-                        $interns_attendance = array($date->getDate(), $_GET["department"]);
+                        $interns_attendance = array($selected_date, $_GET["department"]);
                         
                         $db->query("SELECT intern_personal_information.*, intern_wsap_information.*, departments.*, attendance.* 
                         FROM intern_personal_information, intern_wsap_information, departments, attendance
@@ -292,7 +373,7 @@
                         att_date=:att_date AND name=:dept_name".$sort);
                         $db->selectInternsAttendance($interns_attendance);
                     } else if (!empty($_GET["search"])) {
-                        $interns_attendance = array($date->getDate(), $_GET["search"]);
+                        $interns_attendance = array($selected_date, $_GET["search"]);
                         
                         $db->query("SELECT intern_personal_information.*, intern_wsap_information.*, departments.*, attendance.* 
                         FROM intern_personal_information, intern_wsap_information, departments, attendance
@@ -310,14 +391,13 @@
                         intern_wsap_information.department_id = departments.id AND
                         intern_personal_information.id = attendance.intern_id AND
                         att_date=:att_date".$sort);
-                        $db->selectDate($date->getDate());
+                        $db->setAttDate($selected_date);
                     }
                     $db->execute();
                     
                     $conditions = array("AU", "AE", "MS", "AS", "OD", "Late", "No Time out");
 
                     while ($row = $db->fetch()) { ?>
-                        <!--INTERN CARD 1-->
                         <a class="clickable-card" href="profile.php" draggable="false">
                             <div class="attendance text-center">
                                 <div class="top">
@@ -333,7 +413,7 @@
                                         }
                                     } ?>">
                                 </div>
-                                <div class="summary-total mt-2 width-fit mx-auto">
+                                <div class="summary-total mt-2 w-fit mx-auto">
                                     <h5 class="mb-0 text-dark">
                                         <?= $row["last_name"].", ".$row["first_name"] ?>
                                     </h5>
@@ -343,20 +423,20 @@
                                     <div class="w-100">
                                         <p class="m-0 fw-bold">Time in</p> <?php
                                         if (strlen($row["time_in"]) > 0) {
-                                            if( $row["time_in"] == $conditions[0]) { ?>
-                                                <p class="bg-danger text-light rounded width-fit m-auto px-2 pt-1 pb-1">
+                                            if ($row["time_in"] == $conditions[0]) { ?>
+                                                <p class="bg-danger text-light rounded w-fit m-auto px-2 pt-1 pb-1">
                                                     <?= $row["time_in"] ?>
                                                 </p> <?php
                                             }  else if ($row["time_in"] == $conditions[1]) { ?>
-                                                <p class="bg-primary text-light rounded width-fit m-auto px-2 pt-1 pb-1">
+                                                <p class="bg-primary text-light rounded w-fit m-auto px-2 pt-1 pb-1">
                                                     <?= $row["time_in"] ?>
                                                 </p> <?php
                                             }  else if (str_contains($row["time_in"], $conditions[5])) { ?>
-                                                <p class="bg-warning text-dark rounded width-fit m-auto px-2 pt-1 pb-1">
+                                                <p class="bg-warning text-dark rounded w-fit m-auto px-2 pt-1 pb-1">
                                                     <?= $row["time_in"] ?>
                                                 </p> <?php
                                             } else { ?>
-                                                <p class="bg-success text-light rounded width-fit m-auto px-2 pt-1 pb-1">
+                                                <p class="bg-success text-light rounded w-fit m-auto px-2 pt-1 pb-1">
                                                     <?= $row["time_in"] ?>
                                                 </p> <?php
                                             }
@@ -366,19 +446,19 @@
                                         <p class="m-0 fw-bold">Time out</p> <?php 
                                         if (strlen($row["time_out"]) > 0) {
                                             if ($row["time_out"] == $conditions[0]) { ?>
-                                                <p class="bg-danger text-light rounded width-fit m-auto px-2 pt-1 pb-1">
+                                                <p class="bg-danger text-light rounded w-fit m-auto px-2 pt-1 pb-1">
                                                     <?= $row["time_out"] ?>
                                                 </p> <?php
                                             }  else if ($row["time_out"] == $conditions[1]) { ?>
-                                                <p class="bg-primary text-light rounded width-fit m-auto px-2 pt-1 pb-1">
+                                                <p class="bg-primary text-light rounded w-fit m-auto px-2 pt-1 pb-1">
                                                     <?= $row["time_out"] ?>
                                                 </p> <?php
                                             }  else if ($row["time_out"] == $conditions[6]) { ?>
-                                                <p class="bg-warning text-dark rounded width-fit m-auto px-2 pt-1 pb-1">
+                                                <p class="bg-warning text-dark rounded w-fit m-auto px-2 pt-1 pb-1">
                                                     <?= $row["time_out"] ?>
                                                 </p> <?php
                                             }  else { ?>
-                                                <p class="bg-success text-light rounded width-fit m-auto px-2 pt-1 pb-1">
+                                                <p class="bg-success text-light rounded w-fit m-auto px-2 pt-1 pb-1">
                                                     <?= $row["time_out"] ?>
                                                 </p> <?php
                                             }
@@ -390,7 +470,7 @@
                     } ?>
             </div> <?php
             if ($db->rowCount() == 0) { ?>
-                <div class="w-100 text-center mt-5">
+                <div class="w-100 text-center my-5">
                     <h3>No Record</h3>
                 </div> <?php
             } ?>

@@ -115,6 +115,7 @@
                 
                 $time_in = $lts_att["time_in"];
                 $time_out = $date->getTime();
+
                 if (strlen($time_out) > 8) {
                     $time_out = substr($time_out, 0, 8);
                 }
@@ -293,20 +294,20 @@
                             <td><?= date("l", strtotime($row["att_date"])); ?></td>
                             <td> <?php
                                 if (strlen($row["time_in"]) > 0) {
-                                    if( $row["time_in"] == $conditions[0]) { ?>
-                                        <p class="bg-danger text-light rounded width-fit m-auto px-2 pt-1 pb-1">
+                                    if ($row["time_in"] == $conditions[0]) { ?>
+                                        <p class="bg-danger text-light rounded w-fit m-auto px-2 pt-1 pb-1">
                                             <?= $row["time_in"] ?>
                                         </p> <?php
                                     }  else if ($row["time_in"] == $conditions[1]) { ?>
-                                        <p class="bg-primary text-light rounded width-fit m-auto px-2 pt-1 pb-1">
+                                        <p class="bg-primary text-light rounded w-fit m-auto px-2 pt-1 pb-1">
                                             <?= $row["time_in"] ?>
                                         </p> <?php
                                     }  else if (str_contains($row["time_in"], $conditions[5])) { ?>
-                                        <p class="bg-warning text-dark rounded width-fit m-auto px-2 pt-1 pb-1">
+                                        <p class="bg-warning text-dark rounded w-fit m-auto px-2 pt-1 pb-1">
                                             <?= $row["time_in"] ?>
                                         </p> <?php
                                     } else { ?>
-                                        <p class="bg-success text-light rounded width-fit m-auto px-2 pt-1 pb-1">
+                                        <p class="bg-success text-light rounded w-fit m-auto px-2 pt-1 pb-1">
                                             <?= $row["time_in"] ?>
                                         </p> <?php
                                     }
@@ -315,55 +316,62 @@
                             <td> <?php 
                                 if (strlen($row["time_out"]) > 0) {
                                     if ($row["time_out"] == $conditions[0]) { ?>
-                                        <p class="bg-danger text-light rounded width-fit m-auto px-2 pt-1 pb-1">
+                                        <p class="bg-danger text-light rounded w-fit m-auto px-2 pt-1 pb-1">
                                             <?= $row["time_out"] ?>
                                         </p> <?php
                                     }  else if ($row["time_out"] == $conditions[1]) { ?>
-                                        <p class="bg-primary text-light rounded width-fit m-auto px-2 pt-1 pb-1">
+                                        <p class="bg-primary text-light rounded w-fit m-auto px-2 pt-1 pb-1">
                                             <?= $row["time_out"] ?>
                                         </p> <?php
                                     }  else if ($row["time_out"] == $conditions[6]) { ?>
-                                        <p class="bg-warning text-dark rounded width-fit m-auto px-2 pt-1 pb-1">
+                                        <p class="bg-warning text-dark rounded w-fit m-auto px-2 pt-1 pb-1">
                                             <?= $row["time_out"] ?>
                                         </p> <?php
                                     }  else { ?>
-                                        <p class="bg-success text-light rounded width-fit m-auto px-2 pt-1 pb-1">
+                                        <p class="bg-success text-light rounded w-fit m-auto px-2 pt-1 pb-1">
                                             <?= $row["time_out"] ?>
                                         </p> <?php
                                     }
                                 } ?>
                             </td>
                             <td><?php
-                            $time_in = $row["time_in"];
-                            $time_out = $row["time_out"];
+                                $time_in = $row["time_in"];
+                                $time_out = $row["time_out"];
 
-                            $rendered_hours = 0;
-                            if(!empty($time_in) && !empty($time_out)) {
-                                if (strlen($time_in) > 8) {
-                                    $time_in = substr($time_in, 0, 8);
+                                $rendered_hours = 0;
+                                if ($time_out != "No Time out") {
+                                    if(!empty($time_in) && !empty($time_out)) {
+                                        if (strlen($time_in) > 8) {
+                                            $time_in = substr($time_in, 0, 8);
+                                        }
+                                        
+                                        if (strlen($time_out) > 8) {
+                                            $time_out = substr($time_out, 0, 8);
+                                        }
+    
+                                        $time_in = new DateTime(date('G:i', strtotime($time_in)));
+                                        $time_out = new DateTime(date('G:i', strtotime($time_out)));
+    
+                                        $rendered_hours = $time_in->diff($time_out)->format('%h');
+                                        $rendered_minutes = $time_in->diff($time_out)->format('%i');
+                                        $rendered_hours += round($rendered_minutes/60);
+    
+                                        if ($rendered_hours > 4) { $rendered_hours -= 1; }
+                                    }
                                 }
                                 
-                                if (strlen($time_out) > 8) {
-                                    $time_out = substr($time_out, 0, 8);
-                                }
-
-                                $time_in = new DateTime(date('G:i', strtotime($time_in)));
-                                $time_out = new DateTime(date('G:i', strtotime($time_out)));
-
-                                $rendered_hours = $time_in->diff($time_out)->format('%h');
-                                $rendered_minutes = $time_in->diff($time_out)->format('%i');
-                                $rendered_hours += round($rendered_minutes/60);
-
-                                if ($rendered_hours > 4) { $rendered_hours -= 1; }
-                            }
-                            
-                            echo $rendered_hours;
-                            ?></td>
+                                echo $rendered_hours; ?>
+                            </td>
                         </tr> <?php
                     }
                 } ?>
             </tbody>
-        </table>
+        </table>> <?php
+        if ($db->rowCount() == 0) { ?>
+            <div class="w-100 text-center my-5">
+                <h3>No Record</h3>
+            </div> <?php
+        } ?>
     </div>
 </div>
 <?php

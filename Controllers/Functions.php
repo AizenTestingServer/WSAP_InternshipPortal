@@ -43,4 +43,16 @@
             $date->getDateTimeValue() >= $date->morning_shift_end() && $date->getDateTimeValue() < $date->afternoon_shift_start();
     }
 
+    function isMorningShift($time_in, $time_out) {
+        $date = new Date();
+        return $time_in >= $date->time_in_start() && $time_in < $date->afternoon_shift_start() &&
+            $time_out >= $date->time_in_start() && $time_out < $date->afternoon_shift_start();
+    }
+
+    function isAfternoonShift($time_in, $time_out) {
+        $date = new Date();
+        return $time_in >= $date->morning_shift_end() && $time_in < $date->time_out_overtime_end() &&
+            $time_out >= $date->morning_shift_end() && $time_out < $date->time_out_overtime_end();
+    }
+
 ?>

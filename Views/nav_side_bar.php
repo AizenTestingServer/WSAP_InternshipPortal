@@ -127,6 +127,20 @@
                     </a>
                 </li>
                 -->
+                <li>
+                    <a <?php
+                    if ($targetActive == "roles") { ?>
+                        class="active" <?php
+                    } else { ?>
+                        class="inactive"
+                        href="roles.php" <?php
+                    } ?>>
+                        <div class="icon-container">
+                            <i class="fa-solid fa-user-gear fa-2x"></i>
+                        </div>
+                        Roles
+                    </a>
+                </li>
             </ul>
         </div> <?php
     }

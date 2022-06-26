@@ -181,7 +181,7 @@ class Database {
         $this->stmt->bindValue(':intern_id', $new_password[1]);
     }
 
-    function selectDate($date) {
+    function setAttDate($date) {
         $this->stmt->bindValue(':att_date', $date);
     }
 
@@ -199,6 +199,19 @@ class Database {
         $this->stmt->bindValue(':att_date', $interns_attendance[0]);
         $this->stmt->bindValue(':dept_name', $interns_attendance[1]);
         $this->stmt->bindValue(':intern_name', $interns_attendance[2]);
+    }
+
+    function selectInterns($interns) {
+        $this->stmt->bindValue(':intern_name', $interns);
+    }
+
+    function selectInterns2($interns) {
+        $this->stmt->bindValue(':dept_name', $interns);
+    }
+
+    function selectInterns3($interns) {
+        $this->stmt->bindValue(':dept_name', $interns[0]);
+        $this->stmt->bindValue(':intern_name', $interns[1]);
     }
 }
 

@@ -320,7 +320,7 @@
                         } ?>
                     </div> <?php
                     if ($record_count == 0) { ?>
-                        <div class="w-100 text-center">
+                        <div class="w-100 text-center my-5">
                             <h3>Empty</h3>
                         </div> <?php
                     } ?>

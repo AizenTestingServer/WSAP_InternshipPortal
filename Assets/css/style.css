@@ -682,16 +682,16 @@ a.dt-button {
     width: calc(100% - 310px);
 }
 
-.width-fit {
+.w-fit {
     width: fit-content;
 }
 
-.interns-attendance {
+.interns-attendance, .interns {
     display: grid;
     gap: 1rem;
 }
 
-.interns-attendance .attendance {
+.interns-attendance .attendance, .interns .intern {
     border-radius: 0.75rem;
     border: 0 solid #eceef3;
     box-shadow: 0 3px 3px -1px rgb(10 22 70 / 10%), 0 0 1px 0 rgb(10 22 70 / 6%);
@@ -702,7 +702,7 @@ a.dt-button {
     background: var(--white);
 }
 
-.interns-attendance .attendance .top {
+.interns-attendance .attendance .top, .interns .intern .top {
     display: flex;
     justify-content: space-between;
     align-items: center;
@@ -710,70 +710,88 @@ a.dt-button {
     height: 75%;
 }
 
-.interns-attendance .attendance .top .left {
-    line-height: 1.75em;
+.interns-attendance .attendance .bottom, .interns .intern .bottom {
+    width: 100%;
+    height: 25%;
 }
 
-.interns-attendance .attendance .top .left .subheader {
-    font-size: 12px;
-    font-weight: 600;
-    color: #6B7B93;
+.calendar {
+    display: grid;
+    grid-template-columns: repeat(5, 1fr);
+    gap: 1rem;
 }
 
-.interns-attendance .attendance .top .left .summary-total {
-    font-weight: 600 !important;
-    color: #16192C;
-    font-size: 22px;
-    letter-spacing: -2px !important;
+.calendar .calendar-item {
+    border-radius: 0.75rem;
+    border: 0 solid #eceef3;
+    box-shadow: 0 3px 3px -1px rgb(10 22 70 / 10%), 0 0 1px 0 rgb(10 22 70 / 6%);
+    word-wrap: break-word;
+    padding: 1.5rem;
+    font-family: 'Inter', sans-serif;
+    color: var(--text-2);
+    background: var(--white);
+
 }
 
-.interns-attendance .attendance .bottom {
+.calendar .calendar-item .top {
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+    width: 100%;
+    height: 75%;
+}
+
+.calendar .calendar-item .bottom {
     width: 100%;
     height: 25%;
 }
 
 @media (min-width: 576px) {
-    .interns-attendance {
+    .interns-attendance, .interns {
         grid-template-columns: repeat(1, 1fr);
+    }
+
+    .w-sm-100 {
+        width: 100%;
     }
 }
 
 @media (min-width: 768px) {
-    .interns-attendance {
+    .interns-attendance, .interns {
         grid-template-columns: repeat(2, 1fr);
     }
 
-    .width-md-100 {
+    .w-md-100 {
         width: 100%;
     }
 }
 
 @media (min-width: 992px) {
-    .interns-attendance {
+    .interns-attendance, .interns {
         grid-template-columns: repeat(3, 1fr);
     }
 
-    .width-lg-fit {
+    .w-lg-fit {
         width: fit-content;
     }
 }
 
 @media (min-width: 1400px) {
-    .interns-attendance {
+    .interns-attendance, .interns {
         grid-template-columns: repeat(4, 1fr);
     }
 }
 
 @media (max-width: 1200px) {
     .summary,
-    .brand_grid {
+    .brand_grid, .calendar {
         grid-template-columns: repeat(4, 1fr);
     }
 }
 
 @media (max-width: 1000px) {
     .summary,
-    .brand_grid {
+    .brand_grid, .calendar {
         grid-template-columns: repeat(3, 1fr);
     }
 }
@@ -799,7 +817,7 @@ a.dt-button {
     }
 
     .summary,
-    .brand_grid {
+    .brand_grid, .calendar {
         grid-template-columns: repeat(2, 1fr);
     }
 }
@@ -817,7 +835,7 @@ a.dt-button {
     }
 
     .summary,
-    .brand_grid {
+    .brand_grid, .calendar {
         grid-template-columns: repeat(1, 1fr);
     }
 }

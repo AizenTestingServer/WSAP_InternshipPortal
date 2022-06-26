@@ -20,7 +20,11 @@
     intern_personal_information.id=:intern_id AND
     intern_educational_information.id=:intern_id AND
     intern_accounts.id=:intern_id");
-    $db->setInternId($_SESSION["intern_id"]);
+    if (!empty($_GET["intern_id"])) {
+        $db->setInternId($_GET["intern_id"]);
+    } else {
+        $db->setInternId($_SESSION["intern_id"]);
+    }
     $db->execute();
     
     $value = $db->fetch();
@@ -292,12 +296,15 @@
                                 unset($_SESSION['upload_failed']);
                             ?>
                         </div> <?php
-                    } ?>
-                    <input class="form-control form-control-sm mx-auto" id="formFileSm" type="file" accept="image/*"
-                        onchange="loadFile(event)" name="image" style="max-width: 350px;">
+                    }
 
-                    <button class="btn btn-sm btn-smoke border-dark mt-2 w-100" style="max-width: 150px;"
-                    type="submit" name="uploadImage">Upload</button>
+                    if (empty($_GET["intern_id"])) { ?>
+                        <input class="form-control form-control-sm mx-auto" id="formFileSm" type="file" accept="image/*"
+                            onchange="loadFile(event)" name="image" style="max-width: 350px;">
+    
+                        <button class="btn btn-sm btn-smoke border-dark mt-2 w-100" style="max-width: 150px;"
+                        type="submit" name="uploadImage">Upload</button> <?php
+                    } ?>
                 </form>
             </div>
 
@@ -333,7 +340,10 @@
                                             echo $_SESSION["last_name"];
                                         } else {
                                             echo $value["last_name"];
-                                        } ?>" maxLength="32">
+                                        } ?>" maxLength="32" <?php
+                                        if (!empty($_GET["intern_id"])) { ?>
+                                            disabled <?php
+                                        } ?>>
                                 </div>
                                 <div class="col-lg-4 col-md-12 user_input my-1">
                                     <label class="text-indigo mb-2" for="firstName">First Name
@@ -345,7 +355,10 @@
                                             echo $_SESSION["first_name"];
                                         } else {
                                             echo $value["first_name"];
-                                        } ?>" maxLength="32">
+                                        } ?>" maxLength="32" <?php
+                                        if (!empty($_GET["intern_id"])) { ?>
+                                            disabled <?php
+                                        } ?>>
                                 </div>
                                 <div class="col-lg-4 col-md-12 user_input my-1">
                                     <label class="text-indigo mb-2" for="middleName">Middle Name</label>
@@ -355,13 +368,19 @@
                                             echo $_SESSION["middle_name"];
                                         } else {
                                             echo $value["middle_name"];
-                                        } ?>" maxLength="32">
+                                        } ?>" maxLength="32" <?php
+                                        if (!empty($_GET["intern_id"])) { ?>
+                                            disabled <?php
+                                        } ?>>
                                 </div>
                             </div>
                         </div>
 
                         <div class="col-lg-12 col-md-12 col-sm-6">
-                            <div class="row mb-4">
+                            <div class="row <?php
+                                if (empty($_GET["intern_id"])) { ?>
+                                    mb-4 <?php
+                                } ?>">
                                 <div class="col-lg-4 col-md-12 user_input my-1">
                                     <label class="mb-2" for="birthday">Birthday
                                         <span class="text-danger">*</span>
@@ -372,11 +391,17 @@
                                             echo $_SESSION["birthday"];
                                         } else {
                                             echo date("Y-m-d", strtotime($value["birthday"]));
-                                        } ?>">
+                                        } ?>" <?php
+                                        if (!empty($_GET["intern_id"])) { ?>
+                                            disabled <?php
+                                        } ?>>
                                 </div>
                                 <div class="col-lg-4 col-md-12 user_input my-1">
                                     <label class="mb-2" for="gender">Gender</label>
-                                    <select name="gender" class="form-select">
+                                    <select name="gender" class="form-select" <?php
+                                        if (!empty($_GET["intern_id"])) { ?>
+                                            disabled <?php
+                                        } ?>>
                                         <option value="0" <?php
                                             if (isset($_SESSION['gender'])) {
                                                 if ($_SESSION['gender'] == 0) { ?>
@@ -401,17 +426,18 @@
                                 </div>
                             </div>
                         </div>
-                    </div>
-
-                    <div class="bottom-right mt-4">
-                        <button class="btn btn-danger" type="submit" name="resetPersonal">Reset</button>
-                        <button class="btn btn-indigo" type="submit" name="savePersonal">Save Changes</button>
-                    </div>
+                    </div> <?php
+                    if (empty($_GET["intern_id"])) { ?>
+                        <div class="bottom-right mt-4">
+                            <button class="btn btn-danger" type="submit" name="resetPersonal">Reset</button>
+                            <button class="btn btn-indigo" type="submit" name="savePersonal">Save Changes</button>
+                        </div> <?php
+                    } ?>
                 </form>
             </div>
         </div>
 
-        <div id="wsap-info" class="row rounded shadow pb-4 position-relative">
+        <div id="wsap-info" class="row rounded shadow mt-4 pb-4 position-relative">
             <div class="rounded shadow px-0">
                 <h6 class="d-block text-light px-3 pt-2 pb-2 rounded mb-0" style="background: #0D0048;">
                     WSAP Information
@@ -449,7 +475,10 @@
                                         </div>
                                         <div class="col-lg-4 col-md-6 col-sm-6 user_input my-1">
                                             <label class="text-indigo mb-2" for="department">Department</label>
-                                            <select name="department" class="form-select"> <?php
+                                            <select name="department" class="form-select" <?php
+                                                if (!empty($_GET["intern_id"])) { ?>
+                                                    disabled <?php
+                                                } ?>> <?php
                                                 $db->query("SELECT * FROM departments ORDER BY name");
                                                 $db->execute();
 
@@ -467,7 +496,10 @@
                                         </div>
                                         <div class="col-lg-4 col-md-6 col-sm-6 user_input my-1">
                                             <label class="mb-2" for="status">Status</label>
-                                            <select name="status" class="form-select">
+                                            <select name="status" class="form-select" <?php
+                                                if (!empty($_GET["intern_id"])) { ?>
+                                                    disabled <?php
+                                                } ?>>
                                             <option value="0" <?php
                                                 if (isset($_SESSION['status'])) {
                                                     if ($_SESSION['status'] == 0) { ?>
@@ -555,7 +587,10 @@
                                                     echo $_SESSION["onboard_date"];
                                                 } else {
                                                     echo date("Y-m-d", strtotime($value["onboard_date"]));
-                                                } ?>">
+                                                } ?>" <?php
+                                                if (!empty($_GET["intern_id"])) { ?>
+                                                    disabled <?php
+                                                } ?>>
                                         </div>
                                         <div class="col-lg-3 col-md-6 col-sm-6 user_input my-1">
                                             <label class="mb-2" for="offboardDate">Estimated Offboard Date
@@ -566,7 +601,7 @@
                                             $estimated_weekends = ceil(($rendering_days/5) * 2);
                                             $rendering_days += $estimated_weekends + 1;
 
-                                            echo date('Y-m-d', strtotime($date->getDate().' + '.$rendering_days.' days')); ?>"
+                                            echo date('m/d/Y', strtotime($date->getDate().' + '.$rendering_days.' days')); ?>"
                                             disabled>
                                         </div>
                                         <div class="col-lg-3 col-md-6 col-sm-6 user_input my-1">
@@ -585,7 +620,10 @@
                         </div>
 
                         <div class="col-lg-12">
-                            <div class="row mt-2 mb-4">
+                            <div class="row mt-2 <?php
+                                if (empty($_GET["intern_id"])) { ?>
+                                    mb-4 <?php
+                                } ?>">
                                 <div class="col-lg-4 col-md-6 col-sm-6 user_input my-1">
                                     <label class="text-indigo mb-2" for="emailAddress">Email Address
                                         <span class="text-danger">*</span></label>
@@ -594,7 +632,10 @@
                                                 echo $_SESSION["email_address"];
                                             } else {
                                                 echo $value["email_address"];
-                                            } ?>" maxLength="64">
+                                            } ?>" maxLength="64" <?php
+                                            if (!empty($_GET["intern_id"])) { ?>
+                                                disabled <?php
+                                            } ?>>
                                 </div>
                                 <div class="col-lg-4 col-md-6 col-sm-6 user_input my-1">
                                     <label class="text-indigo mb-2" for="mobileNumber">Mobile Number
@@ -608,7 +649,10 @@
                                                 echo $_SESSION["mobile_number"];
                                             } else {
                                                 echo $value["mobile_number"];
-                                            } ?>" maxLength="10">
+                                            } ?>" maxLength="10" <?php
+                                            if (!empty($_GET["intern_id"])) { ?>
+                                                disabled <?php
+                                            } ?>>
                                     </div>
                                 </div>
                                 <div class="col-lg-4 col-md-6 col-sm-6 user_input my-1">
@@ -622,17 +666,22 @@
                                                 echo $_SESSION["mobile_number_2"];
                                             } else {
                                                 echo $value["mobile_number_2"];
-                                            } ?>" maxLength="10">
+                                            } ?>" maxLength="10" <?php
+                                            if (!empty($_GET["intern_id"])) { ?>
+                                                disabled <?php
+                                            } ?>>
                                     </div>
                                 </div>
                             </div>
                         </div>
-                    </div>
+                    </div> <?php
 
-                    <div class="bottom-right mt-4">
-                        <button class="btn btn-danger" type="submit" name="resetWSAP">Reset</button>
-                        <button class="btn btn-indigo" type="submit" name="saveWSAP">Save Changes</button>
-                    </div>
+                    if (empty($_GET["intern_id"])) { ?>
+                        <div class="bottom-right mt-4">
+                            <button class="btn btn-danger" type="submit" name="resetWSAP">Reset</button>
+                            <button class="btn btn-indigo" type="submit" name="saveWSAP">Save Changes</button>
+                        </div> <?php
+                    } ?>
                 </form>
             </div>
         </div>
@@ -665,7 +714,10 @@
                 <form action="<?= htmlspecialchars($_SERVER["PHP_SELF"]);?>" method="post">
                     <div class="row">
                         <div class="col-lg-12">
-                            <div class="row mb-4">
+                            <div class="row <?php
+                                if (empty($_GET["intern_id"])) { ?>
+                                    mb-4 <?php
+                                } ?>">
                                 <div class="col-lg-12">
                                     <div class="row">
                                         <div class="col-lg-6 col-md-12 user_input my-1">
@@ -676,7 +728,10 @@
                                                 echo $_SESSION["university"];
                                                 } else {
                                                     echo $value["university"];
-                                                } ?>" maxLength="64">
+                                                } ?>" maxLength="64" <?php
+                                                if (!empty($_GET["intern_id"])) { ?>
+                                                    disabled <?php
+                                                } ?>>
                                         </div>
                                         <div class="col-lg-6 col-md-12 user_input my-1">
                                             <label class="text-indigo mb-2" for="course">Course
@@ -686,7 +741,10 @@
                                                 echo $_SESSION["course"];
                                                 } else {
                                                     echo $value["course"];
-                                                } ?>" maxLength="64">
+                                                } ?>" maxLength="64" <?php
+                                                if (!empty($_GET["intern_id"])) { ?>
+                                                    disabled <?php
+                                                } ?>>
                                         </div>
                                         <div class="col-lg-4 col-md-6 col-sm-6 user_input my-1">
                                             <label class="text-indigo mb-2" for="university_abbreviation">University Abbreviation
@@ -696,7 +754,10 @@
                                                 echo $_SESSION["university_abbreviation"];
                                                 } else {
                                                     echo $value["university_abbreviation"];
-                                                } ?>" maxLength="16">
+                                                } ?>" maxLength="16" <?php
+                                                if (!empty($_GET["intern_id"])) { ?>
+                                                    disabled <?php
+                                                } ?>>
                                         </div>
                                         <div class="col-lg-4 col-md-6 col-sm-6 user_input my-1">
                                             <label class="text-indigo mb-2" for="course_abbreviation">Course Abbreviation
@@ -706,11 +767,17 @@
                                                 echo $_SESSION["course_abbreviation"];
                                                 } else {
                                                     echo $value["course_abbreviation"];
-                                                } ?>" maxLength="12">
+                                                } ?>" maxLength="12" <?php
+                                                if (!empty($_GET["intern_id"])) { ?>
+                                                    disabled <?php
+                                                } ?>>
                                         </div>
                                         <div class="col-lg-4 col-md-6 col-sm-6 user_input my-1">
                                             <label class="mb-2" for="year">Year</label>
-                                            <select name="year" class="form-select">
+                                            <select name="year" class="form-select" <?php
+                                                if (!empty($_GET["intern_id"])) { ?>
+                                                    disabled <?php
+                                                } ?>>
                                                 <option value="1" <?php
                                                 if (isset($_SESSION['year'])) {
                                                     if ($_SESSION['year'] == 1) { ?>
@@ -767,12 +834,13 @@
                                 </div>
                             </div>
                         </div>
-                    </div>
-
-                    <div class="bottom-right mt-4">
-                        <button class="btn btn-danger" type="submit" name="resetEducational">Reset</button>
-                        <button class="btn btn-indigo" type="submit" name="saveEducational">Save Changes</button>
-                    </div>
+                    </div> <?php
+                    if (empty($_GET["intern_id"])) { ?>
+                        <div class="bottom-right mt-4">
+                            <button class="btn btn-danger" type="submit" name="resetEducational">Reset</button>
+                            <button class="btn btn-indigo" type="submit" name="saveEducational">Save Changes</button>
+                        </div> <?php
+                    } ?>
                 </form>
             </div>
         </div>
@@ -805,7 +873,10 @@
                 <form action="<?= htmlspecialchars($_SERVER["PHP_SELF"]);?>" method="post">
                     <div class="row">
                         <div class="col-lg-12">
-                            <div class="row mb-4">
+                            <div class="row <?php
+                                if (empty($_GET["intern_id"])) { ?>
+                                    mb-4 <?php
+                                } ?>">
                                 <div class="col-lg-12">
                                     <div class="row">
                                         <div class="col-lg-3 col-md-6 col-sm-6 user_input my-1">
@@ -813,33 +884,35 @@
                                                 <span class="text-danger">*</span></label>
                                             <input type="date" name="date_created" class="form-control"
                                                 value="<?= $value["date_created"]; ?>" disabled>
-                                        </div>
-                                        <div class="col-lg-3 col-md-6 col-sm-6 user_input my-1">
-                                            <label class="text-indigo mb-2" for="new_password">New Password
-                                                <span class="text-danger">*</span></label>
-                                            <input type="password" name="new_password" class="form-control" maxLength="16">
-                                        </div>
-                                        <div class="col-lg-3 col-md-6 col-sm-6 user_input my-1">
-                                            <label class="text-indigo mb-2" for="confirm_password">Confirm Password
-                                                <span class="text-danger">*</span></label>
-                                            <input type="password" name="confirm_password" class="form-control" maxLength="16">
-                                        </div>
-                                        <div class="col-lg-3 col-md-6 col-sm-6 user_input my-1">
-                                            <label class="text-indigo mb-2" for="current_password">Current Password
-                                                <span class="text-danger">*</span></label>
-                                            <input type="password" name="current_password" class="form-control" maxLength="16">
-                                        </div>
+                                        </div> <?php
+                                        if (empty($_GET["intern_id"])) { ?>
+                                            <div class="col-lg-3 col-md-6 col-sm-6 user_input my-1">
+                                                <label class="text-indigo mb-2" for="new_password">New Password
+                                                    <span class="text-danger">*</span></label>
+                                                <input type="password" name="new_password" class="form-control" maxLength="16">
+                                            </div>
+                                            <div class="col-lg-3 col-md-6 col-sm-6 user_input my-1">
+                                                <label class="text-indigo mb-2" for="confirm_password">Confirm Password
+                                                    <span class="text-danger">*</span></label>
+                                                <input type="password" name="confirm_password" class="form-control" maxLength="16">
+                                            </div>
+                                            <div class="col-lg-3 col-md-6 col-sm-6 user_input my-1">
+                                                <label class="text-indigo mb-2" for="current_password">Current Password
+                                                    <span class="text-danger">*</span></label>
+                                                <input type="password" name="current_password" class="form-control" maxLength="16">
+                                            </div> <?php
+                                        } ?>
                                     </div>
                                 </div>
                             </div>
                         </div>
-                    </div>
-
-
-                    <div class="bottom-right mt-4">
-                        <button class="btn btn-danger" type="reset">Clear</button>
-                        <button class="btn btn-indigo" type="submit" name="saveAccount">Submit</button>
-                    </div>
+                    </div> <?php
+                    if (empty($_GET["intern_id"])) { ?>
+                        <div class="bottom-right mt-4">
+                            <button class="btn btn-danger" type="reset">Clear</button>
+                            <button class="btn btn-indigo" type="submit" name="saveAccount">Submit</button>
+                        </div> <?php
+                    } ?>
                 </form>
             </div>
         </div>

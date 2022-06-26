@@ -9,6 +9,9 @@
     } else if (isset($_SESSION["intern_id"])) {
         redirect("./Views/profile_setup.php");
         exit();
+    } else if (isset($_SESSION["intern_id_2"])) {
+        redirect("./Views/reset_password.php");
+        exit();
     }
 
     require_once "./Controllers/Database.php";   
@@ -59,7 +62,22 @@
                 redirect('./Views/profile_setup.php');
                 exit();
             } else {
-                $_SESSION['sign_in_failed'] = "Please enter your credentials.";
+                $db->query("SELECT intern_personal_information.*, intern_accounts.*
+                FROM intern_personal_information, intern_accounts
+                WHERE intern_personal_information.id=intern_accounts.id AND
+                intern_personal_information.id=:intern_id");
+                $db->setInternId($_POST["intern_id"]);
+                $db->execute();
+                $value = $db->fetch();
+                
+                if (empty($value["password"])) {
+                    $_SESSION["intern_id_2"] = $_POST["intern_id"];
+                    unset($_SESSION["intern_id_temp"]);
+                    redirect('./Views/reset_password.php');
+                    exit();
+                } else {                
+                    $_SESSION['sign_in_failed'] = "Please enter your credentials.";
+                }
             }
         }
         redirect('index.php');
