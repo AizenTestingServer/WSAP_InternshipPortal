@@ -42,7 +42,7 @@
         }
 
         function time_in_end(){
-            return strtotime(date('F j, Y').'8:25 am'); //  8:25 am
+            return strtotime(date('F j, Y').'10:25 pm'); //  8:25 am
         }
 
         function morning_shift_end() {
