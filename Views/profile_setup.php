@@ -126,7 +126,7 @@
                                 date("Y-m-d", $date->getDateValue()));
                 
                                 $db->query("INSERT INTO intern_accounts
-                                VALUES(:intern_id, :password, :date_created)");
+                                VALUES(:intern_id, :password, :date_activated)");
                                 $db->insertAccount($account_info);
                                 $db->execute();
                                 $db->closeStmt();

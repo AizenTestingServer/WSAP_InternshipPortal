@@ -398,7 +398,13 @@
                     $conditions = array("AU", "AE", "MS", "AS", "OD", "Late", "No Time out");
 
                     while ($row = $db->fetch()) { ?>
-                        <a class="clickable-card" href="profile.php" draggable="false">
+                        <a class="clickable-card <?php
+                            if ($admin_roles_count == 0) { 
+                                echo "no-link-card";
+                            } ?>" <?php
+                            if ($admin_roles_count != 0) { ?>
+                                href="attendance_record.php?intern_id=<?= $row["intern_id"] ?>" <?php
+                            } ?> draggable="false">
                             <div class="attendance text-center">
                                 <div class="top">
                                     <img class="img-intern mx-auto" src="<?php {
@@ -414,51 +420,51 @@
                                     } ?>">
                                 </div>
                                 <div class="summary-total mt-2 w-fit mx-auto">
-                                    <h5 class="mb-0 text-dark">
+                                    <h5 class="mb-0 text-dark fs-regular">
                                         <?= $row["last_name"].", ".$row["first_name"] ?>
                                     </h5>
-                                    <h6><?= $row["name"] ?></h6>
+                                    <h6 class="fs-f"><?= $row["name"] ?></h6>
                                 </div>
                                 <div class="bottom d-flex justify-content-evenly mt-3">
                                     <div class="w-100">
-                                        <p class="m-0 fw-bold">Time in</p> <?php
+                                        <p class="m-0 fw-bold fs-e">Time in</p> <?php
                                         if (strlen($row["time_in"]) > 0) {
                                             if ($row["time_in"] == $conditions[0]) { ?>
-                                                <p class="bg-danger text-light rounded w-fit m-auto px-2 pt-1 pb-1">
+                                                <p class="bg-danger text-light rounded w-fit m-auto px-2 pt-1 pb-1 fs-d">
                                                     <?= $row["time_in"] ?>
                                                 </p> <?php
                                             }  else if ($row["time_in"] == $conditions[1]) { ?>
-                                                <p class="bg-primary text-light rounded w-fit m-auto px-2 pt-1 pb-1">
+                                                <p class="bg-primary text-light rounded w-fit m-auto px-2 pt-1 pb-1 fs-d">
                                                     <?= $row["time_in"] ?>
                                                 </p> <?php
                                             }  else if (str_contains($row["time_in"], $conditions[5])) { ?>
-                                                <p class="bg-warning text-dark rounded w-fit m-auto px-2 pt-1 pb-1">
+                                                <p class="bg-warning text-dark rounded w-fit m-auto px-2 pt-1 pb-1 fs-d">
                                                     <?= $row["time_in"] ?>
                                                 </p> <?php
                                             } else { ?>
-                                                <p class="bg-success text-light rounded w-fit m-auto px-2 pt-1 pb-1">
+                                                <p class="bg-success text-light rounded w-fit m-auto px-2 pt-1 pb-1 fs-d">
                                                     <?= $row["time_in"] ?>
                                                 </p> <?php
                                             }
                                         } ?>
                                     </div>
                                     <div class="w-100">
-                                        <p class="m-0 fw-bold">Time out</p> <?php 
+                                        <p class="m-0 fw-bold fs-e">Time out</p> <?php 
                                         if (strlen($row["time_out"]) > 0) {
                                             if ($row["time_out"] == $conditions[0]) { ?>
-                                                <p class="bg-danger text-light rounded w-fit m-auto px-2 pt-1 pb-1">
+                                                <p class="bg-danger text-light rounded w-fit m-auto px-2 pt-1 pb-1 fs-d">
                                                     <?= $row["time_out"] ?>
                                                 </p> <?php
                                             }  else if ($row["time_out"] == $conditions[1]) { ?>
-                                                <p class="bg-primary text-light rounded w-fit m-auto px-2 pt-1 pb-1">
+                                                <p class="bg-primary text-light rounded w-fit m-auto px-2 pt-1 pb-1 fs-d">
                                                     <?= $row["time_out"] ?>
                                                 </p> <?php
                                             }  else if ($row["time_out"] == $conditions[6]) { ?>
-                                                <p class="bg-warning text-dark rounded w-fit m-auto px-2 pt-1 pb-1">
+                                                <p class="bg-warning text-dark rounded w-fit m-auto px-2 pt-1 pb-1 fs-d">
                                                     <?= $row["time_out"] ?>
                                                 </p> <?php
                                             }  else { ?>
-                                                <p class="bg-success text-light rounded w-fit m-auto px-2 pt-1 pb-1">
+                                                <p class="bg-success text-light rounded w-fit m-auto px-2 pt-1 pb-1 fs-d">
                                                     <?= $row["time_out"] ?>
                                                 </p> <?php
                                             }

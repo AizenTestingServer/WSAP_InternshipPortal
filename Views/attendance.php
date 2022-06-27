@@ -229,7 +229,6 @@
 
                     <div class="modal-footer">
                         <form action="<?= htmlspecialchars($_SERVER["PHP_SELF"]);?>" method="post">
-                            <button class="btn btn-secondary" data-bs-dismiss="modal">Close</button>
                             <button type="submit" name="timeIn" class="btn btn-success">Time in</button>
                         </form>
                     </div>
@@ -258,7 +257,6 @@
 
                     <div class="modal-footer">
                         <form action="<?= htmlspecialchars($_SERVER["PHP_SELF"]); ?>" method="post">
-                            <button class="btn btn-secondary" data-bs-dismiss="modal">Close</button>
                             <button type="submit" name="timeOut" class="btn btn-danger">Time out</button>
                         </form>
                     </div>
@@ -302,11 +300,23 @@
                                         <p class="bg-primary text-light rounded w-fit m-auto px-2 pt-1 pb-1">
                                             <?= $row["time_in"] ?>
                                         </p> <?php
+                                    }  else if (str_contains($row["time_in"], $conditions[2])) { ?>
+                                        <p class="bg-secondary text-light rounded w-fit m-auto px-2 pt-1 pb-1">
+                                            <?= $row["time_in"] ?>
+                                        </p> <?php
+                                    }  else if (str_contains($row["time_in"], $conditions[3])) { ?>
+                                        <p class="bg-info text-dark rounded w-fit m-auto px-2 pt-1 pb-1">
+                                            <?= $row["time_in"] ?>
+                                        </p> <?php
+                                    }  else if (str_contains($row["time_in"], $conditions[4])) { ?>
+                                        <p class="bg-dark text-light rounded w-fit m-auto px-2 pt-1 pb-1">
+                                            <?= $row["time_in"] ?>
+                                        </p> <?php
                                     }  else if (str_contains($row["time_in"], $conditions[5])) { ?>
                                         <p class="bg-warning text-dark rounded w-fit m-auto px-2 pt-1 pb-1">
                                             <?= $row["time_in"] ?>
                                         </p> <?php
-                                    } else { ?>
+                                    }  else { ?>
                                         <p class="bg-success text-light rounded w-fit m-auto px-2 pt-1 pb-1">
                                             <?= $row["time_in"] ?>
                                         </p> <?php
@@ -323,6 +333,18 @@
                                         <p class="bg-primary text-light rounded w-fit m-auto px-2 pt-1 pb-1">
                                             <?= $row["time_out"] ?>
                                         </p> <?php
+                                    }  else if (str_contains($row["time_out"], $conditions[2])) { ?>
+                                        <p class="bg-secondary text-light rounded w-fit m-auto px-2 pt-1 pb-1">
+                                            <?= $row["time_out"] ?>
+                                        </p> <?php
+                                    }  else if (str_contains($row["time_out"], $conditions[3])) { ?>
+                                        <p class="bg-info text-dark rounded w-fit m-auto px-2 pt-1 pb-1">
+                                            <?= $row["time_out"] ?>
+                                        </p> <?php
+                                    }  else if (str_contains($row["time_out"], $conditions[4])) { ?>
+                                        <p class="bg-dark text-light rounded w-fit m-auto px-2 pt-1 pb-1">
+                                            <?= $row["time_out"] ?>
+                                        </p> <?php
                                     }  else if ($row["time_out"] == $conditions[6]) { ?>
                                         <p class="bg-warning text-dark rounded w-fit m-auto px-2 pt-1 pb-1">
                                             <?= $row["time_out"] ?>
@@ -334,7 +356,7 @@
                                     }
                                 } ?>
                             </td>
-                            <td><?php
+                            <td> <?php
                                 $time_in = $row["time_in"];
                                 $time_out = $row["time_out"];
 
@@ -366,7 +388,7 @@
                     }
                 } ?>
             </tbody>
-        </table>> <?php
+        </table> <?php
         if ($db->rowCount() == 0) { ?>
             <div class="w-100 text-center my-5">
                 <h3>No Record</h3>

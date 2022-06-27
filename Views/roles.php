@@ -235,6 +235,94 @@
                                 </div>
                             </div> <?php
                             if ($admin_roles_count != 0) { ?>
+
+                                <div class="modal fade" id="addRoleModal" tabindex="-1"
+                                    aria-labelledby="addRoleModalLabel" aria-hidden="true">
+                                    <div class="modal-dialog modal-dialog-centered">
+                                        <div class="modal-content">
+                                            <div class="modal-header">
+                                                <h5 class="modal-title" id="addRoleModalLabel">Add Role</h5>
+                                                <button type="button" class="btn-close" data-bs-dismiss="modal"
+                                                    aria-label="Close"></button>
+                                            </div>
+
+                                            <form action="<?= htmlspecialchars($_SERVER[" PHP_SELF"]);?>" method="post">
+                                                <div class="modal-body">
+                                                    <div class="row">
+                                                        <div class="col-12 user_input my-1">
+                                                            <label class="mb-2" for="Name">Name
+                                                                <span class="text-danger">*</span>
+                                                            </label>
+                                                            <input type="text" name="Name" class="form-control"
+                                                                maxLength="32">
+                                                        </div>
+                                                        <div class="col-12 user_input my-1">
+                                                            <label class="text-indigo mb-2" for="brand">Brand</label>
+                                                            <select name="brand" class="form-select" <?php
+                                                                if (!empty($_GET["intern_id"])) { ?>
+                                                                    disabled <?php
+                                                                } ?>> <?php
+                                                                $db->query("SELECT * FROM brands ORDER BY name");
+                                                                $db->execute();
+
+                                                                $count = 0;
+                                                                while ($row = $db->fetch()) { ?>
+                                                                    <option <?php
+                                                                        if ($count == 0) { ?>
+                                                                            selected <?php
+                                                                        } ?>
+                                                                        value="<?= $row["id"] ?>"><?= $row["name"] ?>
+                                                                    </option> <?php 
+                                                                    $count++;
+                                                                } ?>
+                                                            </select>
+                                                        </div>
+                                                        <div class="col-12 user_input my-1">
+                                                            <label class="text-indigo mb-2" for="department">Department</label>
+                                                            <select name="department" class="form-select" <?php
+                                                                if (!empty($_GET["intern_id"])) { ?>
+                                                                    disabled <?php
+                                                                } ?>> <?php
+                                                                $db->query("SELECT * FROM departments ORDER BY name");
+                                                                $db->execute();
+
+                                                                $count = 0;
+                                                                while ($row = $db->fetch()) { ?>
+                                                                    <option <?php
+                                                                        if ($count == 0) { ?>
+                                                                            selected <?php
+                                                                        } ?>
+                                                                        value="<?= $row["id"] ?>"><?= $row["name"] ?>
+                                                                    </option> <?php 
+                                                                    $count++;
+                                                                } ?>
+                                                            </select>
+                                                        </div>
+                                                        <div class="col-12">
+                                                            <div class="row">
+                                                                <div class="col-6 user_input my-1">
+                                                                    <label class="text-indigo mb-2" for="Admin">Admin
+                                                                    </label>
+                                                                </div>
+                                                                <div class="col-6 user_input my-1">
+                                                                    <label class="text-indigo mb-2" for="Level">Level
+                                                                    </label>
+                                                                    <input type="number" name="Level" class="form-control"
+                                                                        maxLength="11">
+                                                                </div>
+                                                            </div>
+                                                        </div>
+                                                    </div>
+                                                </div>
+
+                                                <div class="modal-footer">
+                                                    <button type="submit" name="btnAddIntern" class="btn btn-success">Submit</button>
+                                                </div>
+                                            </form>
+                                        </div>
+                                    </div>
+                                </div>
+
                                 <div class="w-fit my-2 ms-auto">
                                     <button type="button" class="btn btn-primary" data-bs-toggle="modal" 
                                         data-bs-target="#addRoleModal">Add Role</button>

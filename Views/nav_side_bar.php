@@ -25,18 +25,19 @@
                     if ($targetActive == "brands") { ?>
                         class="active" <?php
                     } else { ?>
-                        class="inactive" <?php
+                        class="inactive"
+                        href="brands.php" <?php
                     } ?>>
                         <div class="icon-container">
                             <i class="fa-solid fa-bullhorn fa-2x"></i>
-                        </div> Brand
+                        </div> Brands
                     </a>
                     <ul class="dropdown-list">
                         <!--
                         <li><a href="#">Organizational Chart</a></li>
-                    <li><a href="#">Promotions</a></li>
-                        -->
+                        <li><a href="#">Promotions</a></li>
                         <li><a href="brands.php">Websites</a></li>
+                        -->
                     </ul>
                 </li>
                 <!--
@@ -119,6 +120,7 @@
                     <ul class="dropdown-list">
                         <li><a href="profile.php">My Profile</a></li>
                         <li><a href="interns.php">Interns</a></li>
+                        <li><a href="admins.php">Admins</a></li>
                     </ul>
                 </li>
                 <!--

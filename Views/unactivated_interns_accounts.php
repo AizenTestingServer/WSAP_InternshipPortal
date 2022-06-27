@@ -49,22 +49,22 @@
     if (isset($_POST["search"])) {
         if (!empty($_POST["search_intern"])) {
             if (!empty($_GET["sort"])) {
-                redirect("interns_unactivated_accounts.php?search=".$_POST["search_intern"]."&sort=".$_GET["sort"]);
+                redirect("unactivated_interns_accounts.php?search=".$_POST["search_intern"]."&sort=".$_GET["sort"]);
             } else {
-                redirect("interns_unactivated_accounts.php?search=".$_POST["search_intern"]);
+                redirect("unactivated_interns_accounts.php?search=".$_POST["search_intern"]);
             }
         } else {
             if (!empty($_GET["sort"])) {
-                redirect("interns_unactivated_accounts.php?sort=".$_GET["sort"]);
+                redirect("unactivated_interns_accounts.php?sort=".$_GET["sort"]);
             } else {
-                redirect("interns_unactivated_accounts.php");
+                redirect("unactivated_interns_accounts.php");
             }
         }
         exit();
     }
 
     if (isset($_POST["reset"])) {
-        redirect("interns_unactivated_accounts.php");
+        redirect("unactivated_interns_accounts.php");
         exit();
     }
 
@@ -144,10 +144,7 @@
                             </div>
 
                             <div class="modal-footer">
-                                <form action="<?= htmlspecialchars($_SERVER["PHP_SELF"]);?>" method="post">
-                                    <button class="btn btn-secondary" data-bs-dismiss="modal">Close</button>
-                                    <button type="submit" name="btnAddIntern" class="btn btn-success">Submit</button>
-                                </form>
+                                <button type="submit" name="btnAddIntern" class="btn btn-success">Submit</button>
                             </div>
                         </form>
                     </div>
@@ -197,21 +194,21 @@
                                         <ul class="dropdown-menu me-2z" aria-labelledby="dropdownMenuButton1" name="sort">
                                             <li><a class="dropdown-item btn-smoke" <?php
                                                 if (!empty($_GET["search"])) { ?>
-                                                    href="interns_unactivated_accounts.php?search=<?= $_GET["search"] ?>" <?php
+                                                    href="unactivated_interns_accounts.php?search=<?= $_GET["search"] ?>" <?php
                                                 } else { ?>
-                                                    href="interns_unactivated_accounts.php" <?php
+                                                    href="unactivated_interns_accounts.php" <?php
                                                 } ?>>Default</a></li>
                                             <li><a class="dropdown-item btn-smoke" <?php
                                                 if (!empty($_GET["search"])) { ?>
-                                                    href="interns_unactivated_accounts.php?search=<?= $_GET["search"] ?>&sort=1" <?php
+                                                    href="unactivated_interns_accounts.php?search=<?= $_GET["search"] ?>&sort=1" <?php
                                                 } else { ?>
-                                                    href="interns_unactivated_accounts.php?sort=1" <?php
+                                                    href="unactivated_interns_accounts.php?sort=1" <?php
                                                 } ?>>A-Z</a></li>
                                             <li><a class="dropdown-item btn-smoke" <?php
                                                 if (!empty($_GET["search"])) { ?>
-                                                    href="interns_unactivated_accounts.php?search=<?= $_GET["search"] ?>&sort=2" <?php
+                                                    href="unactivated_interns_accounts.php?search=<?= $_GET["search"] ?>&sort=2" <?php
                                                 } else { ?>
-                                                    href="interns_unactivated_accounts.php?sort=2" <?php
+                                                    href="unactivated_interns_accounts.php?sort=2" <?php
                                                 } ?>>Z-A</a></li>
                                         </ul>
                                     </div>
@@ -296,7 +293,7 @@
                     <a class="btn btn-secondary" href="dashboard.php">Return to Dashboard</a>
                 </div> 
             </div> <?php
-        } ?>        
+        } ?>
     </div>
 </div>
 <?php

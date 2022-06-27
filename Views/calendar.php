@@ -48,20 +48,21 @@
         </div>
 
         <div class="calendar"> <?php
-            $db->query("SELECT DISTINCT att_date FROM attendance");
-            $db->execute();
+            $records_db = new Database();
+            $records_db->query("SELECT DISTINCT att_date FROM attendance ORDER BY id DESC");
+            $records_db->execute();
 
-            while ($row = $db->fetch()) { ?>
-                <a class="clickable-card"
-                href="interns_attendance.php?date=<?= $row["att_date"] ?>"
+            while ($row = $records_db->fetch()) { ?>
+                <a class="clickable-card" href="interns_attendance.php?date=<?= $row["att_date"] ?>"
                 draggable="false">
-                    <div class="calendar-item text-center ">
-                        <div class="calendar-date mt-2 p-2">
-                            <h6><?= date('Y', strtotime($row["att_date"])) ?></h6>
-                            <h1><?= date('d', strtotime($row["att_date"])) ?></h1>
-                            <h6><?= date('F', strtotime($row["att_date"])) ?></h6>
+                    <div class="calendar-item text-center">
+                        <div class="calendar-date mt-2">
+                            <h6 class="text-dark fw-bold"><?= date('Y', strtotime($row["att_date"])) ?></h6>
+                            <h1 class="text-dark"><?= date('d', strtotime($row["att_date"])) ?></h1>
+                            <h6 class="fw-bold mb-0"><?= date('F', strtotime($row["att_date"])) ?></h6>
+                            <h6><?= date("D", strtotime($row["att_date"])); ?></h6>
                         </div>
-                        <div class="bottom d-flex justify-content-evenly border py-2"> <?php
+                        <div class="bottom d-flex justify-content-evenly border py-1"> <?php
                             $db->query("SELECT COUNT(*) as present FROM attendance WHERE att_date=:att_date");
                             $db->setAttDate($row["att_date"]);
                             $db->execute();
@@ -74,41 +75,52 @@
                             $morning_shift_count = 0;
                             $afternoon_shift_count = 0;
                             while($row = $db->fetch()) {
-                                if (isMorningShift(strtotime($row["time_in"]), strtotime($row["time_out"]))) {
+                                $time_in = $row["time_in"];
+                                $time_out = $row["time_out"];
+
+                                if (strlen($time_in) > 8) {
+                                    $time_in = substr($time_in, 0, 8);
+                                }
+                                
+                                if (strlen($time_out) > 8) {
+                                    $time_out = substr($time_out, 0, 8);
+                                }
+
+                                if (isMorningShift(strtotime($time_in), strtotime($time_out))) {
                                     $morning_shift_count++;
-                                } else if (isAfternoonShift(strtotime($row["time_in"]), strtotime($row["time_out"]))) {
+                                } else if (isAfternoonShift(strtotime($time_in), strtotime($time_out))) {
                                     $afternoon_shift_count++;
                                 }
                             } ?>
                             <div>
-                                <h8>MS</h8>
-                                <p class="bg-secondary text-light rounded w-fit m-auto px-2 pt-1 pb-1 mt-1">
+                                <p class="fs-e mb-1">MS</p>
+                                <p class="bg-secondary text-light rounded w-fit m-auto px-2 pt-1 pb-1">
                                     <?= $morning_shift_count ?>
                                 </p>
                             </div>
                             <div>
-                                <h8>FT</h8>
-                                <p class="bg-info text-dark rounded w-fit m-auto px-2 pt-1 pb-1 mt-1">
+                                <p class="fs-e mb-1">FT</p>
+                                <p class="bg-info text-dark rounded w-fit m-auto px-2 pt-1 pb-1">
                                     <?= $value["present"] - $morning_shift_count - $afternoon_shift_count ?>
                                 </p>
                             </div>
                             <div>
-                                <h8>AS</h8>
-                                <p class="bg-secondary text-light rounded w-fit m-auto px-2 pt-1 pb-1 mt-1">
+                                <p class="fs-e mb-1">AS</p>
+                                <p class="bg-secondary text-light rounded w-fit m-auto px-2 pt-1 pb-1">
                                     <?= $afternoon_shift_count ?>
                                 </p>
                             </div>
                         </div>
-                        <div class="bottom d-flex justify-content-evenly border py-2">
+                        <div class="bottom d-flex justify-content-evenly border border-top-0 py-1">
                             <div>
-                                <h8>Present</h8>
-                                <p class="bg-success text-light rounded w-fit m-auto px-2 pt-1 pb-1 mt-1">
+                                <p class="fs-e mb-1">Present</p>
+                                <p class="bg-success text-light rounded w-fit m-auto px-2 pt-1 pb-1">
                                     <?= $value["present"] ?>
                                 </p>
                             </div>
                             <div>
-                                <h8>Absent</h8>
-                                <p class="bg-danger text-light rounded w-fit m-auto px-2 pt-1 pb-1 mt-1">
+                                <p class="fs-e mb-1">Absent</p>
+                                <p class="bg-danger text-light rounded w-fit m-auto px-2 pt-1 pb-1">
                                     <?= $active_interns - $value["present"] ?>
                                 </p>
                             </div>
