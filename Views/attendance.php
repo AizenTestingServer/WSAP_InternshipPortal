@@ -23,33 +23,20 @@
         if ($date->getDate() != $lts_att["att_date"]) {
             if (empty($lts_att["time_out"])) {
                 $attendance = array(
-                    "No Time out",
-                    $_SESSION["intern_id"],
+                    "NTO",
                     $lts_att["id"]
                 );
 
-                $db->query("UPDATE attendance SET time_out=:time_out 
-                WHERE intern_id=:intern_id && id=:id");
+                $db->query("UPDATE attendance SET time_out=:time_out WHERE id=:id");
                 $db->timeOut($attendance);
                 $db->execute();
                 $db->closeStmt();
             }
         }
 
-        $time_in_enabled = false;
         $time_out_enabled = false;
         if ($db->rowCount() != 0 && $date->getDateValue() == strtotime($lts_att["att_date"])) {
-            if (!empty($lts_att["time_out"]) || atMorningShift() || atAfternoonShift() ||
-            atOvertime() || atEndOfDay() || atAfternoonTimeIn($lts_att["time_in"])) {
-                $time_out_enabled = false;
-            } else {
-                $time_out_enabled = true;
-            }
-        } else {
-            if (($date->getDateTimeValue() >= $date->time_in_start() &&  $date->getDateTimeValue() < $date->time_in_end()) ||
-            ($date->getDateTimeValue() >= $date->morning_shift_end() && $date->getDateTimeValue() < $date->afternoon_shift_start())) {
-                $time_in_enabled = true;
-            }
+            $time_out_enabled = isTimeOutEnabled($lts_att["time_in"], $lts_att["time_out"]);
         }
 
         if (isset($_POST["timeIn"])) { 
@@ -58,7 +45,7 @@
                 $attendance = array(
                     strtoupper($_SESSION["intern_id"]),
                     $date->getDate(),
-                    $date->getTime()." Late",
+                    $date->getTime()." L",
                     null,
                 );
             } else {
@@ -88,30 +75,27 @@
     
         if (isset($_POST["timeOut"])) {
             if (!empty($lts_att["time_in"]) && empty($lts_att["time_out"])) {
-                if ($date->getDateTimeValue() >= $date->time_out_overtime_start()) {
-                    $attendance = array(
-                        $date->getTime()." Overtime",
-                        $_SESSION["intern_id"],
-                        $lts_att["id"]
-                    );
-                } else {
-                    $attendance = array(
-                        $date->getTime(),
-                        $_SESSION["intern_id"],
-                        $lts_att["id"]
-                    );
+                $time_out = $date->getTime();
+               
+                if (isMorningShift($lts_att["time_in"], $date->getTime())) {
+                    $time_out =  $time_out." MS";
                 }
-    
-                $db->query("UPDATE attendance SET time_out=:time_out 
-                WHERE intern_id=:intern_id && id=:id");
+                if (isAfternoonShift($lts_att["time_in"], $date->getTime())) {
+                    $time_out =  $time_out." AS";
+                }
+                if (isOvertime($date->getTime())) {
+                    $time_out =  $time_out." OT";
+                }
+                
+                $attendance = array(
+                    $time_out,
+                    $lts_att["id"]
+                );
+
+                $db->query("UPDATE attendance SET time_out=:time_out WHERE id=:id");
                 $db->timeOut($attendance);
                 $db->execute();
                 $db->closeStmt();
-
-                $db->query("SELECT * FROM intern_wsap_information WHERE id=:intern_id;");
-                $db->setInternId($_SESSION["intern_id"]);
-                $db->execute();
-                $lts_att = $db->fetch();
                 
                 $time_in = $lts_att["time_in"];
                 $time_out = $date->getTime();
@@ -119,16 +103,27 @@
                 if (strlen($time_out) > 8) {
                     $time_out = substr($time_out, 0, 8);
                 }
+                                    
+                if (isMorningShift($time_in, $time_out) || isAfternoonShift($time_in, $time_out)) {
+                    $rendered_hours = 4;
+                } else {
+                    $rendered_hours = 8;
+                }
 
-                $time_in = new DateTime(date('G:i', strtotime($time_in)));
-                $time_out = new DateTime(date('G:i', strtotime($time_out)));
+                if (isOvertime($time_out)) {
+                    $dt_time_out_start = new DateTime(date('G:i', $date->time_out_start()));
+                    $dt_time_out = new DateTime(date('G:i', strtotime($time_out)));
+                    $rendered_hours += $dt_time_out_start->diff($dt_time_out)->format('%h');
+                    $rendered_minutes = $dt_time_out_start->diff($dt_time_out)->format('%i');
+                    $rendered_hours += round($rendered_minutes/60, 1);
+                }
 
-                $rendered_hours = $time_in->diff($time_out)->format('%h');
-                $rendered_minutes = $time_in->diff($time_out)->format('%i');
-                $rendered_hours += round($rendered_minutes/60);
-
-                if ($rendered_hours > 4) { $rendered_hours -= 1; }
-                $rendered_hours += $lts_att["rendered_hours"];
+                $db->query("SELECT * FROM intern_wsap_information WHERE id=:intern_id;");
+                $db->setInternId($_SESSION["intern_id"]);
+                $db->execute();
+                $wsap_info = $db->fetch();
+                
+                $rendered_hours += $wsap_info["rendered_hours"];
 
                 $computed_rendered_hours = array(
                     $rendered_hours,
@@ -167,24 +162,28 @@
                 <div class="col-md-12 p-4">
                     <h5 class="fs-intern fw-bold">Attendance Legend</h5>
                     <ul class="attendance_legend">
+                        <li class="bg-morning text-light">MS - Morning Shift</li>
+                        <li class="bg-afternoon text-light">AS - Afteroon Shift</li>
+                        <li class="bg-indigo text-light">OT - Overtime</li>
+                        <li class="bg-warning">L - Late | NTO - No Time out</li>
                         <li class="bg-danger text-light">AU - Absent Unexcused</li>
                         <li class="bg-primary text-light">AE - Absent Excused</li>
-                        <!--
-                        <li class="bg-info">MS - Morning Shift</li>
-                        <li class="bg-secondary text-light">AS - Afternoon Shift</li>
-                        <li class="bg-dark text-light">OD - Off-Duty</li>
-                        -->
                     </ul>
                 </div>
             </div>
         </div>
 
-        <h3>My Attendance</h3>
+        <div class="row align-items-center mb-2">
+            <div class="col-md-12">
+                <h3>My Attendance</h3>
+            </div>
+        </div>
+
         <div class="col-md-12">
             <div id="time-in-time-out-layout" class="d-flex">
                 <?php
                     if (isset($_SESSION["intern_id"])) {
-                        if ($time_in_enabled) {
+                        if (isTimeInEnabled()) {
                             $date->time_in_enabled();
                         } else {
                             $date->time_in_disabled();
@@ -278,18 +277,18 @@
             <tbody>
                 <?php
                 if (isset($_SESSION["intern_id"])) {
-                    $db->query("SELECT * FROM attendance WHERE intern_id=:intern_id ORDER BY id DESC;");
+                    $db->query("SELECT * FROM attendance WHERE intern_id=:intern_id ORDER BY id DESC");
                     $db->setInternId($_SESSION["intern_id"]);
                     $db->execute();
 
                     $count = 0;
-                    $conditions = array("AU", "AE", "MS", "AS", "OD", "Late", "No Time out");
+                    $conditions = array("AU", "AE", "MS", "AS", "OT", "OD", "L", "NTO");
                     while ($row = $db->fetch()) {
                         $count++;  ?>
                         <tr>
                             <th scope="row"><?= $count ?></th>
                             <td><?= $row["att_date"] ?></td>
-                            <td><?= date("l", strtotime($row["att_date"])); ?></td>
+                            <td><?= date("l", strtotime($row["att_date"])) ?></td>
                             <td> <?php
                                 if (strlen($row["time_in"]) > 0) {
                                     if ($row["time_in"] == $conditions[0]) { ?>
@@ -300,19 +299,19 @@
                                         <p class="bg-primary text-light rounded w-fit m-auto px-2 pt-1 pb-1">
                                             <?= $row["time_in"] ?>
                                         </p> <?php
-                                    }  else if (str_contains($row["time_in"], $conditions[2])) { ?>
-                                        <p class="bg-secondary text-light rounded w-fit m-auto px-2 pt-1 pb-1">
+                                    }  else if (strlen($row["time_out"]) > 0 && str_contains($row["time_out"], $conditions[2])) { ?>
+                                        <p class="bg-morning text-light rounded w-fit m-auto px-2 pt-1 pb-1">
                                             <?= $row["time_in"] ?>
                                         </p> <?php
-                                    }  else if (str_contains($row["time_in"], $conditions[3])) { ?>
-                                        <p class="bg-info text-dark rounded w-fit m-auto px-2 pt-1 pb-1">
+                                    }  else if (strlen($row["time_out"]) > 0 && str_contains($row["time_out"], $conditions[3])) { ?>
+                                        <p class="bg-afternoon text-light rounded w-fit m-auto px-2 pt-1 pb-1">
                                             <?= $row["time_in"] ?>
                                         </p> <?php
                                     }  else if (str_contains($row["time_in"], $conditions[4])) { ?>
                                         <p class="bg-dark text-light rounded w-fit m-auto px-2 pt-1 pb-1">
                                             <?= $row["time_in"] ?>
                                         </p> <?php
-                                    }  else if (str_contains($row["time_in"], $conditions[5])) { ?>
+                                    }  else if (str_contains($row["time_in"], $conditions[6])) { ?>
                                         <p class="bg-warning text-dark rounded w-fit m-auto px-2 pt-1 pb-1">
                                             <?= $row["time_in"] ?>
                                         </p> <?php
@@ -323,7 +322,7 @@
                                     }
                                 } ?>
                             </td>
-                            <td> <?php 
+                            <td> <?php
                                 if (strlen($row["time_out"]) > 0) {
                                     if ($row["time_out"] == $conditions[0]) { ?>
                                         <p class="bg-danger text-light rounded w-fit m-auto px-2 pt-1 pb-1">
@@ -333,19 +332,23 @@
                                         <p class="bg-primary text-light rounded w-fit m-auto px-2 pt-1 pb-1">
                                             <?= $row["time_out"] ?>
                                         </p> <?php
+                                    }  else if (str_contains($row["time_out"], $conditions[4])) { ?>
+                                        <p class="bg-indigo text-light rounded w-fit m-auto px-2 pt-1 pb-1">
+                                            <?= $row["time_out"] ?>
+                                        </p> <?php
                                     }  else if (str_contains($row["time_out"], $conditions[2])) { ?>
-                                        <p class="bg-secondary text-light rounded w-fit m-auto px-2 pt-1 pb-1">
+                                        <p class="bg-morning text-light rounded w-fit m-auto px-2 pt-1 pb-1">
                                             <?= $row["time_out"] ?>
                                         </p> <?php
                                     }  else if (str_contains($row["time_out"], $conditions[3])) { ?>
-                                        <p class="bg-info text-dark rounded w-fit m-auto px-2 pt-1 pb-1">
+                                        <p class="bg-afternoon text-light rounded w-fit m-auto px-2 pt-1 pb-1">
                                             <?= $row["time_out"] ?>
                                         </p> <?php
-                                    }  else if (str_contains($row["time_out"], $conditions[4])) { ?>
+                                    }  else if (str_contains($row["time_out"], $conditions[5])) { ?>
                                         <p class="bg-dark text-light rounded w-fit m-auto px-2 pt-1 pb-1">
                                             <?= $row["time_out"] ?>
                                         </p> <?php
-                                    }  else if ($row["time_out"] == $conditions[6]) { ?>
+                                    }  else if ($row["time_out"] == $conditions[7]) { ?>
                                         <p class="bg-warning text-dark rounded w-fit m-auto px-2 pt-1 pb-1">
                                             <?= $row["time_out"] ?>
                                         </p> <?php
@@ -361,24 +364,26 @@
                                 $time_out = $row["time_out"];
 
                                 $rendered_hours = 0;
-                                if ($time_out != "No Time out") {
-                                    if(!empty($time_in) && !empty($time_out)) {
-                                        if (strlen($time_in) > 8) {
-                                            $time_in = substr($time_in, 0, 8);
-                                        }
-                                        
-                                        if (strlen($time_out) > 8) {
-                                            $time_out = substr($time_out, 0, 8);
-                                        }
-    
-                                        $time_in = new DateTime(date('G:i', strtotime($time_in)));
-                                        $time_out = new DateTime(date('G:i', strtotime($time_out)));
-    
-                                        $rendered_hours = $time_in->diff($time_out)->format('%h');
-                                        $rendered_minutes = $time_in->diff($time_out)->format('%i');
-                                        $rendered_hours += round($rendered_minutes/60);
-    
-                                        if ($rendered_hours > 4) { $rendered_hours -= 1; }
+                                if (!empty($time_in) && !empty($time_out) && $time_out != "NTO") {
+                                    if (strlen($time_in) > 8) {
+                                        $time_in = substr($time_in, 0, 8);
+                                    }                                    
+                                    if (strlen($time_out) > 8) {
+                                        $time_out = substr($time_out, 0, 8);
+                                    }
+
+                                    if (isMorningShift($time_in, $time_out) || isAfternoonShift($time_in, $time_out)) {
+                                        $rendered_hours = 4;
+                                    } else {
+                                        $rendered_hours = 8;
+                                    }
+
+                                    if (isOvertime($time_out)) {
+                                        $dt_time_out_start = new DateTime(date('G:i', $date->time_out_start()));
+                                        $dt_time_out = new DateTime(date('G:i', strtotime($time_out)));
+                                        $rendered_hours += $dt_time_out_start->diff($dt_time_out)->format('%h');
+                                        $rendered_minutes = $dt_time_out_start->diff($dt_time_out)->format('%i');
+                                        $rendered_hours += round($rendered_minutes/60, 1);
                                     }
                                 }
                                 

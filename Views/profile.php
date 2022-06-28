@@ -463,9 +463,9 @@
                         </div>
                     </div> <?php
                     if (empty($_GET["intern_id"])) { ?>
-                        <div class="bottom-right mt-4">
-                            <button class="btn btn-danger" type="submit" name="resetPersonal">Reset</button>
+                        <div class="bottom-right">
                             <button class="btn btn-indigo" type="submit" name="savePersonal">Save Changes</button>
+                            <button class="btn btn-danger" name="resetPersonal">Reset</button>
                         </div> <?php
                     } ?>
                 </form>
@@ -667,7 +667,7 @@
                                             <span class="text-danger">*</span> <?php
                                         } ?>
                                     </label>
-                                    <input type="email" name="emailAddress" class="form-control"
+                                    <input name="emailAddress" class="form-control"
                                         value="<?php if(isset($_SESSION["email_address"])) {
                                                 echo $_SESSION["email_address"];
                                             } else {
@@ -720,9 +720,9 @@
                     </div> <?php
 
                     if (empty($_GET["intern_id"])) { ?>
-                        <div class="bottom-right mt-4">
-                            <button class="btn btn-danger" type="submit" name="resetWSAP">Reset</button>
+                        <div class="bottom-right">
                             <button class="btn btn-indigo" type="submit" name="saveWSAP">Save Changes</button>
+                            <button class="btn btn-danger" name="resetWSAP">Reset</button>
                         </div> <?php
                     } ?>
                 </form>
@@ -891,9 +891,9 @@
                         </div>
                     </div> <?php
                     if (empty($_GET["intern_id"])) { ?>
-                        <div class="bottom-right mt-4">
-                            <button class="btn btn-danger" type="submit" name="resetEducational">Reset</button>
+                        <div class="bottom-right">
                             <button class="btn btn-indigo" type="submit" name="saveEducational">Save Changes</button>
+                            <button class="btn btn-danger" name="resetEducational">Reset</button>
                         </div> <?php
                     } ?>
                 </form>
@@ -962,13 +962,123 @@
                         </div>
                     </div> <?php
                     if (empty($_GET["intern_id"])) { ?>
-                        <div class="bottom-right mt-4">
-                            <button class="btn btn-danger" type="reset">Clear</button>
+                        <div class="bottom-right">
                             <button class="btn btn-indigo" type="submit" name="saveAccount">Submit</button>
+                            <button class="btn btn-danger" type="reset">Clear</button>
                         </div> <?php
                     } ?>
                 </form>
             </div>
+        </div>
+
+        <div id="roles" class="row rounded shadow mt-4 pb-4 position-relative">
+            <div class="rounded shadow px-0">
+                <h6 class="d-block text-light px-3 pt-2 pb-2 bg-indigo rounded mb-0">
+                    Roles
+                </h6>
+            </div>
+            
+            <table class="table caption-top fs-d text-center mt-2">
+                <thead>
+                    <tr>
+                        <th scope="col">#</th>
+                        <th scope="col">Name</th>
+                        <th scope="col">Brand</th>
+                        <th scope="col">Department</th>
+                        <th scope="col">Admin</th>
+                        <th scope="col">Level</th>
+                    </tr>
+                </thead>
+                <tbody> <?php
+                    $db->query("SELECT intern_roles.*, roles.*, roles.name AS role_name,
+                    brands.*, brands.name AS brand_name, departments.*, departments.name AS dept_name
+                    FROM intern_roles, roles
+                    LEFT JOIN brands ON roles.brand_id = brands.id 
+                    LEFT JOIN departments ON roles.department_id = departments.id
+                    WHERE intern_roles.role_id=roles.id AND intern_roles.intern_id=:intern_id");
+                    $db->setInternId($value["id"]);
+                    $db->execute();
+
+                    $count = 0;
+                    while ($row = $db->fetch()) {
+                        $count++;  ?>
+                        <tr>
+                            <div class="modal fade" id="removeRole<?= $row["id"] ?>" tabindex="-1"
+                                aria-labelledby="removeRoleModalLabel" aria-hidden="true">
+                                <div class="modal-dialog modal-dialog-centered">
+                                    <div class="modal-content">
+                                        <div class="modal-header">
+                                            <div>
+                                                <h5 class="modal-title" id="removeRoleModalLabel">
+                                                    Remove Role from Intern
+                                                </h5>
+                                                <h6 class="modal-title fs-f ms-2" id="removeRoleModalLabel">
+                                                    <?= $value["last_name"].", ".$value["first_name"] ?>
+                                                </h6>
+                                            </div>
+                                            <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Close"></button>
+                                        </div>
+                                        
+                                        <form action="<?= htmlspecialchars($_SERVER["PHP_SELF"]);?>" method="post">
+                                            <div class="modal-body">
+                                                <div class="text-center">
+                                                    <div class="summary-total mt-2 w-fit mx-auto">
+                                                        <h5 class="text-dark fs-regularmb-0"><?= $row["role_name"] ?></h5>
+                                                        <h6><?php
+                                                            if (!empty($row["dept_name"])) {
+                                                                echo $row["dept_name"];
+                                                            } else {
+                                                                echo "No Department";
+                                                            } ?></h6>
+                                                        <h6 class="fs-f mb-0"><?php
+                                                            if (!empty($row["brand_name"])) {
+                                                                echo $row["brand_name"];
+                                                            } else {
+                                                                echo "No Brand";
+                                                            } ?></h6>
+                                                        <input type="text" name="intern_role_id" class="form-control text-center d-none mt-2"
+                                                            value="<?= $row["id"] ?>" readonly>
+                                                    </div>
+                                                </div>
+                                            </div>
+
+                                            <div class="modal-footer">
+                                                <button type="submit" name="btnRemoveRole" class="btn btn-danger">Remove</button>
+                                            </div>
+                                        </form>
+                                    </div>
+                                </div>
+                            </div>
+                            <th scope="row"><?= $count ?></th>
+                            <td><?= $row["role_name"] ?></td>
+                            <td><?php
+                            if (!empty($row["brand_name"])) {
+                                echo $row["brand_name"];
+                            } else {
+                                echo "No Brand";
+                            } ?></td>
+                            <td><?php
+                            if (!empty($row["dept_name"])) {
+                                echo $row["dept_name"];
+                            } else {
+                                echo "No Department";
+                            } ?></td>
+                            <td><?php
+                                if ($row["admin"] == 1) {
+                                    echo "Yes";;
+                                } else {
+                                    echo "No";
+                                } ?></td>
+                            <td><?= $row["admin_level"] ?></td>
+                        </tr> <?php
+                    } ?>
+                </tbody>
+            </table> <?php
+            if ($db->rowCount() == 0) { ?>
+                <div class="w-100 text-center my-5">
+                    <h3>No Record</h3>
+                </div> <?php
+            } ?>
         </div>
 
     </div>

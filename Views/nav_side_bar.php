@@ -76,6 +76,7 @@
                         <li><a href="attendance.php">My Attendance</a></li>
                         <li><a href="interns_attendance.php">Interns' Attendance</a></li>
                         <li><a href="calendar.php">Calendar</a></li>
+                        <li><a href="daily_time_record.php">Interns' DTR</a></li>
                         <!-- 
                         <li><a href="attendance_it.php">IT Dept</a></li>
                         <li><a href="attendance_hr.php">HR Dept</a></li>
@@ -121,6 +122,7 @@
                         <li><a href="profile.php">My Profile</a></li>
                         <li><a href="interns.php">Interns</a></li>
                         <li><a href="admins.php">Admins</a></li>
+                        <li><a href="roles.php">Roles</a></li>
                     </ul>
                 </li>
                 <!--
@@ -129,20 +131,6 @@
                     </a>
                 </li>
                 -->
-                <li>
-                    <a <?php
-                    if ($targetActive == "roles") { ?>
-                        class="active" <?php
-                    } else { ?>
-                        class="inactive"
-                        href="roles.php" <?php
-                    } ?>>
-                        <div class="icon-container">
-                            <i class="fa-solid fa-user-gear fa-2x"></i>
-                        </div>
-                        Roles
-                    </a>
-                </li>
             </ul>
         </div> <?php
     }

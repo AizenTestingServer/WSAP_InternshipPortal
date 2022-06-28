@@ -93,49 +93,8 @@
             <div class="col-md-12">
                 <h3>Admins</h3>
             </div>
-        </div> <?php
-        if ($admin_roles_count != 0) {
-            if (isset($_SESSION['personal_success'])) { ?>
-                <div class="alert alert-success text-success">
-                    <?php
-                        echo $_SESSION['personal_success'];
-                        unset($_SESSION['personal_success']);
-                    ?>
-                </div> <?php
-            }
-
-            if (isset($_SESSION['personal_failed'])) { ?>
-                <div class="alert alert-danger text-danger">
-                    <?php
-                        echo $_SESSION['personal_failed'];
-                        unset($_SESSION['personal_failed']);
-                    ?>
-                </div> <?php
-            } ?>
-            <div class="modal fade" id="addAdminModal" tabindex="-1" aria-labelledby="addAdminModalLabel" aria-hidden="true">
-                <div class="modal-dialog modal-dialog-centered">
-                    <div class="modal-content">
-                        <div class="modal-header">
-                            <h5 class="modal-title" id="addAdminModalLabel">Add Intern</h5>
-                            <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Close"></button>
-                        </div>
-
-                        <form action="<?= htmlspecialchars($_SERVER["PHP_SELF"]);?>" method="post">
-                            <div class="modal-body">
-                                <div class="row">
-                                </div>
-                            </div>
-
-                            <div class="modal-footer">
-                                <button type="submit" name="btnAddAdmin" class="btn btn-success">Submit</button>
-                            </div>
-                        </form>
-                    </div>
-                </div>
-            </div> <?php
-        } ?>
+        </div>
         
-
         <div>
             <form method="post">
                 <div class="row">
@@ -148,7 +107,7 @@
                             } ?>">
                             <div class="input-group-append">
                                 <button class="btn btn-indigo" type="submit" name="search">Search</button>
-                                <button class="btn btn-danger" type="submit" name="reset">Reset</button>
+                                <button class="btn btn-danger" name="reset">Reset</button>
                             </div>
                         </div>
                     </div>
@@ -331,13 +290,7 @@
                                             } ?>>Newest Intern</a></li>
                                     </ul>
                                 </div>
-                            </div> <?php
-                            if ($admin_roles_count != 0) { ?>
-                                <div class="w-fit my-2 ms-auto">
-                                    <button type="button" class="btn btn-primary" data-bs-toggle="modal" 
-                                        data-bs-target="#addAdminModal">Add Admin</button>
-                                </div> <?php
-                            } ?>
+                            </div>
                         </div>
                     </div>
                 </div>

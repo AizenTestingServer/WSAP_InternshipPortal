@@ -69,7 +69,7 @@
     }
 
     require_once "../Templates/header_view.php";
-    setTitle("WSAP IP Interns");
+    setTitle("WSAP IP Unacivated Interns' Accounts");
 ?>
 <div class="my-container"> 
     <?php
@@ -163,7 +163,7 @@
                                 } ?>">
                                 <div class="input-group-append">
                                     <button class="btn btn-indigo" type="submit" name="search">Search</button>
-                                    <button class="btn btn-danger" type="submit" name="reset">Reset</button>
+                                    <button class="btn btn-danger" name="reset">Reset</button>
                                 </div>
                             </div>
                         </div>
@@ -283,7 +283,7 @@
                 } ?>
             </div> <?php
         } else { ?>
-            <div class="d-flex justify-content-center align-items-center" style="height: 90vh;">
+            <div id="access-denied">
                 <div class="text-center">
                     <i class="fa-solid fa-lock fa-3x text-warning mb-4"></i>
                     <h3 class="fw-bold">Access Denied</h3>

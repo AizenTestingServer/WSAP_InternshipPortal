@@ -3,7 +3,7 @@
 
     require_once "../Controllers/Functions.php";
 
-    if (!isset($_SESSION["intern_id"])) {
+    if (!isset($_SESSION["intern_id"]) || isset($_SESSION["password"])) {
         redirect("../index.php");
         exit();
     }
@@ -133,27 +133,27 @@
 
                                 move_uploaded_file($tmp_name, $image_path);
                                 
-                                $_SESSION['setup_success'] = "Successfully saved the profile setup.";
+                                $_SESSION['setup_success'] = "Successfully setup the profile.";
                                 $_SESSION['password'] = $_POST["password"];
                                 redirect('dashboard.php');
                                 exit();
                             } else {
-                                $_SESSION["failed"] = "The file must be an image!";
+                                $_SESSION["setup_failed"] = "The file must be an image!";
                             }
                         } else {
-                            $_SESSION["failed"] = "There is an error occurred!";
+                            $_SESSION["setup_failed"] = "There is an error occurred!";
                         }
                     } else {
-                        $_SESSION["failed"] = "You must select an image file first!";
+                        $_SESSION["setup_failed"] = "You must select an image file first!";
                     }
                 } else {
-                    $_SESSION['failed'] = "The password does not match!";
+                    $_SESSION['setup_failed'] = "The password does not match!";
                 }
             } else {
-                $_SESSION['failed'] = "The new password must be between 6 and 16 characters!";
+                $_SESSION['setup_failed'] = "The new password must be between 6 and 16 characters!";
             }
         } else {
-            $_SESSION['failed'] = "Please fill-out the required fields!";
+            $_SESSION['setup_failed'] = "Please fill-out the required fields!";
         }
         redirect('profile_setup.php');
         exit();
@@ -183,11 +183,11 @@
             </div> <?php
         }
 
-        if (isset($_SESSION['failed'])) { ?>
+        if (isset($_SESSION['setup_failed'])) { ?>
             <div class="alert alert-danger text-danger">
                 <?php
-                    echo $_SESSION['failed'];
-                    unset($_SESSION['failed']);
+                    echo $_SESSION['setup_failed'];
+                    unset($_SESSION['setup_failed']);
                 ?>
             </div> <?php
         } ?>
@@ -415,7 +415,7 @@
                                 <div class="col-lg-4 col-md-6 col-sm-6 user_input my-1">
                                     <label class="text-indigo mb-2" for="emailAddress">Email Address
                                         <span class="text-danger">*</span></label>
-                                    <input type="email" name="emailAddress" class="form-control"
+                                    <input name="emailAddress" class="form-control"
                                         value="<?php if(isset($_SESSION["email_address"])) {
                                             echo $_SESSION["email_address"]; } ?>" maxLength="64">
                                 </div>
@@ -570,7 +570,7 @@
             <div class="row rounded shadow mt-4 pb-4 position-relative">
 
                 <div class="col-12 p-4">
-                    <div class="bottom-right mt-4">
+                    <div class="bottom-right">
                         <button class="btn btn-indigo" type="submit" name="setProfile">Submit</button>
                     </div>
                 </div>

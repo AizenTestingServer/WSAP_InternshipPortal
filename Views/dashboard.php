@@ -20,7 +20,7 @@
 
     $intern_wsap_info = $db->fetch();
 
-    $db->query("SELECT COUNT(*) as total_interns FROM intern_wsap_information");
+    $db->query("SELECT COUNT(*) AS total_interns FROM intern_wsap_information");
     $db->execute();
 
     $total_interns = 0;
@@ -28,7 +28,7 @@
         $total_interns = $value["total_interns"];
     }
 
-    $db->query("SELECT COUNT(*) as active_interns FROM intern_wsap_information WHERE status = 1");
+    $db->query("SELECT COUNT(*) AS active_interns FROM intern_wsap_information WHERE status = 1");
     $db->execute();
 
     $active_interns = 0;
@@ -36,7 +36,7 @@
         $active_interns = $value["active_interns"];
     }
 
-    $db->query("SELECT COUNT(*) as brand_count FROM brands");
+    $db->query("SELECT COUNT(*) AS brand_count FROM brands");
     $db->execute();
 
     $brand_count = 0;
@@ -49,20 +49,9 @@
     $db->execute();
     $lts_att = $db->fetch();
 
-    $remind_time_in = false;
     $remind_time_out = false;
     if ($db->rowCount() != 0 && $date->getDateValue() == strtotime($lts_att["att_date"])) {
-        if (!empty($lts_att["time_out"]) || atMorningShift() || atAfternoonShift() ||
-        atOvertime() || atEndOfDay() || atAfternoonTimeIn($lts_att["time_in"])) {
-            $remind_time_out = false;
-        } else {
-            $remind_time_out = true;
-        }
-    } else {
-        if (($date->getDateTimeValue() >= $date->time_in_start() &&  $date->getDateTimeValue() < $date->time_in_end()) ||
-        ($date->getDateTimeValue() >= $date->morning_shift_end() && $date->getDateTimeValue() < $date->afternoon_shift_start())) {
-            $remind_time_in = true;
-        }
+        $remind_time_out = isTimeOutEnabled($lts_att["time_in"], $lts_att["time_out"]);
     }
 
     if (isset($_POST["goToAttendance"])) {
@@ -186,7 +175,7 @@
                                 </div>
                             </div>
                             <div class="right">
-                                <i class="fa-solid fa-graduation-cap bg-red-pallete text-light circle"></i>
+                                <i class="fa-solid fa-graduation-cap bg-red-palette text-light circle"></i>
                             </div>
                         </div>
                         <div class="bottom">
@@ -228,7 +217,7 @@
                                 </div>
                             </div>
                             <div class="right">
-                                <i class="fa-solid fa-user-group bg-red-pallete text-light circle"></i>
+                                <i class="fa-solid fa-user-group bg-red-palette text-light circle"></i>
                             </div>
                         </div>
                         <div class="bottom">
@@ -263,17 +252,17 @@
                 <div class="col-md-12 p-4" id="dat">
                     <div class="d-flex justify-content-between align-items-center mb-2">
                         <h4 class="mt-4 fw-bold">Tasks and Reminders</h4>
-                        <div>
+                        <!-- <div>
                             <button class="btn btn-outline-dark fs-c">
-                                <i class="fa-solid fa-plus"></i> Add New
+                                <i class="fa-solid fa-plus me-2"></i>Add New
                             </button>
-                        </div>
+                        </div> -->
 
                     </div>
 
                     <?php $record_count = 0; ?>
                     <div class="daily_task"> <?php
-                        if ($remind_time_in) { $record_count++; ?>
+                        if (isTimeInEnabled()) { $record_count++; ?>
                             <div class="task-box">
                                 <div class="task-box-status">
                                     <div class="d-flex justify-content-between">

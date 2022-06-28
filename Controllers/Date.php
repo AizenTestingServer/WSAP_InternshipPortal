@@ -8,6 +8,18 @@
             return date('g:i a');
         }
 
+        function getHour() {
+            return date('g');
+        }
+
+        function getMin() {
+            return date('i');
+        }
+
+        function getTimeType() {
+            return date('a');
+        }
+
         function getDate() {
             return date('F j, Y');
         }

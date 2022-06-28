@@ -28,7 +28,12 @@
             <?php include_once "profile_nav.php"; ?>
         </div>
         
-        <h3 class="fw-bold">Brands</h3>
+        <div class="row align-items-center mb-2">
+            <div class="col-md-12">
+                <h3>Brands</h3>
+            </div>
+        </div>
+
         <div class="brand_grid fs-inter"> <?php
             while ($row = $db->fetch()) { ?>
                 <div class="boxes">

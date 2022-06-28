@@ -43,16 +43,32 @@
             $date->getDateTimeValue() >= $date->morning_shift_end() && $date->getDateTimeValue() < $date->afternoon_shift_start();
     }
 
+    function isTimeInEnabled() {
+        $date = new Date();
+        return ($date->getDateTimeValue() >= $date->time_in_start() &&  $date->getDateTimeValue() < $date->time_in_end()) ||
+            ($date->getDateTimeValue() >= $date->morning_shift_end() && $date->getDateTimeValue() < $date->afternoon_shift_start());
+    }
+
+    function isTimeOutEnabled($time_in, $time_out) {
+        $date = new Date();
+        return !(!empty($time_out) || atMorningShift() || atAfternoonShift() ||
+        atOvertime() || atEndOfDay() || atAfternoonTimeIn($time_in));
+    }
+
     function isMorningShift($time_in, $time_out) {
         $date = new Date();
-        return $time_in >= $date->time_in_start() && $time_in < $date->afternoon_shift_start() &&
-            $time_out >= $date->time_in_start() && $time_out < $date->afternoon_shift_start();
+        return strtotime($time_in) >= $date->time_in_start() && strtotime($time_in) < $date->afternoon_shift_start() &&
+            strtotime($time_out) >= $date->time_in_start() && strtotime($time_out) < $date->afternoon_shift_start();
     }
 
     function isAfternoonShift($time_in, $time_out) {
         $date = new Date();
-        return $time_in >= $date->morning_shift_end() && $time_in < $date->time_out_overtime_end() &&
-            $time_out >= $date->morning_shift_end() && $time_out < $date->time_out_overtime_end();
+        return strtotime($time_in) >= $date->morning_shift_end() && strtotime($time_in) < $date->time_out_overtime_end() &&
+            strtotime($time_out) >= $date->morning_shift_end() && strtotime($time_out) < $date->time_out_overtime_end();
     }
 
+    function isOvertime($time_out) {
+        $date = new Date();
+        return strtotime($time_out) >= $date->time_out_overtime_start() && strtotime($time_out) < $date->time_out_overtime_end();
+    }
 ?>

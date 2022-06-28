@@ -67,6 +67,10 @@ class Database {
         return $this->stmt->closeCursor();
     }
 
+    function setId($id) {
+        $this->stmt->bindValue(':id', $id);
+    }
+
     function setInternId($intern_id) {
         $this->stmt->bindValue(':intern_id', $intern_id);
     }
@@ -80,8 +84,7 @@ class Database {
 
     function timeOut($attendance) {
         $this->stmt->bindValue(':time_out', $attendance[0]);
-        $this->stmt->bindValue(':intern_id', $attendance[1]);
-        $this->stmt->bindValue(':id', $attendance[2]);
+        $this->stmt->bindValue(':id', $attendance[1]);
     }
 
     function setAbsent($attendance) {
@@ -152,6 +155,15 @@ class Database {
         $this->stmt->bindValue(':intern_id', $wsap_info[6]);
     }
 
+    function setWSAPInfo2($wsap_info) {
+        $this->stmt->bindValue(':dept_id', $wsap_info[0]);
+        $this->stmt->bindValue(':status', $wsap_info[1]);
+        $this->stmt->bindValue(':onboard_date', $wsap_info[2]);
+        $this->stmt->bindValue(':rendered_hours', $wsap_info[3]);
+        $this->stmt->bindValue(':target_rendering_hours', $wsap_info[4]);
+        $this->stmt->bindValue(':intern_id', $wsap_info[5]);
+    }
+
     function insertEducationalInfo($educational_info) {
         $this->stmt->bindValue(':intern_id', $educational_info[0]);
         $this->stmt->bindValue(':university', $educational_info[1]);
@@ -212,6 +224,60 @@ class Database {
     function selectInterns3($interns) {
         $this->stmt->bindValue(':dept_name', $interns[0]);
         $this->stmt->bindValue(':intern_name', $interns[1]);
+    }
+
+    function selectRoles($roles) {
+        $this->stmt->bindValue(':role_name', $roles[0]);
+    }
+
+    function selectRoles2($roles) {
+        $this->stmt->bindValue(':dept_name', $roles[0]);
+    }
+
+    function selectRoles3($roles) {
+        $this->stmt->bindValue(':brand_name', $roles[0]);
+    }
+
+    function selectRoles4($roles) {
+        $this->stmt->bindValue(':role_name', $roles[0]);
+        $this->stmt->bindValue(':dept_name', $roles[1]);
+    }
+
+    function selectRoles5($roles) {
+        $this->stmt->bindValue(':role_name', $roles[0]);
+        $this->stmt->bindValue(':brand_name', $roles[1]);
+    }
+
+    function selectRoles6($roles) {
+        $this->stmt->bindValue(':dept_name', $roles[0]);
+        $this->stmt->bindValue(':brand_name', $roles[1]);
+    }
+
+    function selectRoles7($roles) {
+        $this->stmt->bindValue(':role_name', $roles[0]);
+        $this->stmt->bindValue(':dept_name', $roles[1]);
+        $this->stmt->bindValue(':brand_name', $roles[2]);
+    }
+
+    function setRoleId($role_id) {
+        $this->stmt->bindValue(':role_id', $role_id);
+    }
+
+    function insertRole($roles) {
+        $this->stmt->bindValue(':role_name', $roles[0]);
+        $this->stmt->bindValue(':brand_id', $roles[1]);
+        $this->stmt->bindValue(':dept_id', $roles[2]);
+        $this->stmt->bindValue(':admin', $roles[3]);
+        $this->stmt->bindValue(':level', $roles[4]);
+    }
+
+    function updateRole($roles) {
+        $this->stmt->bindValue(':role_name', $roles[0]);
+        $this->stmt->bindValue(':brand_id', $roles[1]);
+        $this->stmt->bindValue(':dept_id', $roles[2]);
+        $this->stmt->bindValue(':admin', $roles[3]);
+        $this->stmt->bindValue(':level', $roles[4]);
+        $this->stmt->bindValue(':role_id', $roles[5]);
     }
 }
 

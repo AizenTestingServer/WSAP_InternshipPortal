@@ -20,6 +20,36 @@
     
     $value = $db->fetch();
 
+    if (isset($_POST["setPassword"])) {
+        if (!empty($_POST["password"]) && !empty($_POST["confirm_password"])) {
+            if (strlen($_POST["password"]) > 5) {
+                if ($_POST["password"] == $_POST["confirm_password"]) {
+                    $password = array(md5($_POST["password"]), $_SESSION["intern_id_2"]);
+        
+                    $db->query("UPDATE intern_accounts SET password=:password WHERE id=:intern_id");
+                    $db->updatePassword($password);
+                    $db->execute();
+                    $db->closeStmt(); 
+                
+                    $_SESSION['setup_success'] = "Successfully setup the password.";
+                    $_SESSION['intern_id'] = $_SESSION["intern_id_2"];
+                    $_SESSION['password'] = $_POST["password"];
+                    unset($_SESSION["intern_id_2"]);
+                    redirect('dashboard.php');
+                    exit();
+                } else {
+                    $_SESSION['setup_failed'] = "The new and confirm password does not match!";
+                }
+            } else {
+                $_SESSION['setup_failed'] = "The new password must be between 6 and 16 characters!";
+            }
+        } else {
+            $_SESSION['setup_failed'] = "Please fill-out the required fields!";
+        }
+        redirect('profile.php#account-info');
+        exit();
+    }
+
     require_once "../Templates/header_view.php";
     setTitle("WSAP IP Reset Password");
 ?> 
@@ -31,7 +61,7 @@
         
         <div class="row align-items-center mb-2">
             <div class="col-md-12">
-                <h3>Forgot Password</h3>
+                <h3>Reset Password</h3>
             </div>
         </div> <?php
 
@@ -44,11 +74,11 @@
             </div> <?php
         }
 
-        if (isset($_SESSION['failed'])) { ?>
+        if (isset($_SESSION['setup_failed'])) { ?>
             <div class="alert alert-danger text-danger">
                 <?php
-                    echo $_SESSION['failed'];
-                    unset($_SESSION['failed']);
+                    echo $_SESSION['setup_failed'];
+                    unset($_SESSION['setup_failed']);
                 ?>
             </div> <?php
         } ?>
@@ -87,8 +117,8 @@
             <div class="row rounded shadow mt-4 pb-4 position-relative">
 
                 <div class="col-12 p-4">
-                    <div class="bottom-right mt-4">
-                        <button class="btn btn-indigo" type="submit" name="setProfile">Submit</button>
+                    <div class="bottom-right">
+                        <button class="btn btn-indigo" type="submit" name="setPassword">Submit</button>
                     </div>
                 </div>
             </div>

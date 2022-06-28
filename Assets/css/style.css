@@ -12,6 +12,9 @@
     --text-2: #5c5b61;
     --text-3: #cbcbd7;
     --red-palette: #f04770;
+    --morning: #69ACDD;
+    --afternoon: #FC7E41;
+    --text-custom-dark: #040015;
     --text-color: rgb(52, 68, 109);
     --text-custom-dark: #040015;
 }
@@ -108,8 +111,16 @@ body {
     background: var(--text-indigo);
 }
 
-.bg-red-pallete {
+.bg-red-palette {
     background: var(--red-palette);
+}
+
+.bg-morning {
+    background: var(--morning);
+}
+
+.bg-afternoon {
+    background: var(--afternoon);
 }
 
 .bg-white {
@@ -118,8 +129,14 @@ body {
 
 .bottom-right {
     position: absolute;
-    right: 16px;
-    bottom: 16px;
+    right: 1rem;
+    bottom: 1rem;
+}
+
+.top-right {
+    position: absolute;
+    right: 1rem;
+    top: 1rem;
 }
 
 .btn-indigo {
@@ -334,8 +351,8 @@ body {
 }
 
 .img-intern {
-    width: 150px;
-    height: 150px;
+    width: 100px;
+    height: 100px;
     object-fit: contain;
 }
 
@@ -520,11 +537,6 @@ a.dt-button {
     cursor: pointer;
 }
 
-.no-link-card {
-    text-decoration: none;
-    cursor: default;
-}
-
 .summary {
     display: grid;
     grid-template-columns: repeat(5, 1fr);
@@ -691,7 +703,6 @@ a.dt-button {
 }
 
 .interns-attendance, .interns {
-    grid-template-columns: repeat(5, 1fr);
     display: grid;
     gap: 1rem;
 }
@@ -751,6 +762,23 @@ a.dt-button {
     height: 25%;
 }
 
+#access-denied {
+    height: 100vh;
+    width: calc(100% - 100px);
+    display: flex;
+    justify-content: center;
+    align-items: center;
+    position: absolute;
+    top: 0;
+}
+
+@media (min-width: 0px) {
+    .intern.info {
+        margin-top: 230px;
+        width: 100%;
+    }
+}
+
 @media (min-width: 576px) {
     .interns-attendance, .interns {
         grid-template-columns: repeat(1, 1fr);
@@ -761,6 +789,11 @@ a.dt-button {
     }
 
     .w-sm-100 {
+        width: 100%;
+    }
+    
+    .intern.info {
+        margin-top: 230px;
         width: 100%;
     }
 }
@@ -779,6 +812,7 @@ a.dt-button {
     }
     
     .intern.info {
+        margin-top: 0;
         width: calc(100% - 310px);
     }
 }
@@ -825,7 +859,7 @@ a.dt-button {
 
 @media (max-width: 900px) {
     #time-in-time-out-layout {
-        margin-top: 130px;
+        margin-top: 230px;
         width: 100%;
     }
 
