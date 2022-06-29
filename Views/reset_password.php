@@ -23,30 +23,34 @@
     if (isset($_POST["setPassword"])) {
         if (!empty($_POST["password"]) && !empty($_POST["confirm_password"])) {
             if (strlen($_POST["password"]) > 5) {
-                if ($_POST["password"] == $_POST["confirm_password"]) {
-                    $password = array(md5($_POST["password"]), $_SESSION["intern_id_2"]);
-        
-                    $db->query("UPDATE intern_accounts SET password=:password WHERE id=:intern_id");
-                    $db->updatePassword($password);
-                    $db->execute();
-                    $db->closeStmt(); 
-                
-                    $_SESSION['setup_success'] = "Successfully setup the password.";
-                    $_SESSION['intern_id'] = $_SESSION["intern_id_2"];
-                    $_SESSION['password'] = $_POST["password"];
-                    unset($_SESSION["intern_id_2"]);
-                    redirect('dashboard.php');
-                    exit();
+                if (isValidPassword($_POST["password"])) {
+                    if ($_POST["password"] == $_POST["confirm_password"]) {
+                        $password = array(md5($_POST["password"]), $_SESSION["intern_id_2"]);
+            
+                        $db->query("UPDATE intern_accounts SET password=:password WHERE id=:intern_id");
+                        $db->updatePassword($password);
+                        $db->execute();
+                        $db->closeStmt(); 
+                    
+                        $_SESSION["setup_success"] = "Successfully setup the password.";
+                        $_SESSION["intern_id"] = $_SESSION["intern_id_2"];
+                        $_SESSION["password"] = $_POST["password"];
+                        unset($_SESSION["intern_id_2"]);
+                        redirect("dashboard.php");
+                        exit();
+                    } else {
+                        $_SESSION["setup_failed"] = "The new and confirm password does not match!";
+                    }
                 } else {
-                    $_SESSION['setup_failed'] = "The new and confirm password does not match!";
+                    $_SESSION["setup_failed"] = "The password must only contain letters or numbers!";
                 }
             } else {
-                $_SESSION['setup_failed'] = "The new password must be between 6 and 16 characters!";
+                $_SESSION["setup_failed"] = "The new password must be between 6 and 16 characters!";
             }
         } else {
-            $_SESSION['setup_failed'] = "Please fill-out the required fields!";
+            $_SESSION["setup_failed"] = "Please fill-out the required fields!";
         }
-        redirect('profile.php#account-info');
+        redirect("profile.php#account-info");
         exit();
     }
 
@@ -59,26 +63,26 @@
             <?php include_once "profile_nav_setup.php"; ?>
         </div>
         
-        <div class="row align-items-center mb-2">
-            <div class="col-md-12">
+        <div class="d-flex align-items-center mb-2">
+            <div>
                 <h3>Reset Password</h3>
             </div>
         </div> <?php
 
-        if (isset($_SESSION['setup_success'])) { ?>
+        if (isset($_SESSION["setup_success"])) { ?>
             <div class="alert alert-success text-success">
                 <?php
-                    echo $_SESSION['setup_success'];
-                    unset($_SESSION['setup_success']);
+                    echo $_SESSION["setup_success"];
+                    unset($_SESSION["setup_success"]);
                 ?>
             </div> <?php
         }
 
-        if (isset($_SESSION['setup_failed'])) { ?>
+        if (isset($_SESSION["setup_failed"])) { ?>
             <div class="alert alert-danger text-danger">
                 <?php
-                    echo $_SESSION['setup_failed'];
-                    unset($_SESSION['setup_failed']);
+                    echo $_SESSION["setup_failed"];
+                    unset($_SESSION["setup_failed"]);
                 ?>
             </div> <?php
         } ?>
@@ -128,7 +132,7 @@
 
 <script>
     var loadFile = function (event) {
-        var output = document.getElementById('output');
+        var output = document.getElementById("output");
         output.src = URL.createObjectURL(event.target.files[0]);
         output.onload = function () {
             URL.revokeObjectURL(output.src)

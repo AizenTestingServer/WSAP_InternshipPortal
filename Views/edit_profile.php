@@ -96,24 +96,30 @@
         } else {
             $_SESSION["upload_failed"] = "You must select an image file first!";
         }
-        redirect('edit_profile.php?intern_id='.$_GET["intern_id"]);
+        redirect("edit_profile.php?intern_id=".$_GET["intern_id"]);
         exit();
     }
 
     if (isset($_POST["savePersonal"])) {
-        $_SESSION['last_name'] = $_POST["lastName"];
-        $_SESSION['first_name'] = $_POST["firstName"];
-        $_SESSION['middle_name'] = $_POST["middleName"];
-        $_SESSION['birthday'] = $_POST["birthday"];
-        $_SESSION['gender'] = $_POST["gender"];
+        $last_name = ucwords(trim($_POST["lastName"]));
+        $first_name = ucwords(trim($_POST["firstName"]));
+        $middle_name = ucwords(trim($_POST["middleName"]));
+        $gender = $_POST["gender"];
+        $birthday = $_POST["birthday"];
 
-        if (!empty($_POST["lastName"]) && !empty($_POST["firstName"]) && !empty($_POST["birthday"])) {
-            $personal_info = array(ucwords($_POST["lastName"]),
-            ucwords($_POST["firstName"]),
-            ucwords($_POST["middleName"]),
-            $_POST["gender"],
-            $_POST["birthday"],
-            $_GET["intern_id"]);
+        $_SESSION["last_name"] = $last_name;
+        $_SESSION["first_name"] = $first_name;
+        $_SESSION["middle_name"] = $middle_name;
+        $_SESSION["gender"] = $gender;
+        $_SESSION["birthday"] = $birthday;
+
+        if (!empty($last_name) && !empty($first_name) && !empty($birthday)) {
+            $personal_info = array($last_name,
+            $first_name,
+            $middle_name,
+            $gender,
+            $birthday,
+            $_SESSION["intern_id"]);
     
             $db->query("UPDATE intern_personal_information
             SET last_name=:last_name, first_name=:first_name, middle_name=:middle_name,
@@ -122,43 +128,49 @@
             $db->execute();
             $db->closeStmt();
             
-            $_SESSION['personal_success'] = "Successfully saved the changes.";
-            unset($_SESSION['last_name']);
-            unset($_SESSION['first_name']);
-            unset($_SESSION['middle_name']);
-            unset($_SESSION['birthday']);
-            unset($_SESSION['gender']);
+            $_SESSION["personal_success"] = "Successfully saved the changes.";
+            unset($_SESSION["last_name"]);
+            unset($_SESSION["first_name"]);
+            unset($_SESSION["middle_name"]);
+            unset($_SESSION["birthday"]);
+            unset($_SESSION["gender"]);
         } else {
-            $_SESSION['personal_failed'] = "Please fill-out the required fields!";
+            $_SESSION["personal_failed"] = "Please fill-out the required fields!";
         }
-        redirect('edit_profile.php?intern_id='.$_GET["intern_id"].'#personal-info');
+        redirect("edit_profile.php?intern_id=".$_GET["intern_id"]."#personal-info");
         exit();
     }
 
     if (isset($_POST["resetPersonal"])) {
-        unset($_SESSION['last_name']);
-        unset($_SESSION['first_name']);
-        unset($_SESSION['middle_name']);
-        unset($_SESSION['birthday']);
-        unset($_SESSION['gender']);
+        unset($_SESSION["last_name"]);
+        unset($_SESSION["first_name"]);
+        unset($_SESSION["middle_name"]);
+        unset($_SESSION["gender"]);
+        unset($_SESSION["birthday"]);
 
-        redirect('edit_profile.php?intern_id='.$_GET["intern_id"].'#personal-info');
+        redirect("edit_profile.php?intern_id=".$_GET["intern_id"]."#personal-info");
         exit();
     }
 
     if (isset($_POST["saveWSAP"])) {
-        $_SESSION['dept_id'] = $_POST["department"];
-        $_SESSION['status'] = $_POST["status"];
-        $_SESSION['onboard_date'] = $_POST["onboardDate"];
-        $_SESSION['rendered_hours'] = $_POST["renderedHours"];
-        $_SESSION['target_rendering_hours'] = $_POST["targetRenderingHours"];
+        $dept_id = $_POST["department"];
+        $status = $_POST["status"];
+        $onboard_date = $_POST["onboardDate"];
+        $rendered_hours = $_POST["renderedHours"];
+        $target_rendering_hours = $_POST["targetRenderingHours"];
+
+        $_SESSION["dept_id"] = $dept_id;
+        $_SESSION["status"] = $status;
+        $_SESSION["onboard_date"] = $onboard_date;
+        $_SESSION["rendered_hours"] = $rendered_hours;
+        $_SESSION["target_rendering_hours"] = $target_rendering_hours;
         
-        if (!empty($_POST["onboardDate"])) {
-            $wsap_info = array($_POST["department"],
-            $_POST["status"],
-            $_POST["onboardDate"],
-            $_POST["renderedHours"],
-            $_POST["targetRenderingHours"],
+        if (!empty($onboard_date)) {
+            $wsap_info = array($dept_id,
+            $status,
+            $onboard_date,
+            $rendered_hours,
+            $target_rendering_hours,
             $_GET["intern_id"]);
     
             $db->query("UPDATE intern_wsap_information
@@ -169,27 +181,57 @@
             $db->execute();
             $db->closeStmt();
             
-            $_SESSION['wsap_success'] = "Successfully saved the changes.";
-            unset($_SESSION['dept_id']);
-            unset($_SESSION['status']);
-            unset($_SESSION['onboard_date']);
-            unset($_SESSION['rendered_hours']);
-            unset($_SESSION['target_rendering_hours']);
+            $_SESSION["wsap_success"] = "Successfully saved the changes.";
+            unset($_SESSION["dept_id"]);
+            unset($_SESSION["status"]);
+            unset($_SESSION["onboard_date"]);
+            unset($_SESSION["rendered_hours"]);
+            unset($_SESSION["target_rendering_hours"]);
         } else {
-            $_SESSION['wsap_failed'] = "Please fill-out the required fields!";
+            $_SESSION["wsap_failed"] = "Please fill-out the required fields!";
         }
-        redirect('edit_profile.php?intern_id='.$_GET["intern_id"].'#wsap-info');
+        redirect("edit_profile.php?intern_id=".$_GET["intern_id"]."#wsap-info");
         exit();
     }
 
     if (isset($_POST["resetWSAP"])) {
-        unset($_SESSION['dept_id']);
-        unset($_SESSION['status']);
-        unset($_SESSION['onboard_date']);
-        unset($_SESSION['rendered_hours']);
-        unset($_SESSION['target_rendering_hours']);
+        unset($_SESSION["dept_id"]);
+        unset($_SESSION["status"]);
+        unset($_SESSION["onboard_date"]);
+        unset($_SESSION["rendered_hours"]);
+        unset($_SESSION["target_rendering_hours"]);
         
-        redirect('edit_profile.php?intern_id='.$_GET["intern_id"].'#wsap-info');
+        redirect("edit_profile.php?intern_id=".$_GET["intern_id"]."#wsap-info");
+        exit();
+    }
+    
+    if (isset($_POST["resetPassword"])) {
+        $reset_password = array("", $_GET["intern_id"]);
+
+        $db->query("UPDATE intern_accounts SET password=:password WHERE id=:intern_id");
+        $db->updatePassword($reset_password);
+        $db->execute();
+        $db->closeStmt();
+        
+        $_SESSION["reset_success"] = "Successfully reset the password of an intern.";
+
+        redirect("edit_profile.php?intern_id=".$_GET["intern_id"]."#account-info");
+        exit();
+    }
+    
+    if (isset($_POST["removeRole"])) {
+        if (!empty($_POST["intern_role_id"])) {
+            $db->query("DELETE FROM intern_roles WHERE id=:id");
+            $db->setId($_POST["intern_role_id"]);
+            $db->execute();
+            $db->closeStmt();
+            
+            $_SESSION["role_success"] = "Successfully removed a role from intern.";
+        } else {
+            $_SESSION["role_failed"] = "Please fill-out the required fields!";
+        }
+
+        redirect("edit_profile.php?intern_id=".$_GET["intern_id"]."#roles");
         exit();
     }
 
@@ -222,41 +264,6 @@
         redirect("edit_profile.php");
         exit();
     }
-    
-    if (isset($_POST["btnRemoveRole"])) {
-        if (!empty($_POST["intern_role_id"])) {
-            $db->query("DELETE FROM intern_roles WHERE id=:id");
-            $db->setId($_POST["intern_role_id"]);
-            $db->execute();
-            $db->closeStmt();
-            
-            $_SESSION['role_success'] = "Successfully removed a role from intern.";
-        } else {
-            $_SESSION['role_failed'] = "Please fill-out the required fields!";
-        }
-        $parameters = "?";
-        if (!empty($_POST["search_intern"])) {
-            $parameters = $parameters."search=".$_POST["search_intern"];
-        }
-
-        if (!empty($_GET["department"])) {
-            if (strlen($parameters) > 1) { $parameters = $parameters."&"; }
-            $parameters = $parameters."department=".$_GET["department"];
-        }
-        
-        if (!empty($_GET["sort"])) {
-            if (strlen($parameters) > 1) { $parameters = $parameters."&"; }
-            $parameters = $parameters."sort=".$_GET["sort"];
-        }
-
-        if (strlen($parameters) > 1) {
-            redirect("edit_profile.php".$parameters."#roles");
-        } else {
-            redirect("edit_profile.php");
-        }
-
-        exit();
-    }
 
     require_once "../Templates/header_view.php";
     setTitle("WSAP IP Edit Profile");
@@ -271,8 +278,8 @@
             <?php include_once "profile_nav.php"; ?>
         </div>
         
-        <div class="row align-items-center mb-2">
-            <div class="col-md-12">
+        <div class="d-flex align-items-center mb-2">
+            <div>
                 <h3>Edit Profile</h3>
             </div>
         </div> <?php
@@ -300,20 +307,20 @@
                                     }
                                 } ?>" /> <?php
 
-                            if (isset($_SESSION['upload_success'])) { ?>
+                            if (isset($_SESSION["upload_success"])) { ?>
                                 <div class="alert alert-success text-success">
                                     <?php
-                                        echo $_SESSION['upload_success'];
-                                        unset($_SESSION['upload_success']);
+                                        echo $_SESSION["upload_success"];
+                                        unset($_SESSION["upload_success"]);
                                     ?>
                                 </div> <?php
                             }
 
-                            if (isset($_SESSION['upload_failed'])) { ?>
+                            if (isset($_SESSION["upload_failed"])) { ?>
                                 <div class="alert alert-danger text-danger">
                                     <?php
-                                        echo $_SESSION['upload_failed'];
-                                        unset($_SESSION['upload_failed']);
+                                        echo $_SESSION["upload_failed"];
+                                        unset($_SESSION["upload_failed"]);
                                     ?>
                                 </div> <?php
                             } ?>
@@ -327,20 +334,20 @@
                     </div>
 
                     <div class="col-lg-8 col-md-7 p-4"> <?php
-                        if (isset($_SESSION['personal_success'])) { ?>
+                        if (isset($_SESSION["personal_success"])) { ?>
                             <div class="alert alert-success text-success">
                                 <?php
-                                    echo $_SESSION['personal_success'];
-                                    unset($_SESSION['personal_success']);
+                                    echo $_SESSION["personal_success"];
+                                    unset($_SESSION["personal_success"]);
                                 ?>
                             </div> <?php
                         }
 
-                        if (isset($_SESSION['personal_failed'])) { ?>
+                        if (isset($_SESSION["personal_failed"])) { ?>
                             <div class="alert alert-danger text-danger">
                                 <?php
-                                    echo $_SESSION['personal_failed'];
-                                    unset($_SESSION['personal_failed']);
+                                    echo $_SESSION["personal_failed"];
+                                    unset($_SESSION["personal_failed"]);
                                 ?>
                             </div> <?php
                         } ?>
@@ -403,8 +410,8 @@
                                             <label class="mb-2" for="gender">Gender</label>
                                             <select name="gender" class="form-select">
                                                 <option value="0" <?php
-                                                    if (isset($_SESSION['gender'])) {
-                                                        if ($_SESSION['gender'] == 0) { ?>
+                                                    if (isset($_SESSION["gender"])) {
+                                                        if ($_SESSION["gender"] == 0) { ?>
                                                             selected <?php
                                                         }
                                                     } else {
@@ -413,8 +420,8 @@
                                                         }
                                                     } ?>>Male</option>
                                                 <option value="1" <?php
-                                                    if (isset($_SESSION['gender'])) {
-                                                        if ($_SESSION['gender'] == 1) { ?>
+                                                    if (isset($_SESSION["gender"])) {
+                                                        if ($_SESSION["gender"] == 1) { ?>
                                                             selected <?php
                                                         }
                                                     } else {
@@ -444,20 +451,20 @@
                     </div>
 
                     <div class="col-12 p-4"> <?php
-                        if (isset($_SESSION['wsap_success'])) { ?>
+                        if (isset($_SESSION["wsap_success"])) { ?>
                             <div class="alert alert-success text-success">
                                 <?php
-                                    echo $_SESSION['wsap_success'];
-                                    unset($_SESSION['wsap_success']);
+                                    echo $_SESSION["wsap_success"];
+                                    unset($_SESSION["wsap_success"]);
                                 ?>
                             </div> <?php
                         }
 
-                        if (isset($_SESSION['wsap_failed'])) { ?>
+                        if (isset($_SESSION["wsap_failed"])) { ?>
                             <div class="alert alert-danger text-danger">
                                 <?php
-                                    echo $_SESSION['wsap_failed'];
-                                    unset($_SESSION['wsap_failed']);
+                                    echo $_SESSION["wsap_failed"];
+                                    unset($_SESSION["wsap_failed"]);
                                 ?>
                             </div> <?php
                         } ?>
@@ -494,8 +501,8 @@
                                                     <label class="mb-2" for="status">Status</label>
                                                     <select name="status" class="form-select">
                                                     <option value="0" <?php
-                                                        if (isset($_SESSION['status'])) {
-                                                            if ($_SESSION['status'] == 0) { ?>
+                                                        if (isset($_SESSION["status"])) {
+                                                            if ($_SESSION["status"] == 0) { ?>
                                                                 selected <?php
                                                             }
                                                         } else {
@@ -504,8 +511,8 @@
                                                             }
                                                         } ?>>Inactive</option>
                                                         <option value="1" <?php
-                                                        if (isset($_SESSION['status'])) {
-                                                            if ($_SESSION['status'] == 1) { ?>
+                                                        if (isset($_SESSION["status"])) {
+                                                            if ($_SESSION["status"] == 1) { ?>
                                                                 selected <?php
                                                             }
                                                         } else {
@@ -514,8 +521,8 @@
                                                             }
                                                         } ?>>Active</option>
                                                         <option value="2" <?php
-                                                        if (isset($_SESSION['status'])) {
-                                                            if ($_SESSION['status'] == 2) { ?>
+                                                        if (isset($_SESSION["status"])) {
+                                                            if ($_SESSION["status"] == 2) { ?>
                                                                 selected <?php
                                                             }
                                                         } else {
@@ -524,8 +531,8 @@
                                                             }
                                                         } ?>>Offboarded</option>
                                                         <option value="3" <?php
-                                                        if (isset($_SESSION['status'])) {
-                                                            if ($_SESSION['status'] == 3) { ?>
+                                                        if (isset($_SESSION["status"])) {
+                                                            if ($_SESSION["status"] == 3) { ?>
                                                                 selected <?php
                                                             }
                                                         } else {
@@ -534,8 +541,8 @@
                                                             }
                                                         } ?>>Withdrew</option>
                                                         <option value="4" <?php
-                                                        if (isset($_SESSION['status'])) {
-                                                            if ($_SESSION['status'] == 4) { ?>
+                                                        if (isset($_SESSION["status"])) {
+                                                            if ($_SESSION["status"] == 4) { ?>
                                                                 selected <?php
                                                             }
                                                         } else {
@@ -544,8 +551,8 @@
                                                             }
                                                         } ?>>Extended</option>
                                                         <option value="5" <?php
-                                                        if (isset($_SESSION['status'])) {
-                                                            if ($_SESSION['status'] == 5) { ?>
+                                                        if (isset($_SESSION["status"])) {
+                                                            if ($_SESSION["status"] == 5) { ?>
                                                                 selected <?php
                                                             }
                                                         } else {
@@ -554,8 +561,8 @@
                                                             }
                                                         } ?>>Suspended</option>
                                                         <option value="6" <?php
-                                                        if (isset($_SESSION['status'])) {
-                                                            if ($_SESSION['status'] == 6) { ?>
+                                                        if (isset($_SESSION["status"])) {
+                                                            if ($_SESSION["status"] == 6) { ?>
                                                                 selected <?php
                                                             }
                                                         } else {
@@ -591,7 +598,7 @@
                                                     $estimated_weekends = ceil(($rendering_days/5) * 2);
                                                     $rendering_days += $estimated_weekends + 1;
 
-                                                    echo date('m/d/Y', strtotime($date->getDate().' + '.$rendering_days.' days')); ?>"
+                                                    echo date("m/d/Y", strtotime($date->getDate()." + ".$rendering_days." days")); ?>"
                                                     disabled>
                                                 </div>
                                                 <div class="col-lg-3 col-md-6 col-sm-6 user_input my-1">
@@ -681,10 +688,7 @@
                     <div class="col-12 p-4">
                         <div class="row">
                             <div class="col-lg-12">
-                                <div class="row <?php
-                                    if (empty($_GET["intern_id"])) { ?>
-                                        mb-4 <?php
-                                    } ?>">
+                                <div class="row">
                                     <div class="col-lg-12">
                                         <div class="row">
                                             <div class="col-lg-6 col-md-12 user_input my-1">
@@ -742,8 +746,8 @@
                                                         disabled <?php
                                                     } ?>>
                                                     <option value="1" <?php
-                                                    if (isset($_SESSION['year'])) {
-                                                        if ($_SESSION['year'] == 1) { ?>
+                                                    if (isset($_SESSION["year"])) {
+                                                        if ($_SESSION["year"] == 1) { ?>
                                                             selected <?php
                                                         }
                                                     } else {
@@ -752,8 +756,8 @@
                                                         }
                                                     } ?>>1</option>
                                                     <option value="2" <?php
-                                                    if (isset($_SESSION['year'])) {
-                                                        if ($_SESSION['year'] == 2) { ?>
+                                                    if (isset($_SESSION["year"])) {
+                                                        if ($_SESSION["year"] == 2) { ?>
                                                             selected <?php
                                                         }
                                                     } else {
@@ -762,8 +766,8 @@
                                                         }
                                                     } ?>>2</option>
                                                     <option value="3" <?php
-                                                    if (isset($_SESSION['year'])) {
-                                                        if ($_SESSION['year'] == 3) { ?>
+                                                    if (isset($_SESSION["year"])) {
+                                                        if ($_SESSION["year"] == 3) { ?>
                                                             selected <?php
                                                         }
                                                     } else {
@@ -772,8 +776,8 @@
                                                         }
                                                     } ?>>3</option>
                                                     <option value="4" <?php
-                                                    if (isset($_SESSION['year'])) {
-                                                        if ($_SESSION['year'] == 4) { ?>
+                                                    if (isset($_SESSION["year"])) {
+                                                        if ($_SESSION["year"] == 4) { ?>
                                                             selected <?php
                                                         }
                                                     } else {
@@ -782,8 +786,8 @@
                                                         }
                                                     } ?>>4</option>
                                                     <option value="5" <?php
-                                                    if (isset($_SESSION['year'])) {
-                                                        if ($_SESSION['year'] == 5) { ?>
+                                                    if (isset($_SESSION["year"])) {
+                                                        if ($_SESSION["year"] == 5) { ?>
                                                             selected <?php
                                                         }
                                                     } else {
@@ -808,11 +812,28 @@
                         </h6>
                     </div>
                     
-                    <div class="col-12 p-4">
+                    <div class="col-12 p-4"> <?php
+                        if (isset($_SESSION["reset_success"])) { ?>
+                            <div class="alert alert-success text-success">
+                                <?php
+                                    echo $_SESSION["reset_success"];
+                                    unset($_SESSION["reset_success"]);
+                                ?>
+                            </div> <?php
+                        }
+                        
+                        if (isset($_SESSION["reset_failed"])) { ?>
+                            <div class="alert alert-danger text-danger">
+                                <?php
+                                    echo $_SESSION["reset_failed"];
+                                    unset($_SESSION["reset_failed"]);
+                                ?>
+                            </div> <?php
+                        } ?>
                         <div class="row">
                             <div class="col-lg-12">
                                 <div class="row <?php
-                                    if (empty($_GET["intern_id"])) { ?>
+                                    if ($_GET["intern_id"] != strtoupper($_SESSION["intern_id"])) {  ?>
                                         mb-4 <?php
                                     } ?>">
                                     <div class="col-lg-12">
@@ -826,7 +847,41 @@
                                     </div>
                                 </div>
                             </div>
-                        </div>
+                        </div> <?php
+                        if ($_GET["intern_id"] != strtoupper($_SESSION["intern_id"])) { ?>
+                            <div class="modal fade" id="resetPasswordModal" tabindex="-1"
+                                aria-labelledby="resetPasswordModalLabel" aria-hidden="true">
+                                <div class="modal-dialog modal-dialog-centered">
+                                    <div class="modal-content">
+                                        <div class="modal-header">
+                                            <div class="modal-title" id="resetPasswordModalLabel">
+                                                <h5>Reset Password</h5>
+                                            </div>
+                                            <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Close"></button>
+                                        </div>
+                                        
+                                        <form method="post">
+                                            <div class="modal-body">
+                                                <div class="text-center px-5">
+                                                    <h6 class="text-dark mb-0">
+                                                        Do you want to reset the password of<br><?= $value["last_name"].", ".$value["first_name"]."?"; ?>
+                                                    </h6>
+                                                </div>
+                                            </div>
+
+                                            <div class="modal-footer">
+                                                <button type="submit" name="resetPassword" class="btn btn-danger">Reset Password</button>
+                                            </div>
+                                        </form>
+                                    </div>
+                                </div>
+                            </div>
+                                
+                            <div class="bottom-right">
+                                <button class="btn btn-danger" data-bs-toggle="modal" 
+                                    data-bs-target="#resetPasswordModal">Reset Password</button>
+                            </div> <?php
+                        } ?>
                     </div>
                 </div>
                 
@@ -838,27 +893,24 @@
                     </div>
 
                     <div class="my-3 ms-auto w-fit">
-                        <button type="button" class="btn btn-primary" data-bs-toggle="modal" 
-                            data-bs-target="#addRoleModal">
+                        <a class="btn btn-primary" href="assign_roles.php?intern_id=<?= $_GET["intern_id"] ?>">
                             <i class="fa-solid fa-plus me-2"></i>Add Role
-                        </button>
-                    </div>
-                    
-                    <?php
-                    if (isset($_SESSION['role_success'])) { ?>
+                        </a>
+                    </div> <?php
+                    if (isset($_SESSION["role_success"])) { ?>
                         <div class="alert alert-success text-success">
                             <?php
-                                echo $_SESSION['role_success'];
-                                unset($_SESSION['role_success']);
+                                echo $_SESSION["role_success"];
+                                unset($_SESSION["role_success"]);
                             ?>
                         </div> <?php
                     }
                     
-                    if (isset($_SESSION['role_failed'])) { ?>
+                    if (isset($_SESSION["role_failed"])) { ?>
                         <div class="alert alert-danger text-danger">
                             <?php
-                                echo $_SESSION['role_failed'];
-                                unset($_SESSION['role_failed']);
+                                echo $_SESSION["role_failed"];
+                                unset($_SESSION["role_failed"]);
                             ?>
                         </div> <?php
                     } ?>
@@ -874,8 +926,9 @@
                             </tr>
                         </thead>
                         <tbody> <?php
-                            $db->query("SELECT intern_roles.*, roles.*, roles.name AS role_name,
-                            brands.*, brands.name AS brand_name, departments.*, departments.name AS dept_name
+                            $db->query("SELECT intern_roles.*, intern_roles.id AS intern_role_id,
+                            roles.*, roles.name AS role_name, brands.*, brands.name AS brand_name,
+                            departments.*, departments.name AS dept_name
                             FROM intern_roles, roles
                             LEFT JOIN brands ON roles.brand_id = brands.id 
                             LEFT JOIN departments ON roles.department_id = departments.id
@@ -886,53 +939,55 @@
                             $count = 0;
                             while ($row = $db->fetch()) {
                                 $count++;  ?>
-                                <tr>
-                                    <div class="modal fade" id="removeRole<?= $row["id"] ?>" tabindex="-1"
-                                        aria-labelledby="removeRoleModalLabel" aria-hidden="true">
-                                        <div class="modal-dialog modal-dialog-centered">
-                                            <div class="modal-content">
-                                                <div class="modal-header">
-                                                    <div>
-                                                        <h5 class="modal-title" id="removeRoleModalLabel">
-                                                            Remove Role from Intern
-                                                        </h5>
-                                                        <h6 class="modal-title fs-f ms-2" id="removeRoleModalLabel">
-                                                            <?= $value["last_name"].", ".$value["first_name"] ?>
-                                                        </h6>
+                                <tr> <?php
+                                    if ($row["admin_level"] < $current_level) { ?>
+                                        <div class="modal fade" id="removeRole<?= $row["intern_role_id"] ?>" tabindex="-1"
+                                            aria-labelledby="removeRoleModalLabel" aria-hidden="true">
+                                            <div class="modal-dialog modal-dialog-centered">
+                                                <div class="modal-content">
+                                                    <div class="modal-header">
+                                                        <div>
+                                                            <h5 class="modal-title" id="removeRoleModalLabel">
+                                                                Remove Role from Intern
+                                                            </h5>
+                                                            <h6 class="modal-title fs-f ms-2" id="removeRoleModalLabel">
+                                                                <?= $value["last_name"].", ".$value["first_name"] ?>
+                                                            </h6>
+                                                        </div>
+                                                        <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Close"></button>
                                                     </div>
-                                                    <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Close"></button>
-                                                </div>
-                                                
-                                                <form action="<?= htmlspecialchars($_SERVER["PHP_SELF"]);?>" method="post">
-                                                    <div class="modal-body">
-                                                        <div class="text-center">
-                                                            <div class="summary-total mt-2 w-fit mx-auto">
-                                                                <h5 class="text-dark fs-regularmb-0"><?= $row["role_name"] ?></h5>
-                                                                <h6 class="fs-f mb-0"><?php
-                                                                    if (!empty($row["dept_name"])) {
-                                                                        echo $row["dept_name"];
-                                                                    } else {
-                                                                        echo "No Department";
-                                                                    } ?></h6>
-                                                                <h6 class="fs-f"><?php
-                                                                    if (!empty($row["brand_name"])) {
-                                                                        echo $row["brand_name"];
-                                                                    } else {
-                                                                        echo "No Brand";
-                                                                    } ?></h6>
-                                                                <input type="text" name="intern_role_id" class="form-control text-center d-none mt-2"
-                                                                    value="<?= $row["id"] ?>" readonly>
+                                                    
+                                                    <form method="post">
+                                                        <div class="modal-body">
+                                                            <div class="text-center">
+                                                                <div class="summary-total mt-2 w-fit mx-auto">
+                                                                    <h5 class="text-dark"><?= $row["role_name"] ?></h5>
+                                                                    <h6 class="fs-f mb-0"><?php
+                                                                        if (!empty($row["dept_name"])) {
+                                                                            echo $row["dept_name"];
+                                                                        } else {
+                                                                            echo "No Department";
+                                                                        } ?></h6>
+                                                                    <h6 class="fs-f"><?php
+                                                                        if (!empty($row["brand_name"])) {
+                                                                            echo $row["brand_name"];
+                                                                        } else {
+                                                                            echo "No Brand";
+                                                                        } ?></h6>
+                                                                    <input type="text" name="intern_role_id" class="form-control text-center d-none mt-2"
+                                                                        value="<?= $row["intern_role_id"] ?>" readonly>
+                                                                </div>
                                                             </div>
                                                         </div>
-                                                    </div>
 
-                                                    <div class="modal-footer">
-                                                        <button type="submit" name="btnRemoveRole" class="btn btn-danger">Remove</button>
-                                                    </div>
-                                                </form>
+                                                        <div class="modal-footer">
+                                                            <button type="submit" name="removeRole" class="btn btn-danger">Remove</button>
+                                                        </div>
+                                                    </form>
+                                                </div>
                                             </div>
-                                        </div>
-                                    </div>
+                                        </div> <?php
+                                    } ?>
                                     <th scope="row"><?= $count ?></th>
                                     <td><?= $row["role_name"] ?></td>
                                     <td><?php
@@ -954,11 +1009,17 @@
                                             echo "No";
                                         } ?></td>
                                     <td><?= $row["admin_level"] ?></td>
-                                    <td>
-                                        <button class="btn btn-danger btn-sm" data-bs-toggle="modal" 
-                                            data-bs-target="#removeRole<?= $row["id"] ?>">
-                                            <i class="fa-solid fa-xmark fs-a"></i>
-                                        </button>
+                                    <td> <?php
+                                        if ($row["admin_level"] < $current_level) { ?>
+                                            <button class="btn btn-danger btn-sm" data-bs-toggle="modal" 
+                                                data-bs-target="#removeRole<?= $row["intern_role_id"] ?>">
+                                                <i class="fa-solid fa-xmark fs-a"></i>
+                                            </button> <?php
+                                        } else { ?>
+                                            <button class="btn btn-secondary btn-sm disabled">
+                                                <i class="fa-solid fa-xmark fs-a"></i>
+                                            </button> <?php
+                                        } ?>
                                     </td>
                                 </tr> <?php
                             } ?>
@@ -1291,24 +1352,15 @@
                     } ?>
                 </div> <?php
             }
-        } else { ?>
-            <div id="access-denied">
-                <div class="text-center">
-                    <i class="fa-solid fa-lock fa-3x text-warning mb-4"></i>
-                    <h3 class="fw-bold">Access Denied</h3>
-                    <p>
-                        <pre>Only Admin of WSAP IP can access this feature.</pre>
-                    </p>
-                    <a class="btn btn-secondary" href="dashboard.php">Return to Dashboard</a>
-                </div> 
-            </div> <?php
+        } else {
+            include_once "access_denied.php";
         } ?>
     </div>
 </div>
 
 <script>
     var loadFile = function (event) {
-        var output = document.getElementById('output');
+        var output = document.getElementById("output");
         output.src = URL.createObjectURL(event.target.files[0]);
         output.onload = function () {
             URL.revokeObjectURL(output.src)

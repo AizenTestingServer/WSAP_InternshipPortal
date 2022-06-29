@@ -28,8 +28,8 @@
             <?php include_once "profile_nav.php"; ?>
         </div>
         
-        <div class="row align-items-center mb-2">
-            <div class="col-md-12">
+        <div class="d-flex align-items-center mb-2">
+            <div>
                 <h3>Brands</h3>
             </div>
         </div>

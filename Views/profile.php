@@ -84,23 +84,29 @@
         } else {
             $_SESSION["upload_failed"] = "You must select an image file first!";
         }
-        redirect('profile.php');
+        redirect("profile.php");
         exit();
     }
 
     if (isset($_POST["savePersonal"])) {
-        $_SESSION['last_name'] = $_POST["lastName"];
-        $_SESSION['first_name'] = $_POST["firstName"];
-        $_SESSION['middle_name'] = $_POST["middleName"];
-        $_SESSION['birthday'] = $_POST["birthday"];
-        $_SESSION['gender'] = $_POST["gender"];
+        $last_name = ucwords(trim($_POST["lastName"]));
+        $first_name = ucwords(trim($_POST["firstName"]));
+        $middle_name = ucwords(trim($_POST["middleName"]));
+        $gender = $_POST["gender"];
+        $birthday = $_POST["birthday"];
 
-        if (!empty($_POST["lastName"]) && !empty($_POST["firstName"]) && !empty($_POST["birthday"])) {
-            $personal_info = array(ucwords($_POST["lastName"]),
-            ucwords($_POST["firstName"]),
-            ucwords($_POST["middleName"]),
-            $_POST["gender"],
-            $_POST["birthday"],
+        $_SESSION["last_name"] = $last_name;
+        $_SESSION["first_name"] = $first_name;
+        $_SESSION["middle_name"] = $middle_name;
+        $_SESSION["gender"] = $gender;
+        $_SESSION["birthday"] = $birthday;
+
+        if (!empty($last_name) && !empty($first_name) && !empty($birthday)) {
+            $personal_info = array($last_name,
+            $first_name,
+            $middle_name,
+            $gender,
+            $birthday,
             $_SESSION["intern_id"]);
     
             $db->query("UPDATE intern_personal_information
@@ -110,94 +116,116 @@
             $db->execute();
             $db->closeStmt();
             
-            $_SESSION['personal_success'] = "Successfully saved the changes.";
-            unset($_SESSION['last_name']);
-            unset($_SESSION['first_name']);
-            unset($_SESSION['middle_name']);
-            unset($_SESSION['birthday']);
-            unset($_SESSION['gender']);
+            $_SESSION["personal_success"] = "Successfully saved the changes.";
+            unset($_SESSION["last_name"]);
+            unset($_SESSION["first_name"]);
+            unset($_SESSION["middle_name"]);
+            unset($_SESSION["birthday"]);
+            unset($_SESSION["gender"]);
         } else {
-            $_SESSION['personal_failed'] = "Please fill-out the required fields!";
+            $_SESSION["personal_failed"] = "Please fill-out the required fields!";
         }
-        redirect('profile.php#personal-info');
+        redirect("profile.php#personal-info");
         exit();
     }
 
     if (isset($_POST["resetPersonal"])) {
-        unset($_SESSION['last_name']);
-        unset($_SESSION['first_name']);
-        unset($_SESSION['middle_name']);
-        unset($_SESSION['birthday']);
-        unset($_SESSION['gender']);
+        unset($_SESSION["last_name"]);
+        unset($_SESSION["first_name"]);
+        unset($_SESSION["middle_name"]);
+        unset($_SESSION["gender"]);
+        unset($_SESSION["birthday"]);
 
-        redirect('profile.php#personal-info');
+        redirect("profile.php#personal-info");
         exit();
     }
 
     if (isset($_POST["saveWSAP"])) {
-        $_SESSION['dept_id'] = $_POST["department"];
-        $_SESSION['status'] = $_POST["status"];
-        $_SESSION['onboard_date'] = $_POST["onboardDate"];
-        $_SESSION['email_address'] = $_POST["emailAddress"];
-        $_SESSION['mobile_number'] = $_POST["mobileNumber"];
-        $_SESSION['mobile_number_2'] = $_POST["mobileNumber2"];
+        $dept_id = $_POST["department"];
+        $status = $_POST["status"];
+        $onboard_date = $_POST["onboardDate"];
+        $email_address = trim($_POST["emailAddress"]);
+        $mobile_number = $_POST["mobileNumber"];
+        $mobile_number_2 = $_POST["mobileNumber2"];
+
+        $_SESSION["dept_id"] = $dept_id;
+        $_SESSION["status"] = $status;
+        $_SESSION["onboard_date"] = $onboard_date;
+        $_SESSION["email_address"] = $email_address;
+        $_SESSION["mobile_number"] = $mobile_number;
+        $_SESSION["mobile_number_2"] = $mobile_number_2;
         
-        if (!empty($_POST["onboardDate"]) && !empty($_POST["emailAddress"]) && !empty($_POST["mobileNumber"])) {
-            $wsap_info = array($_POST["department"],
-            $_POST["status"],
-            $_POST["onboardDate"],
-            $_POST["emailAddress"],
-            $_POST["mobileNumber"],
-            $_POST["mobileNumber2"],
-            $_SESSION["intern_id"]);
-    
-            $db->query("UPDATE intern_wsap_information
-            SET department_id=:dept_id, status=:status, onboard_date=:onboard_date, email_address=:email_address,
-            mobile_number=:mobile_number, mobile_number_2=:mobile_number_2 WHERE id=:intern_id");
-            $db->setWSAPInfo($wsap_info);
-            $db->execute();
-            $db->closeStmt();
+        if (!empty($onboard_date) && !empty($email_address) && !empty($mobile_number)) {
+            if (isValidEmail($email_address)) {
+                if (isValidMobileNumber($mobile_number) &&
+                    (empty($mobile_number_2) || isValidMobileNumber($mobile_number_2))) {
+                    $wsap_info = array($dept_id,
+                    $status,
+                    $onboard_date,
+                    $email_address,
+                    $mobile_number,
+                    $mobile_number_2,
+                    $_SESSION["intern_id"]);
             
-            $_SESSION['wsap_success'] = "Successfully saved the changes.";
-            unset($_SESSION['dept_id']);
-            unset($_SESSION['status']);
-            unset($_SESSION['onboard_date']);
-            unset($_SESSION['email_address']);
-            unset($_SESSION['mobile_number']);
-            unset($_SESSION['mobile_number_2']);
+                    $db->query("UPDATE intern_wsap_information
+                    SET department_id=:dept_id, status=:status, onboard_date=:onboard_date, email_address=:email_address,
+                    mobile_number=:mobile_number, mobile_number_2=:mobile_number_2 WHERE id=:intern_id");
+                    $db->setWSAPInfo($wsap_info);
+                    $db->execute();
+                    $db->closeStmt();
+                    
+                    $_SESSION["wsap_success"] = "Successfully saved the changes.";
+                    unset($_SESSION["dept_id"]);
+                    unset($_SESSION["status"]);
+                    unset($_SESSION["onboard_date"]);
+                    unset($_SESSION["email_address"]);
+                    unset($_SESSION["mobile_number"]);
+                    unset($_SESSION["mobile_number_2"]);
+                } else {
+                    $_SESSION["wsap_failed"] = "The mobile number is not a valid number!";
+                }
+            } else {
+                $_SESSION["wsap_failed"] = "The email address is not a valid email!";
+            }
         } else {
-            $_SESSION['wsap_failed'] = "Please fill-out the required fields!";
+            $_SESSION["wsap_failed"] = "Please fill-out the required fields!";
         }
-        redirect('profile.php#wsap-info');
+        redirect("profile.php#wsap-info");
         exit();
     }
 
     if (isset($_POST["resetWSAP"])) {
-        unset($_SESSION['dept_id']);
-        unset($_SESSION['status']);
-        unset($_SESSION['onboard_date']);
-        unset($_SESSION['email_address']);
-        unset($_SESSION['mobile_number']);
-        unset($_SESSION['mobile_number_2']);
+        unset($_SESSION["dept_id"]);
+        unset($_SESSION["status"]);
+        unset($_SESSION["onboard_date"]);
+        unset($_SESSION["email_address"]);
+        unset($_SESSION["mobile_number"]);
+        unset($_SESSION["mobile_number_2"]);
         
-        redirect('profile.php#wsap-info');
+        redirect("profile.php#wsap-info");
         exit();
     }
 
     if (isset($_POST["saveEducational"])) {
-        $_SESSION['university'] = $_POST["university"];
-        $_SESSION['university_abbreviation'] = $_POST["university_abbreviation"];
-        $_SESSION['course'] = $_POST["course"];
-        $_SESSION['course_abbreviation'] = $_POST["course_abbreviation"];
-        $_SESSION['year'] = $_POST["year"];
+        $university = trim($_POST["university"]);
+        $university_abbreviation = trim($_POST["university_abbreviation"]);
+        $course = trim($_POST["course"]);
+        $course_abbreviation = trim($_POST["course_abbreviation"]);
+        $year = $_POST["year"];
 
-        if (!empty($_POST["university"]) && !empty($_POST["course"]) && !empty($_POST["year"]) &&
-        !empty($_POST["university_abbreviation"]) && !empty($_POST["course_abbreviation"])) {
-            $educational_info = array($_POST["university"],
-            $_POST["course"],
-            $_POST["university_abbreviation"],
-            $_POST["course_abbreviation"],
-            $_POST["year"],
+        $_SESSION["university"] = $university;
+        $_SESSION["university_abbreviation"] = $university_abbreviation;
+        $_SESSION["course"] = $course;
+        $_SESSION["course_abbreviation"] = $course_abbreviation;
+        $_SESSION["year"] = $year;
+
+        if (!empty($university) && !empty($course) && !empty($year) &&
+        !empty($university_abbreviation) && !empty($course_abbreviation)) {
+            $educational_info = array($university,
+            $course,
+            $university_abbreviation,
+            $course_abbreviation,
+            $year,
             $_SESSION["intern_id"]);
     
             $db->query("UPDATE intern_educational_information
@@ -207,56 +235,60 @@
             $db->execute();
             $db->closeStmt();
             
-            $_SESSION['educational_success'] = "Successfully saved the changes.";
-            unset($_SESSION['university']);
-            unset($_SESSION['university_abbreviation']);
-            unset($_SESSION['course']);
-            unset($_SESSION['course_abbreviation']);
-            unset($_SESSION['year']);
+            $_SESSION["educational_success"] = "Successfully saved the changes.";
+            unset($_SESSION["university"]);
+            unset($_SESSION["university_abbreviation"]);
+            unset($_SESSION["course"]);
+            unset($_SESSION["course_abbreviation"]);
+            unset($_SESSION["year"]);
         } else {
-            $_SESSION['educational_failed'] = "Please fill-out the required fields!";
+            $_SESSION["educational_failed"] = "Please fill-out the required fields!";
         }
-        redirect('profile.php#educational-info');
+        redirect("profile.php#educational-info");
         exit();
     }
 
     if (isset($_POST["resetEducational"])) {
-        unset($_SESSION['university']);
-        unset($_SESSION['university_abbreviation']);
-        unset($_SESSION['course']);
-        unset($_SESSION['course_abbreviation']);
-        unset($_SESSION['year']);
+        unset($_SESSION["university"]);
+        unset($_SESSION["university_abbreviation"]);
+        unset($_SESSION["course"]);
+        unset($_SESSION["course_abbreviation"]);
+        unset($_SESSION["year"]);
         
-        redirect('profile.php#educational-info');
+        redirect("profile.php#educational-info");
         exit();
     }
 
     if (isset($_POST["saveAccount"])) {
         if (!empty($_POST["new_password"]) && !empty($_POST["confirm_password"]) && !empty($_POST["current_password"])) {
             if (strlen($_POST["new_password"]) > 5) {
-                if ($_POST["new_password"] == $_POST["confirm_password"]) {
-                    if ($_POST["current_password"] == $value["password"]) {
-                        $new_password = array(md5($_POST["new_password"]), $_SESSION["intern_id"]);
-        
-                        $db->query("UPDATE intern_accounts SET password=:password WHERE id=:intern_id");
-                        $db->updatePassword($new_password);
-                        $db->execute();
-                        $db->closeStmt();
-                        
-                        $_SESSION['account_success'] = "Successfully saved the changes.";
+                if (isValidPassword($_POST["new_password"])) {
+                    if ($_POST["new_password"] == $_POST["confirm_password"]) {
+                        if (md5($_POST["current_password"]) == $value["password"]) {
+                            $new_password = array(md5($_POST["new_password"]), $_SESSION["intern_id"]);
+            
+                            $db->query("UPDATE intern_accounts SET password=:password WHERE id=:intern_id");
+                            $db->updatePassword($new_password);
+                            $db->execute();
+                            $db->closeStmt();
+                            
+                            $_SESSION["account_success"] = "Successfully saved the changes.";
+                        } else {
+                            $_SESSION["account_failed"] = "Incorrect password!";
+                        }
                     } else {
-                        $_SESSION['account_failed'] = "Incorrect password!";
+                        $_SESSION["account_failed"] = "The new and confirm password does not match!";
                     }
                 } else {
-                    $_SESSION['account_failed'] = "The new and confirm password does not match!";
+                    $_SESSION["account_failed"] = "The password must only contain letters or numbers!";
                 }
             } else {
-                $_SESSION['account_failed'] = "The new password must be between 6 and 16 characters!";
+                $_SESSION["account_failed"] = "The new password must be between 6 and 16 characters!";
             }
         } else {
-            $_SESSION['account_failed'] = "Please fill-out the required fields!";
+            $_SESSION["account_failed"] = "Please fill-out the required fields!";
         }
-        redirect('profile.php#account-info');
+        redirect("profile.php#account-info");
         exit();
     }
 
@@ -273,8 +305,8 @@
             <?php include_once "profile_nav.php"; ?>
         </div>
         
-        <div class="row align-items-center mb-2">
-            <div class="col-md-12">
+        <div class="d-flex align-items-center mb-2">
+            <div>
                 <h3>My Profile</h3>
             </div>
         </div>
@@ -301,20 +333,20 @@
                             }
                         } ?>" /> <?php
 
-                    if (isset($_SESSION['upload_success'])) { ?>
+                    if (isset($_SESSION["upload_success"])) { ?>
                         <div class="alert alert-success text-success">
                             <?php
-                                echo $_SESSION['upload_success'];
-                                unset($_SESSION['upload_success']);
+                                echo $_SESSION["upload_success"];
+                                unset($_SESSION["upload_success"]);
                             ?>
                         </div> <?php
                     }
 
-                    if (isset($_SESSION['upload_failed'])) { ?>
+                    if (isset($_SESSION["upload_failed"])) { ?>
                         <div class="alert alert-danger text-danger">
                             <?php
-                                echo $_SESSION['upload_failed'];
-                                unset($_SESSION['upload_failed']);
+                                echo $_SESSION["upload_failed"];
+                                unset($_SESSION["upload_failed"]);
                             ?>
                         </div> <?php
                     }
@@ -338,20 +370,20 @@
             </div>
 
             <div class="col-lg-8 col-md-7 p-4"> <?php
-                if (isset($_SESSION['personal_success'])) { ?>
+                if (isset($_SESSION["personal_success"])) { ?>
                     <div class="alert alert-success text-success">
                         <?php
-                            echo $_SESSION['personal_success'];
-                            unset($_SESSION['personal_success']);
+                            echo $_SESSION["personal_success"];
+                            unset($_SESSION["personal_success"]);
                         ?>
                     </div> <?php
                 }
 
-                if (isset($_SESSION['personal_failed'])) { ?>
+                if (isset($_SESSION["personal_failed"])) { ?>
                     <div class="alert alert-danger text-danger">
                         <?php
-                            echo $_SESSION['personal_failed'];
-                            unset($_SESSION['personal_failed']);
+                            echo $_SESSION["personal_failed"];
+                            unset($_SESSION["personal_failed"]);
                         ?>
                     </div> <?php
                 } ?>
@@ -438,8 +470,8 @@
                                             disabled <?php
                                         } ?>>
                                         <option value="0" <?php
-                                            if (isset($_SESSION['gender'])) {
-                                                if ($_SESSION['gender'] == 0) { ?>
+                                            if (isset($_SESSION["gender"])) {
+                                                if ($_SESSION["gender"] == 0) { ?>
                                                     selected <?php
                                                 }
                                             } else {
@@ -448,8 +480,8 @@
                                                 }
                                             } ?>>Male</option>
                                         <option value="1" <?php
-                                            if (isset($_SESSION['gender'])) {
-                                                if ($_SESSION['gender'] == 1) { ?>
+                                            if (isset($_SESSION["gender"])) {
+                                                if ($_SESSION["gender"] == 1) { ?>
                                                     selected <?php
                                                 }
                                             } else {
@@ -480,20 +512,20 @@
             </div>
 
             <div class="col-12 p-4"> <?php
-                if (isset($_SESSION['wsap_success'])) { ?>
+                if (isset($_SESSION["wsap_success"])) { ?>
                     <div class="alert alert-success text-success">
                         <?php
-                            echo $_SESSION['wsap_success'];
-                            unset($_SESSION['wsap_success']);
+                            echo $_SESSION["wsap_success"];
+                            unset($_SESSION["wsap_success"]);
                         ?>
                     </div> <?php
                 }
 
-                if (isset($_SESSION['wsap_failed'])) { ?>
+                if (isset($_SESSION["wsap_failed"])) { ?>
                     <div class="alert alert-danger text-danger">
                         <?php
-                            echo $_SESSION['wsap_failed'];
-                            unset($_SESSION['wsap_failed']);
+                            echo $_SESSION["wsap_failed"];
+                            unset($_SESSION["wsap_failed"]);
                         ?>
                     </div> <?php
                 } ?>
@@ -536,8 +568,8 @@
                                                     disabled <?php
                                                 } ?>>
                                             <option value="0" <?php
-                                                if (isset($_SESSION['status'])) {
-                                                    if ($_SESSION['status'] == 0) { ?>
+                                                if (isset($_SESSION["status"])) {
+                                                    if ($_SESSION["status"] == 0) { ?>
                                                         selected <?php
                                                     }
                                                 } else {
@@ -546,8 +578,8 @@
                                                     }
                                                 } ?>>Inactive</option>
                                                 <option value="1" <?php
-                                                if (isset($_SESSION['status'])) {
-                                                    if ($_SESSION['status'] == 1) { ?>
+                                                if (isset($_SESSION["status"])) {
+                                                    if ($_SESSION["status"] == 1) { ?>
                                                         selected <?php
                                                     }
                                                 } else {
@@ -556,8 +588,8 @@
                                                     }
                                                 } ?>>Active</option>
                                                 <option value="2" <?php
-                                                if (isset($_SESSION['status'])) {
-                                                    if ($_SESSION['status'] == 2) { ?>
+                                                if (isset($_SESSION["status"])) {
+                                                    if ($_SESSION["status"] == 2) { ?>
                                                         selected <?php
                                                     }
                                                 } else {
@@ -566,8 +598,8 @@
                                                     }
                                                 } ?>>Offboarded</option>
                                                 <option value="3" <?php
-                                                if (isset($_SESSION['status'])) {
-                                                    if ($_SESSION['status'] == 3) { ?>
+                                                if (isset($_SESSION["status"])) {
+                                                    if ($_SESSION["status"] == 3) { ?>
                                                         selected <?php
                                                     }
                                                 } else {
@@ -576,8 +608,8 @@
                                                     }
                                                 } ?>>Withdrew</option>
                                                 <option value="4" <?php
-                                                if (isset($_SESSION['status'])) {
-                                                    if ($_SESSION['status'] == 4) { ?>
+                                                if (isset($_SESSION["status"])) {
+                                                    if ($_SESSION["status"] == 4) { ?>
                                                         selected <?php
                                                     }
                                                 } else {
@@ -586,8 +618,8 @@
                                                     }
                                                 } ?>>Extended</option>
                                                 <option value="5" <?php
-                                                if (isset($_SESSION['status'])) {
-                                                    if ($_SESSION['status'] == 5) { ?>
+                                                if (isset($_SESSION["status"])) {
+                                                    if ($_SESSION["status"] == 5) { ?>
                                                         selected <?php
                                                     }
                                                 } else {
@@ -596,8 +628,8 @@
                                                     }
                                                 } ?>>Suspended</option>
                                                 <option value="6" <?php
-                                                if (isset($_SESSION['status'])) {
-                                                    if ($_SESSION['status'] == 6) { ?>
+                                                if (isset($_SESSION["status"])) {
+                                                    if ($_SESSION["status"] == 6) { ?>
                                                         selected <?php
                                                     }
                                                 } else {
@@ -638,7 +670,7 @@
                                             $estimated_weekends = ceil(($rendering_days/5) * 2);
                                             $rendering_days += $estimated_weekends + 1;
 
-                                            echo date('m/d/Y', strtotime($date->getDate().' + '.$rendering_days.' days')); ?>"
+                                            echo date("m/d/Y", strtotime($date->getDate()." + ".$rendering_days." days")); ?>"
                                             disabled>
                                         </div>
                                         <div class="col-lg-3 col-md-6 col-sm-6 user_input my-1">
@@ -737,20 +769,20 @@
             </div>
 
             <div class="col-12 p-4"> <?php
-                if (isset($_SESSION['educational_success'])) { ?>
+                if (isset($_SESSION["educational_success"])) { ?>
                     <div class="alert alert-success text-success">
                         <?php
-                            echo $_SESSION['educational_success'];
-                            unset($_SESSION['educational_success']);
+                            echo $_SESSION["educational_success"];
+                            unset($_SESSION["educational_success"]);
                         ?>
                     </div> <?php
                 }
                 
-                if (isset($_SESSION['educational_failed'])) { ?>
+                if (isset($_SESSION["educational_failed"])) { ?>
                     <div class="alert alert-danger text-danger">
                         <?php
-                            echo $_SESSION['educational_failed'];
-                            unset($_SESSION['educational_failed']);
+                            echo $_SESSION["educational_failed"];
+                            unset($_SESSION["educational_failed"]);
                         ?>
                     </div> <?php
                 } ?>
@@ -834,8 +866,8 @@
                                                     disabled <?php
                                                 } ?>>
                                                 <option value="1" <?php
-                                                if (isset($_SESSION['year'])) {
-                                                    if ($_SESSION['year'] == 1) { ?>
+                                                if (isset($_SESSION["year"])) {
+                                                    if ($_SESSION["year"] == 1) { ?>
                                                         selected <?php
                                                     }
                                                 } else {
@@ -844,8 +876,8 @@
                                                     }
                                                 } ?>>1</option>
                                                 <option value="2" <?php
-                                                if (isset($_SESSION['year'])) {
-                                                    if ($_SESSION['year'] == 2) { ?>
+                                                if (isset($_SESSION["year"])) {
+                                                    if ($_SESSION["year"] == 2) { ?>
                                                         selected <?php
                                                     }
                                                 } else {
@@ -854,8 +886,8 @@
                                                     }
                                                 } ?>>2</option>
                                                 <option value="3" <?php
-                                                if (isset($_SESSION['year'])) {
-                                                    if ($_SESSION['year'] == 3) { ?>
+                                                if (isset($_SESSION["year"])) {
+                                                    if ($_SESSION["year"] == 3) { ?>
                                                         selected <?php
                                                     }
                                                 } else {
@@ -864,8 +896,8 @@
                                                     }
                                                 } ?>>3</option>
                                                 <option value="4" <?php
-                                                if (isset($_SESSION['year'])) {
-                                                    if ($_SESSION['year'] == 4) { ?>
+                                                if (isset($_SESSION["year"])) {
+                                                    if ($_SESSION["year"] == 4) { ?>
                                                         selected <?php
                                                     }
                                                 } else {
@@ -874,8 +906,8 @@
                                                     }
                                                 } ?>>4</option>
                                                 <option value="5" <?php
-                                                if (isset($_SESSION['year'])) {
-                                                    if ($_SESSION['year'] == 5) { ?>
+                                                if (isset($_SESSION["year"])) {
+                                                    if ($_SESSION["year"] == 5) { ?>
                                                         selected <?php
                                                     }
                                                 } else {
@@ -908,20 +940,20 @@
             </div>
 
             <div class="col-12 p-4"> <?php
-                if (isset($_SESSION['account_success'])) { ?>
+                if (isset($_SESSION["account_success"])) { ?>
                     <div class="alert alert-success text-success">
                         <?php
-                            echo $_SESSION['account_success'];
-                            unset($_SESSION['account_success']);
+                            echo $_SESSION["account_success"];
+                            unset($_SESSION["account_success"]);
                         ?>
                     </div> <?php
                 }
                 
-                if (isset($_SESSION['account_failed'])) { ?>
+                if (isset($_SESSION["account_failed"])) { ?>
                     <div class="alert alert-danger text-danger">
                         <?php
-                            echo $_SESSION['account_failed'];
-                            unset($_SESSION['account_failed']);
+                            echo $_SESSION["account_failed"];
+                            unset($_SESSION["account_failed"]);
                         ?>
                     </div> <?php
                 } ?>
@@ -1086,7 +1118,7 @@
 
 <script>
     var loadFile = function (event) {
-        var output = document.getElementById('output');
+        var output = document.getElementById("output");
         output.src = URL.createObjectURL(event.target.files[0]);
         output.onload = function () {
             URL.revokeObjectURL(output.src)

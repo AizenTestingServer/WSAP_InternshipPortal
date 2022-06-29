@@ -38,26 +38,26 @@
             $db->execute();
             $db->closeStmt();
             
-            $_SESSION['success'] = "Successfully added an account.";
+            $_SESSION["success"] = "Successfully added an account.";
         } else {
-            $_SESSION['failed'] = "Please fill-out the required fields!";
+            $_SESSION["failed"] = "Please fill-out the required fields!";
         }
-        redirect('interns.php');
+        redirect("interns.php");
         exit();
     }
     
-    if (isset($_POST["btnRemoveAccount"])) {
+    if (isset($_POST["removeAccount"])) {
         if (!empty($_POST["intern_id"])) {    
             $db->query("DELETE FROM intern_personal_information WHERE id=:intern_id");
             $db->setInternId($_POST["intern_id"]);
             $db->execute();
             $db->closeStmt();
             
-            $_SESSION['success'] = "Successfully removed an account.";
+            $_SESSION["success"] = "Successfully removed an account.";
         } else {
-            $_SESSION['failed'] = "Please fill-out the required fields!";
+            $_SESSION["failed"] = "Please fill-out the required fields!";
         }
-        redirect('interns.php');
+        redirect("interns.php");
         exit();
     }
 
@@ -104,8 +104,8 @@
             <?php include_once "profile_nav.php"; ?>
         </div>
         
-        <div class="row align-items-center mb-2">
-            <div class="col-md-12">
+        <div class="d-flex align-items-center mb-2">
+            <div>
                 <h3>Interns</h3>
             </div>
         </div>        
@@ -369,20 +369,20 @@
                 </div>
             </form>
         </div> <?php
-        if (isset($_SESSION['success'])) { ?>
+        if (isset($_SESSION["success"])) { ?>
             <div class="alert alert-success text-success">
                 <?php
-                    echo $_SESSION['success'];
-                    unset($_SESSION['success']);
+                    echo $_SESSION["success"];
+                    unset($_SESSION["success"]);
                 ?>
             </div> <?php
         }
 
-        if (isset($_SESSION['failed'])) { ?>
+        if (isset($_SESSION["failed"])) { ?>
             <div class="alert alert-danger text-danger">
                 <?php
-                    echo $_SESSION['failed'];
-                    unset($_SESSION['failed']);
+                    echo $_SESSION["failed"];
+                    unset($_SESSION["failed"]);
                 ?>
             </div> <?php
         } ?>
@@ -434,7 +434,7 @@
                                         </div>
 
                                         <div class="modal-footer">
-                                            <button type="submit" name="btnRemoveAccount" class="btn btn-danger">Remove</button>
+                                            <button type="submit" name="removeAccount" class="btn btn-danger">Remove</button>
                                         </div>
                                     </form>
                                 </div>
@@ -444,13 +444,12 @@
                         <div class="position-relative">
                             <div class="intern text-center">
                                 <div class="top">
-                                    <img class="img-intern mx-auto" src="<?php {
+                                    <img class="img-intern mx-auto" src="<?php
                                         if ($row["gender"] == 0) {
                                             echo "../Assets/img/profile_imgs/default_male.png";
                                         } else {
                                             echo "../Assets/img/profile_imgs/default_female.png";
-                                        }
-                                    } ?>">
+                                        } ?>">
                                 </div>
                                 <div class="summary-total mt-2 w-fit mx-auto">
                                     <h5 class="mb-0 text-dark fs-regular">
@@ -463,7 +462,7 @@
                                 data-bs-target="#removeAccountModal<?= $row["id"] ?>">
                                 <i class="fa-solid fa-xmark fs-c"></i>
                             </button>
-                        </div><?php
+                        </div> <?php
                     } ?>
                 </div> <?php
                 if ($db->rowCount() == 0) { ?>

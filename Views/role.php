@@ -45,11 +45,11 @@
     }
 
     if (isset($_POST["submit"])) {
-        $_SESSION['name'] = $_POST["name"];
-        $_SESSION['brand'] = $_POST["brand"];
-        $_SESSION['department'] = $_POST["department"];
-        $_SESSION['admin'] = $_POST["admin"];
-        $_SESSION['level'] = $_POST["level"];
+        $_SESSION["name"] = $_POST["name"];
+        $_SESSION["brand"] = $_POST["brand"];
+        $_SESSION["department"] = $_POST["department"];
+        $_SESSION["admin"] = $_POST["admin"];
+        $_SESSION["level"] = $_POST["level"];
 
         if (!empty($_POST["name"]) && !empty($_POST["level"])) {            
             if ($_POST["level"] < $current_level) {
@@ -65,7 +65,7 @@
                     $db->execute();
                     $db->closeStmt();
     
-                    $_SESSION['role_success'] = "Successfully added a role.";
+                    $_SESSION["role_success"] = "Successfully added a role.";
                 } else {
                     $roles = array($_POST["name"],
                     $_POST["brand"],
@@ -80,29 +80,29 @@
                     $db->execute();
                     $db->closeStmt();
     
-                    $_SESSION['role_success'] = "Successfully saved the changes.";
+                    $_SESSION["role_success"] = "Successfully saved the changes.";
                 }
-                unset($_SESSION['name']);
-                unset($_SESSION['brand']);
-                unset($_SESSION['department']);
-                unset($_SESSION['admin']);
-                unset($_SESSION['level']);
+                unset($_SESSION["name"]);
+                unset($_SESSION["brand"]);
+                unset($_SESSION["department"]);
+                unset($_SESSION["admin"]);
+                unset($_SESSION["level"]);
 
-                redirect('roles.php');
+                redirect("roles.php");
                 exit();
             } else {
-                $_SESSION['role_failed'] = "The level must not be greater than your currrent level (".$current_level.").";
+                $_SESSION["role_failed"] = "The level must not be greater than your currrent level (".$current_level.").";
             }
         } else {
-            $_SESSION['role_failed'] = "Please fill-out the required fields!";
+            $_SESSION["role_failed"] = "Please fill-out the required fields!";
         }
-        redirect('role.php');
+        redirect("role.php");
         exit();
     }
 
     if (isset($_POST["reset"])) {
         
-        redirect('role.php');
+        redirect("role.php");
         exit();
     }
 
@@ -124,8 +124,8 @@
             <?php include_once "profile_nav.php"; ?>
         </div>
         
-        <div class="row align-items-center mb-2">
-            <div class="col-md-12">
+        <div class="d-flex align-items-center mb-2">
+            <div>
                 <h3><?php
                  if (empty($_GET["role_id"])) {
                     echo "Add Role";
@@ -139,20 +139,20 @@
         if ($admin_roles_count != 0) { ?>
         <div id="role" class="row rounded shadow pb-4 position-relative">
             <div class="col-12 p-4 mb-4"> <?php
-                if (isset($_SESSION['role_success'])) { ?>
+                if (isset($_SESSION["role_success"])) { ?>
                     <div class="alert alert-success text-success">
                         <?php
-                            echo $_SESSION['role_success'];
-                            unset($_SESSION['role_success']);
+                            echo $_SESSION["role_success"];
+                            unset($_SESSION["role_success"]);
                         ?>
                     </div> <?php
                 }
                 
-                if (isset($_SESSION['role_failed'])) { ?>
+                if (isset($_SESSION["role_failed"])) { ?>
                     <div class="alert alert-danger text-danger">
                         <?php
-                            echo $_SESSION['role_failed'];
-                            unset($_SESSION['role_failed']);
+                            echo $_SESSION["role_failed"];
+                            unset($_SESSION["role_failed"]);
                         ?>
                     </div> <?php
                 } ?>
@@ -220,7 +220,7 @@
                         </div>
                         <div class="col-2 user_input my-1">
                             <label class="text-indigo mb-2" for="admin">Admin</label>
-                            <select name="admin" class="form-select">
+                            <select id="admin" name="admin" class="form-select">
                                 <option value="0" <?php
                                     if (!empty($_SESSION["admin"])) {
                                         if ($_SESSION["admin"] == 0) { ?>
@@ -232,7 +232,7 @@
                                                 selected <?php
                                             }
                                         }
-                                    }?>>No
+                                    } ?>>No
                                 </option>
                                 <option value="1" <?php
                                     if (!empty($_SESSION["admin"])) {
@@ -253,15 +253,28 @@
                             <label class="text-indigo mb-2" for="level">Level
                                 <span class="text-danger">*</span>
                             </label>
-                            <input type="number" name="level" class="form-control"
+                            <input id="level" type="number" name="level" class="form-control"
                                 value="<?php
                                 if (!empty($_SESSION["level"])) {
                                     echo $_SESSION["level"];
                                 } else {
                                     if (!empty($_GET["role_id"])) {
                                         echo $value["admin_level"];
+                                    } else {
+                                        echo 1;
                                     }
-                                } ?>">
+                                } ?>" <?php
+                                if (!empty($_SESSION["admin"])) {
+                                    if ($_SESSION["admin"] == 0) { ?>
+                                        readonly <?php
+                                    }
+                                } else {
+                                    if (!empty($_GET["role_id"])) {
+                                        if ($value["admin"] == 0) { ?>
+                                            readonly <?php
+                                        }
+                                    }
+                                } ?>>
                         </div>
                     </div> 
                     <div class="bottom-right">
@@ -276,17 +289,22 @@
                 </form>
             </div>
         </div> <?php
-        } else { ?>
-            <div id="access-denied">
-                <div class="text-center">
-                    <i class="fa-solid fa-lock fa-3x text-warning mb-4"></i>
-                    <h3 class="fw-bold">Access Denied</h3>
-                    <p>
-                        <pre>Only Admin of WSAP IP can access this feature.</pre>
-                    </p>
-                    <a class="btn btn-secondary" href="dashboard.php">Return to Dashboard</a>
-                </div> 
-            </div> <?php
+        } else {
+            include_once "access_denied.php";
         } ?>
     </div>
 </div>
+
+<script>
+    const adminLevel = document.getElementById("admin");
+    const levelElement = document.getElementById("level");
+
+    adminLevel.addEventListener("change", function(event) {
+        if (adminLevel.value == 1) {
+            levelElement.removeAttribute("readonly");
+        } else if (adminLevel.value == 0) {
+            levelElement.value = 1;
+            levelElement.setAttribute("readonly", "");
+        }
+    });
+</script>

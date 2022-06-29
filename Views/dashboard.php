@@ -20,7 +20,7 @@
 
     $intern_wsap_info = $db->fetch();
 
-    $db->query("SELECT COUNT(*) AS total_interns FROM intern_wsap_information");
+    $db->query("SELECT COUNT(*) AS total_interns FROM intern_personal_information");
     $db->execute();
 
     $total_interns = 0;
@@ -55,7 +55,7 @@
     }
 
     if (isset($_POST["goToAttendance"])) {
-        redirect('attendance.php');
+        redirect("attendance.php");
         exit();
     }
 
@@ -73,15 +73,15 @@
         </div>
         
         <div class="row mb-3">
-            <div class="col-md-12">
+            <div>
                 <h3>Dashboard</h3>
             </div> <?php
 
-            if (isset($_SESSION['setup_success'])) { ?>
+            if (isset($_SESSION["setup_success"])) { ?>
                 <div class="alert alert-success text-success">
                     <?php
-                        echo $_SESSION['setup_success'];
-                        unset($_SESSION['setup_success']);
+                        echo $_SESSION["setup_success"];
+                        unset($_SESSION["setup_success"]);
                     ?>
                 </div> <?php
             } ?>
@@ -95,7 +95,7 @@
                                     Rendered Hours
                                 </div>
                                 <div class="summary-total">
-                                    <h3><?= $intern_wsap_info["rendered_hours"].'/'.
+                                    <h3><?= $intern_wsap_info["rendered_hours"]."/".
                                     $intern_wsap_info["target_rendering_hours"] ?></h3>
                                 </div>
                             </div>
@@ -171,7 +171,7 @@
                                     $estimated_weekends = ceil(($rendering_days/5) * 2);
                                     $rendering_days += $estimated_weekends + 1;
                                     
-                                    echo date('M j', strtotime($date->getDate().' + '.$rendering_days.' days')); ?></h3>
+                                    echo date("M j", strtotime($date->getDate()." + ".$rendering_days." days")); ?></h3>
                                 </div>
                             </div>
                             <div class="right">
@@ -262,7 +262,7 @@
 
                     <?php $record_count = 0; ?>
                     <div class="daily_task"> <?php
-                        if (isTimeInEnabled()) { $record_count++; ?>
+                        if (isTimeInEnabled($lts_att["att_date"])) { $record_count++; ?>
                             <div class="task-box">
                                 <div class="task-box-status">
                                     <div class="d-flex justify-content-between">

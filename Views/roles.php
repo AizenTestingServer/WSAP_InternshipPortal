@@ -23,6 +23,18 @@
     $db->execute();
     $admin_roles_count = $db->rowCount();
 
+    $current_level = 0;
+    $db->query("SELECT MAX(roles.admin_level) AS max_level
+    FROM intern_personal_information, intern_roles, roles
+    WHERE intern_personal_information.id=intern_roles.intern_id AND
+    intern_roles.role_id=roles.id AND roles.admin=1 AND
+    intern_personal_information.id=:intern_id");
+    $db->setInternId($_SESSION["intern_id"]);
+    $db->execute();
+    if ($value = $db->fetch()) {
+        $current_level = $value["max_level"];
+    }
+
     if (isset($_POST["search"])) {
         $parameters = "?";
         if (!empty($_POST["search_intern"])) {
@@ -72,8 +84,8 @@
             <?php include_once "profile_nav.php"; ?>
         </div>
 
-        <div class="row align-items-center mb-2">
-            <div class="col-md-12">
+        <div class="d-flex align-items-center mb-2">
+            <div>
                 <h3>Roles</h3>
             </div>
         </div>  <?php
@@ -278,7 +290,7 @@
                                                     href="<?= "roles.php" ?>" <?php
                                                 } ?>>Default</a></li>
                                             <li><a class="dropdown-item btn-smoke" <?php
-                                            $parameters = "?";
+                                                $parameters = "?";
                                                 if (!empty($_GET["search"])) {
                                                     $parameters = $parameters."search=".$_GET["search"];
                                                 }
@@ -302,7 +314,7 @@
                                                     href="<?= "roles.php" ?>" <?php
                                                 } ?>>A-Z</a></li>
                                             <li><a class="dropdown-item btn-smoke" <?php
-                                            $parameters = "?";
+                                                $parameters = "?";
                                                 if (!empty($_GET["search"])) {
                                                     $parameters = $parameters."search=".$_GET["search"];
                                                 }
@@ -387,11 +399,11 @@
                     </div>
                 </form>
             </div> <?php
-            if (isset($_SESSION['role_success'])) { ?>
+            if (isset($_SESSION["role_success"])) { ?>
                 <div class="alert alert-success text-success">
                     <?php
-                        echo $_SESSION['role_success'];
-                        unset($_SESSION['role_success']);
+                        echo $_SESSION["role_success"];
+                        unset($_SESSION["role_success"]);
                     ?>
                 </div> <?php
             }?>
@@ -447,8 +459,10 @@
                         $conditions = $conditions." brands.name=:brand_name";
                     }
 
-                    $query = "SELECT roles.*, roles.name AS role_name, roles.id AS role_id, brands.*, brands.name AS brand_name, departments.*, departments.name AS dept_name
-                    FROM roles LEFT JOIN brands ON roles.brand_id = brands.id LEFT JOIN departments ON roles.department_id = departments.id";
+                    $query = "SELECT roles.*, roles.name AS role_name, roles.id AS role_id,
+                    brands.*, brands.name AS brand_name, departments.*, departments.name AS dept_name
+                    FROM roles LEFT JOIN brands ON roles.brand_id = brands.id LEFT JOIN departments
+                    ON roles.department_id = departments.id";
                     
                     if (strlen($conditions) > 6) {
                         $db->query($query.$conditions.$sort);
@@ -498,10 +512,16 @@
                                     echo "No";
                                 } ?></td>
                             <td><?= $row["admin_level"] ?></td>
-                            <td>
-                                <a class="btn btn-secondary btn-sm" href="role.php?role_id=<?= $row["role_id"] ?>">
-                                    <i class="fa-solid fa-pen fs-a"></i>
-                                </a>
+                            <td> <?php
+                                if ($row["admin_level"] < $current_level) { ?>
+                                    <a class="btn btn-secondary btn-sm" href="role.php?role_id=<?= $row["role_id"] ?>">
+                                        <i class="fa-solid fa-pen fs-a"></i>
+                                    </a> <?php
+                                } else { ?>
+                                    <a class="btn btn-secondary btn-sm disabled">
+                                        <i class="fa-solid fa-pen fs-a"></i>
+                                    </a> <?php
+                                } ?>
                             </td>
                         </tr> <?php
                     } ?>
@@ -512,17 +532,8 @@
                     <h3>No Record</h3>
                 </div> <?php
             }
-        } else { ?>
-            <div id="access-denied">
-                <div class="text-center">
-                    <i class="fa-solid fa-lock fa-3x text-warning mb-4"></i>
-                    <h3 class="fw-bold">Access Denied</h3>
-                    <p>
-                        <pre>Only Admin of WSAP IP can access this feature.</pre>
-                    </p>
-                    <a class="btn btn-secondary" href="dashboard.php">Return to Dashboard</a>
-                </div> 
-            </div> <?php
+        } else {
+            include_once "access_denied.php";
         } ?>        
     </div>
 </div>

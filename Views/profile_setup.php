@@ -21,141 +21,174 @@
     $value = $db->fetch();
 
     if (isset($_POST["setProfile"]) &&  isset($_FILES["image"])) {
-        $_SESSION['last_name'] = $_POST["lastName"];
-        $_SESSION['first_name'] = $_POST["firstName"];
-        $_SESSION['middle_name'] = $_POST["middleName"];
-        $_SESSION['birthday'] = $_POST["birthday"];
-        $_SESSION['gender'] = $_POST["gender"];
+        $last_name = ucwords(trim($_POST["lastName"]));
+        $first_name = ucwords(trim($_POST["firstName"]));
+        $middle_name = ucwords(trim($_POST["middleName"]));
+        $gender = $_POST["gender"];
+        $birthday = $_POST["birthday"];
         
-        $_SESSION['dept_id'] = $_POST["department"];
-        $_SESSION['status'] = $_POST["status"];
-        $_SESSION['onboard_date'] = $_POST["onboardDate"];
-        $_SESSION['target_rendering_hours'] = $_POST["targetRenderingHours"];
-        $_SESSION['email_address'] = $_POST["emailAddress"];
-        $_SESSION['mobile_number'] = $_POST["mobileNumber"];
-        $_SESSION['mobile_number_2'] = $_POST["mobileNumber2"];
+        $dept_id = $_POST["department"];
+        $status = $_POST["status"];
+        $onboard_date = $_POST["onboardDate"];
+        $target_rendering_hours = $_POST["targetRenderingHours"];
+        $email_address = trim($_POST["emailAddress"]);
+        $mobile_number = $_POST["mobileNumber"];
+        $mobile_number_2 = $_POST["mobileNumber2"];
+        
+        $university = trim($_POST["university"]);
+        $university_abbreviation = trim($_POST["university_abbreviation"]);
+        $course = trim($_POST["course"]);
+        $course_abbreviation = trim($_POST["course_abbreviation"]);
+        $year = $_POST["year"];
 
-        $_SESSION['university'] = $_POST["university"];
-        $_SESSION['university_abbreviation'] = $_POST["university_abbreviation"];
-        $_SESSION['course'] = $_POST["course"];
-        $_SESSION['course_abbreviation'] = $_POST["course_abbreviation"];
-        $_SESSION['year'] = $_POST["year"];
+        $_SESSION["last_name"] = $last_name;
+        $_SESSION["first_name"] = $first_name;
+        $_SESSION["middle_name"] = $middle_name;
+        $_SESSION["gender"] = $gender;
+        $_SESSION["birthday"] = $birthday;
 
-        $personal_completed = !empty($_POST["lastName"]) && 
-        !empty($_POST["firstName"]) && 
-        !empty($_POST["birthday"]);
+        $_SESSION["dept_id"] = $dept_id;
+        $_SESSION["status"] = $status;
+        $_SESSION["onboard_date"] = $onboard_date;
+        $_SESSION["target_rendering_hours"] = $target_rendering_hours;
+        $_SESSION["email_address"] = $email_address;
+        $_SESSION["mobile_number"] = $mobile_number;
+        $_SESSION["mobile_number_2"] = $mobile_number_2;
 
-        $wsap_completed = !empty($_POST["onboardDate"]) &&
-        !empty($_POST["targetRenderingHours"]) &&
-        !empty($_POST["emailAddress"]) &&
-        !empty($_POST["mobileNumber"]);
+        $_SESSION["university"] = $university;
+        $_SESSION["university_abbreviation"] = $university_abbreviation;
+        $_SESSION["course"] = $course;
+        $_SESSION["course_abbreviation"] = $course_abbreviation;
+        $_SESSION["year"] = $year;
 
-        $educational_completed = !empty($_POST["university"]) &&
-        !empty($_POST["course"]) && !empty($_POST["year"]) &&
-        !empty($_POST["university_abbreviation"]) &&
-        !empty($_POST["course_abbreviation"]);
+        $personal_completed = !empty($last_name) && 
+        !empty($first_name) && 
+        !empty($birthday);
+
+        $wsap_completed = !empty($onboard_date) &&
+        !empty($target_rendering_hours) &&
+        !empty($email_address) &&
+        !empty($mobile_number);
+
+        $educational_completed = !empty($university) &&
+        !empty($course) && !empty($year) &&
+        !empty($university_abbreviation) &&
+        !empty($course_abbreviation);
 
         $account_completed = !empty($_POST["password"]) &&
         !empty($_POST["confirm_password"]);
 
         if ($personal_completed && $wsap_completed && $educational_completed && $account_completed) {
-            if (strlen($_POST["password"]) > 5) {
-                if ($_POST["password"] == $_POST["confirm_password"]) {
-                    $image_name = $_FILES["image"]["name"];
-                    $image_size = $_FILES["image"]["size"];
-                    $tmp_name = $_FILES["image"]["tmp_name"];
-                    $error = $_FILES["image"]["error"];
-
-                    if (!empty($image_name)) {
-                        if ($error == 0) {
-                            $img_ex = strtolower(pathinfo($image_name, PATHINFO_EXTENSION));
-                            $allowed_exs = array("jpg", "jpeg", "png");
-                
-                            if (in_array($img_ex, $allowed_exs)) {
-                                $personal_info = array(ucwords($_POST["lastName"]),
-                                ucwords($_POST["firstName"]),
-                                ucwords($_POST["middleName"]),
-                                $_POST["gender"],
-                                $_POST["birthday"],
-                                $_SESSION["intern_id"]);
-                        
-                                $db->query("UPDATE intern_personal_information
-                                SET last_name=:last_name, first_name=:first_name, middle_name=:middle_name,
-                                gender=:gender, birthday=:birthday WHERE id=:intern_id");
-                                $db->setPersonalInfo($personal_info);
-                                $db->execute();
-                                $db->closeStmt();
-                                
-                                $image_path = "../Assets/img/profile_imgs/".$image_name;
-                                
-                                $wsap_info = array($_SESSION["intern_id"],
-                                $_POST["department"],
-                                $_POST["status"],
-                                $_POST["onboardDate"],
-                                $_POST["targetRenderingHours"],
-                                0,
-                                $_POST["emailAddress"],
-                                $_POST["mobileNumber"],
-                                $_POST["mobileNumber2"],
-                                $image_path);
-                        
-                                $db->query("INSERT INTO intern_wsap_information
-                                VALUES(:intern_id, :dept_id, :status, :onboard_date,
-                                :target_rendering_hours, :rendered_hours,
-                                :email_address, :mobile_number, :mobile_number_2, :image)");
-                                $db->insertWSAPInfo($wsap_info);
-                                $db->execute();
-                                $db->closeStmt();
-
-                                $educational_info = array($_SESSION["intern_id"],
-                                $_POST["university"],
-                                $_POST["university_abbreviation"],
-                                $_POST["course"],
-                                $_POST["course_abbreviation"],
-                                $_POST["year"]);
-                        
-                                $db->query("INSERT INTO intern_educational_information
-                                VALUES(:intern_id, :university, :university_abbreviation,
-                                :course, :course_abbreviation, :year)");
-                                $db->insertEducationalInfo($educational_info);
-                                $db->execute();
-                                $db->closeStmt();
-
-                                $account_info = array($_SESSION["intern_id"],
-                                md5($_POST["password"]),
-                                date("Y-m-d", $date->getDateValue()));
-                
-                                $db->query("INSERT INTO intern_accounts
-                                VALUES(:intern_id, :password, :date_activated)");
-                                $db->insertAccount($account_info);
-                                $db->execute();
-                                $db->closeStmt();
-
-                                move_uploaded_file($tmp_name, $image_path);
-                                
-                                $_SESSION['setup_success'] = "Successfully setup the profile.";
-                                $_SESSION['password'] = $_POST["password"];
-                                redirect('dashboard.php');
-                                exit();
+            if (isValidEmail($email_address)) {
+                if (isValidMobileNumber($mobile_number) &&
+                    (empty($mobile_number_2) || isValidMobileNumber($mobile_number_2))) {
+                    if (strlen($_POST["password"]) > 5) {
+                        if (isValidPassword($_POST["password"])) {
+                            if ($_POST["password"] == $_POST["confirm_password"]) {
+                                $image_name = $_FILES["image"]["name"];
+                                $image_size = $_FILES["image"]["size"];
+                                $tmp_name = $_FILES["image"]["tmp_name"];
+                                $error = $_FILES["image"]["error"];
+            
+                                if (!empty($image_name)) {
+                                    if ($error == 0) {
+                                        $img_ex = strtolower(pathinfo($image_name, PATHINFO_EXTENSION));
+                                        $allowed_exs = array("jpg", "jpeg", "png");
+                            
+                                        if (in_array($img_ex, $allowed_exs)) {
+                                            $personal_info = array($last_name,
+                                            $first_name,
+                                            $middle_name,
+                                            $gender,
+                                            $birthday,
+                                            $_SESSION["intern_id"]);
+                                    
+                                            $db->query("UPDATE intern_personal_information
+                                            SET last_name=:last_name, first_name=:first_name, middle_name=:middle_name,
+                                            gender=:gender, birthday=:birthday WHERE id=:intern_id");
+                                            $db->setPersonalInfo($personal_info);
+                                            $db->execute();
+                                            $db->closeStmt();
+                                            
+                                            $image_path = "../Assets/img/profile_imgs/".$image_name;
+                                            
+                                            $wsap_info = array($_SESSION["intern_id"],
+                                            $dept_id,
+                                            $status,
+                                            $onboard_date,
+                                            $target_rendering_hours,
+                                            0,
+                                            $email_address,
+                                            $mobile_number,
+                                            $mobile_number_2,
+                                            $image_path);
+                                            
+                                            $db->query("INSERT INTO intern_wsap_information
+                                            VALUES(:intern_id, :dept_id, :status, :onboard_date,
+                                            :target_rendering_hours, :rendered_hours,
+                                            :email_address, :mobile_number, :mobile_number_2, :image)");
+                                            $db->insertWSAPInfo($wsap_info);
+                                            $db->execute();
+                                            $db->closeStmt();
+            
+                                            $educational_info = array($_SESSION["intern_id"],
+                                            $university,
+                                            $university_abbreviation,
+                                            $course,
+                                            $course_abbreviation,
+                                            $year);
+                                    
+                                            $db->query("INSERT INTO intern_educational_information
+                                            VALUES(:intern_id, :university, :university_abbreviation,
+                                            :course, :course_abbreviation, :year)");
+                                            $db->insertEducationalInfo($educational_info);
+                                            $db->execute();
+                                            $db->closeStmt();
+            
+                                            $account_info = array($_SESSION["intern_id"],
+                                            md5($_POST["password"]),
+                                            date("Y-m-d", $date->getDateValue()));
+                            
+                                            $db->query("INSERT INTO intern_accounts
+                                            VALUES(:intern_id, :password, :date_activated)");
+                                            $db->insertAccount($account_info);
+                                            $db->execute();
+                                            $db->closeStmt();
+            
+                                            move_uploaded_file($tmp_name, $image_path);
+                                            
+                                            $_SESSION["setup_success"] = "Successfully setup the profile.";
+                                            $_SESSION["password"] = $_POST["password"];
+                                            redirect("dashboard.php");
+                                            exit();
+                                        } else {
+                                            $_SESSION["setup_failed"] = "The file must be an image!";
+                                        }
+                                    } else {
+                                        $_SESSION["setup_failed"] = "There is an error occurred!";
+                                    }
+                                } else {
+                                    $_SESSION["setup_failed"] = "You must select an image file first!";
+                                }
                             } else {
-                                $_SESSION["setup_failed"] = "The file must be an image!";
+                                $_SESSION["setup_failed"] = "The password does not match!";
                             }
                         } else {
-                            $_SESSION["setup_failed"] = "There is an error occurred!";
+                            $_SESSION["setup_failed"] = "The password must only contain letters or numbers!";
                         }
                     } else {
-                        $_SESSION["setup_failed"] = "You must select an image file first!";
+                        $_SESSION["setup_failed"] = "The new password must be between 6 and 16 characters!";
                     }
                 } else {
-                    $_SESSION['setup_failed'] = "The password does not match!";
+                    $_SESSION["setup_failed"] = "The mobile number is not a valid number!";
                 }
             } else {
-                $_SESSION['setup_failed'] = "The new password must be between 6 and 16 characters!";
+                $_SESSION["setup_failed"] = "The email address is not a valid email!";
             }
         } else {
-            $_SESSION['setup_failed'] = "Please fill-out the required fields!";
+            $_SESSION["setup_failed"] = "Please fill-out the required fields!";
         }
-        redirect('profile_setup.php');
+        redirect("profile_setup.php");
         exit();
     }
 
@@ -168,26 +201,26 @@
             <?php include_once "profile_nav_setup.php"; ?>
         </div>
         
-        <div class="row align-items-center mb-2">
-            <div class="col-md-12">
+        <div class="d-flex align-items-center mb-2">
+            <div>
                 <h3>Profile Setup</h3>
             </div>
         </div> <?php
 
-        if (isset($_SESSION['setup_success'])) { ?>
+        if (isset($_SESSION["setup_success"])) { ?>
             <div class="alert alert-success text-success">
                 <?php
-                    echo $_SESSION['setup_success'];
-                    unset($_SESSION['setup_success']);
+                    echo $_SESSION["setup_success"];
+                    unset($_SESSION["setup_success"]);
                 ?>
             </div> <?php
         }
 
-        if (isset($_SESSION['setup_failed'])) { ?>
+        if (isset($_SESSION["setup_failed"])) { ?>
             <div class="alert alert-danger text-danger">
                 <?php
-                    echo $_SESSION['setup_failed'];
-                    unset($_SESSION['setup_failed']);
+                    echo $_SESSION["setup_failed"];
+                    unset($_SESSION["setup_failed"]);
                 ?>
             </div> <?php
         } ?>
@@ -273,16 +306,16 @@
                                     <label class="mb-2" for="gender">Gender</label>
                                     <select name="gender" class="form-select">
                                         <option value="0" <?php
-                                            if (isset($_SESSION['gender'])) {
-                                                if ($_SESSION['gender'] == 0) { ?>
+                                            if (isset($_SESSION["gender"])) {
+                                                if ($_SESSION["gender"] == 0) { ?>
                                                     selected <?php
                                                 }
                                             } else { ?>
                                                 selected <?php
                                             } ?>>Male</option>
                                         <option value="1" <?php
-                                            if (isset($_SESSION['gender'])) {
-                                                if ($_SESSION['gender'] == 1) { ?>
+                                            if (isset($_SESSION["gender"])) {
+                                                if ($_SESSION["gender"] == 1) { ?>
                                                     selected <?php
                                                 }
                                             } ?>>Female</option>
@@ -334,46 +367,46 @@
                                             <label class="mb-2" for="status">Status</label>
                                             <select name="status" class="form-select">
                                                 <option value="0" <?php
-                                                if (isset($_SESSION['status'])) {
-                                                    if ($_SESSION['status'] == 0) { ?>
+                                                if (isset($_SESSION["status"])) {
+                                                    if ($_SESSION["status"] == 0) { ?>
                                                         selected <?php
                                                     }
                                                 } ?>>Inactive</option>
                                                 <option value="1" <?php
-                                                if (isset($_SESSION['status'])) {
-                                                    if ($_SESSION['status'] == 1) { ?>
+                                                if (isset($_SESSION["status"])) {
+                                                    if ($_SESSION["status"] == 1) { ?>
                                                         selected <?php
                                                     }
                                                 } else { ?>
                                                     selected <?php
                                                 } ?>>Active</option>
                                                 <option value="2" <?php
-                                                if (isset($_SESSION['status'])) {
-                                                    if ($_SESSION['status'] == 2) { ?>
+                                                if (isset($_SESSION["status"])) {
+                                                    if ($_SESSION["status"] == 2) { ?>
                                                         selected <?php
                                                     }
                                                 } ?>>Offboarded</option>
                                                 <option value="3" <?php
-                                                if (isset($_SESSION['status'])) {
-                                                    if ($_SESSION['status'] == 3) { ?>
+                                                if (isset($_SESSION["status"])) {
+                                                    if ($_SESSION["status"] == 3) { ?>
                                                         selected <?php
                                                     }
                                                 } ?>>Withdrew</option>
                                                 <option value="4" <?php
-                                                if (isset($_SESSION['status'])) {
-                                                    if ($_SESSION['status'] == 4) { ?>
+                                                if (isset($_SESSION["status"])) {
+                                                    if ($_SESSION["status"] == 4) { ?>
                                                         selected <?php
                                                     }
                                                 } ?>>Extended</option>
                                                 <option value="5" <?php
-                                                if (isset($_SESSION['status'])) {
-                                                    if ($_SESSION['status'] == 5) { ?>
+                                                if (isset($_SESSION["status"])) {
+                                                    if ($_SESSION["status"] == 5) { ?>
                                                         selected <?php
                                                     }
                                                 } ?>>Suspended</option>
                                                 <option value="6" <?php
-                                                if (isset($_SESSION['status'])) {
-                                                    if ($_SESSION['status'] == 6) { ?>
+                                                if (isset($_SESSION["status"])) {
+                                                    if ($_SESSION["status"] == 6) { ?>
                                                         selected <?php
                                                     }
                                                 } ?>>Terminated</option>
@@ -494,34 +527,34 @@
                                             <label class="mb-2" for="year">Year</label>
                                             <select name="year" class="form-select">
                                                 <option value="1" <?php
-                                                if (isset($_SESSION['year'])) {
-                                                    if ($_SESSION['year'] == 1) { ?>
+                                                if (isset($_SESSION["year"])) {
+                                                    if ($_SESSION["year"] == 1) { ?>
                                                         selected <?php
                                                     }
                                                 } else { ?>
                                                     selected <?php
                                                 } ?>>1</option>
                                                 <option value="2" <?php
-                                                if (isset($_SESSION['year'])) {
-                                                    if ($_SESSION['year'] == 2) { ?>
+                                                if (isset($_SESSION["year"])) {
+                                                    if ($_SESSION["year"] == 2) { ?>
                                                         selected <?php
                                                     }
                                                 } ?>>2</option>
                                                 <option value="3" <?php
-                                                if (isset($_SESSION['year'])) {
-                                                    if ($_SESSION['year'] == 3) { ?>
+                                                if (isset($_SESSION["year"])) {
+                                                    if ($_SESSION["year"] == 3) { ?>
                                                         selected <?php
                                                     }
                                                 } ?>>3</option>
                                                 <option value="4" <?php
-                                                if (isset($_SESSION['year'])) {
-                                                    if ($_SESSION['year'] == 4) { ?>
+                                                if (isset($_SESSION["year"])) {
+                                                    if ($_SESSION["year"] == 4) { ?>
                                                         selected <?php
                                                     }
                                                 } ?>>4</option>
                                                 <option value="5" <?php
-                                                if (isset($_SESSION['year'])) {
-                                                    if ($_SESSION['year'] == 5) { ?>
+                                                if (isset($_SESSION["year"])) {
+                                                    if ($_SESSION["year"] == 5) { ?>
                                                         selected <?php
                                                     }
                                                 } ?>>5</option>
@@ -581,7 +614,7 @@
 
 <script>
     var loadFile = function (event) {
-        var output = document.getElementById('output');
+        var output = document.getElementById("output");
         output.src = URL.createObjectURL(event.target.files[0]);
         output.onload = function () {
             URL.revokeObjectURL(output.src)

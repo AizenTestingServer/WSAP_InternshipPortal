@@ -5,16 +5,28 @@
         header("Location: ".$location);
     }
 
-    if (!function_exists('str_contains')) {
+    if (!function_exists("str_contains")) {
         function str_contains(string $haystack, string $needle): bool {
-            return '' === $needle || false !== strpos($haystack, $needle);
+            return "" === $needle || false !== strpos($haystack, $needle);
         }
     }
 
     function randomWord($len = 5) {
-        $result = array_merge(range('0', '9'), range('A', 'Z'));
+        $result = array_merge(range("0", "9"), range("A", "Z"));
         shuffle($result);
         return substr(implode($result), 0, $len);
+    }
+
+    function isValidEmail($email_address) {
+        return filter_var($email_address, FILTER_VALIDATE_EMAIL);
+    }
+
+    function isValidMobileNumber($mobile_number) {
+        return preg_match("/^[0-9]{10}+$/", $mobile_number);
+    }
+
+    function isValidPassword($password) {
+        return preg_match("/^[A-Za-z0-9]*$/", $password);
     }
 
     function atMorningShift() {
@@ -43,16 +55,17 @@
             $date->getDateTimeValue() >= $date->morning_shift_end() && $date->getDateTimeValue() < $date->afternoon_shift_start();
     }
 
-    function isTimeInEnabled() {
+    function isTimeInEnabled($att_date) {
         $date = new Date();
-        return ($date->getDateTimeValue() >= $date->time_in_start() &&  $date->getDateTimeValue() < $date->time_in_end()) ||
-            ($date->getDateTimeValue() >= $date->morning_shift_end() && $date->getDateTimeValue() < $date->afternoon_shift_start());
+        return $att_date != $date->getDate() &&
+            (($date->getDateTimeValue() >= $date->time_in_start() &&  $date->getDateTimeValue() < $date->time_in_end()) ||
+            ($date->getDateTimeValue() >= $date->morning_shift_end() && $date->getDateTimeValue() < $date->afternoon_shift_start()));
     }
 
     function isTimeOutEnabled($time_in, $time_out) {
         $date = new Date();
         return !(!empty($time_out) || atMorningShift() || atAfternoonShift() ||
-        atOvertime() || atEndOfDay() || atAfternoonTimeIn($time_in));
+            atOvertime() || atEndOfDay() || atAfternoonTimeIn($time_in));
     }
 
     function isMorningShift($time_in, $time_out) {
@@ -70,5 +83,10 @@
     function isOvertime($time_out) {
         $date = new Date();
         return strtotime($time_out) >= $date->time_out_overtime_start() && strtotime($time_out) < $date->time_out_overtime_end();
+    }
+
+    function getMonths() {
+        return array("January", "February", "March", "April", "May", "June",
+            "July", "August", "September", "October", "November", "December");
     }
 ?>

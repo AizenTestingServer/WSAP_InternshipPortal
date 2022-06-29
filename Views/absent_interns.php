@@ -80,8 +80,8 @@
             <?php include_once "profile_nav.php"; ?>
         </div>
         
-        <div class="row align-items-center mb-2">
-            <div class="col-md-12">
+        <div class="d-flex align-items-center mb-2">
+            <div>
                 <h3>Absent Interns</h3>
             </div>
         </div> <?php
@@ -375,17 +375,8 @@
                     </div> <?php
                 } ?>
             </div> <?php
-        } else { ?>
-            <div id="access-denied">
-                <div class="text-center">
-                    <i class="fa-solid fa-lock fa-3x text-warning mb-4"></i>
-                    <h3 class="fw-bold">Access Denied</h3>
-                    <p>
-                        <pre>Only Admin of WSAP IP can access this feature.</pre>
-                    </p>
-                    <a class="btn btn-secondary" href="dashboard.php">Return to Dashboard</a>
-                </div> 
-            </div> <?php
+        } else {
+            include_once "access_denied.php";
         } ?>        
     </div>
 </div>

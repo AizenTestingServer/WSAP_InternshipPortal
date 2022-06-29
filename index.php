@@ -41,13 +41,13 @@
                 $_SESSION["intern_id"] = $_POST["intern_id"];
                 $_SESSION["password"] = $_POST["password"];
                 unset($_SESSION["intern_id_temp"]);
-                redirect('./Views/dashboard.php');
+                redirect("./Views/dashboard.php");
                 exit();
             } else {
-                $_SESSION['sign_in_failed'] = "Unregistered account!";
+                $_SESSION["sign_in_failed"] = "Unregistered account!";
             }
         } else if (empty($_POST["intern_id"]) && empty($_POST["password"])) {
-            $_SESSION['sign_in_failed'] = "Please enter your credentials.";
+            $_SESSION["sign_in_failed"] = "Please enter your credentials.";
         } else {
             $_SESSION["intern_id_temp"] = $_POST["intern_id"];
 
@@ -59,7 +59,7 @@
             if ($db->rowCount() != 0) {
                 $_SESSION["intern_id"] = $_POST["intern_id"];
                 unset($_SESSION["intern_id_temp"]);
-                redirect('./Views/profile_setup.php');
+                redirect("./Views/profile_setup.php");
                 exit();
             } else {
                 $db->query("SELECT intern_personal_information.*, intern_accounts.*
@@ -73,14 +73,14 @@
                 if (empty($value["password"])) {
                     $_SESSION["intern_id_2"] = $_POST["intern_id"];
                     unset($_SESSION["intern_id_temp"]);
-                    redirect('./Views/reset_password.php');
+                    redirect("./Views/reset_password.php");
                     exit();
                 } else {                
-                    $_SESSION['sign_in_failed'] = "Please enter your credentials.";
+                    $_SESSION["sign_in_failed"] = "Please enter your credentials.";
                 }
             }
         }
-        redirect('index.php');
+        redirect("index.php");
         exit();
     }
 
@@ -96,11 +96,11 @@
                     <h4 class="title">INTERNSHIP PORTAL</h4>
                 </div>
                 <?php
-                    if (isset($_SESSION['sign_in_failed'])) { ?>
+                    if (isset($_SESSION["sign_in_failed"])) { ?>
                         <div class="alert alert-danger text-danger">
                             <?php
-                                echo $_SESSION['sign_in_failed'];
-                                unset($_SESSION['sign_in_failed']);
+                                echo $_SESSION["sign_in_failed"];
+                                unset($_SESSION["sign_in_failed"]);
                             ?>
                         </div> <?php
                     }
@@ -121,6 +121,11 @@
                     <button name="signIn" class="btn btn-warning w-100">Sign in</button>
                 </div>
             </form>
+            <div class="text-center mt-4"style="line-height: 14px;">
+                <h6 class="fw-bold fs-f">Developed by: WSAP Interns</h6>
+                <p class="m-0 fs-e">IT Department</p>
+                <p class="m-0 fs-e">Web Development Team</p>
+            </div>
         </div>
     </div>
 </div>

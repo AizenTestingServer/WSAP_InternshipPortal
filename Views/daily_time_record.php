@@ -52,18 +52,18 @@
                 $time_out = substr($time_out, 0, 8);
             }
 
-            $time_out_hr = date('g', strtotime($time_out));
-            $time_out_min = date('i', strtotime($time_out));
-            $time_out_time_type = date('a', strtotime($time_out));
+            $time_out_hr = date("g", strtotime($time_out));
+            $time_out_min = date("i", strtotime($time_out));
+            $time_out_time_type = date("a", strtotime($time_out));
         }
 
         if (strlen($time_in) > 8) {
             $time_in = substr($time_in, 0, 8);
         }
 
-        $time_in_hr = date('g', strtotime($time_in));
-        $time_in_min = date('i', strtotime($time_in));
-        $time_in_time_type = date('a', strtotime($time_in));
+        $time_in_hr = date("g", strtotime($time_in));
+        $time_in_min = date("i", strtotime($time_in));
+        $time_in_time_type = date("a", strtotime($time_in));
     }
 
     if (isset($_POST["search"])) {
@@ -134,10 +134,10 @@
         }
 
         if (isOvertime($time_out)) {
-            $dt_time_out_start = new DateTime(date('G:i', $date->time_out_start()));
-            $dt_time_out = new DateTime(date('G:i', strtotime($time_out)));
-            $rendered_hours += $dt_time_out_start->diff($dt_time_out)->format('%h');
-            $rendered_minutes = $dt_time_out_start->diff($dt_time_out)->format('%i');
+            $dt_time_out_start = new DateTime(date("G:i", $date->time_out_start()));
+            $dt_time_out = new DateTime(date("G:i", strtotime($time_out)));
+            $rendered_hours += $dt_time_out_start->diff($dt_time_out)->format("%h");
+            $rendered_minutes = $dt_time_out_start->diff($dt_time_out)->format("%i");
             $rendered_hours += round($rendered_minutes/60, 1);
         }
 
@@ -159,10 +159,10 @@
         $db->execute();
         $db->closeStmt();
         
-        $_SESSION['time_out_success'] = "Successfully setup the time out.";
-        unset($_SESSION['time_out_hr']);
-        unset($_SESSION['time_out_min']);
-        unset($_SESSION['time_out_time_type']);
+        $_SESSION["time_out_success"] = "Successfully setup the time out.";
+        unset($_SESSION["time_out_hr"]);
+        unset($_SESSION["time_out_min"]);
+        unset($_SESSION["time_out_time_type"]);
 
         redirect("daily_time_record.php?intern_id=".$_GET["intern_id"]);
         exit();
@@ -202,8 +202,8 @@
             } ?>
         </div>
 
-        <div class="row align-items-center mb-2">
-            <div class="col-md-12">
+        <div class="d-flex align-items-center mb-2">
+            <div>
                 <h3>Daily Time Record</h3>
             </div>
         </div> <?php
@@ -262,6 +262,14 @@
                             } ?>
                         </div>
                     </div>
+                </div>
+                                
+                <div class="w-fit my-2 ms-auto">
+                    <a class="btn btn-primary"
+                        href="preview_pdf.php?intern_id=<?= $_GET["intern_id"] ?>"
+                        target="window">
+                        Preview DTR as PDF
+                    </a>
                 </div> <?php
                         
                 if (!empty($_GET["id"]) && $selected_att["time_out"] == "NTO" &&
@@ -322,11 +330,11 @@
                     </div> <?php
                 }
 
-                if (isset($_SESSION['time_out_success'])) { ?>
+                if (isset($_SESSION["time_out_success"])) { ?>
                     <div class="alert alert-success text-success">
                         <?php
-                            echo $_SESSION['time_out_success'];
-                            unset($_SESSION['time_out_success']);
+                            echo $_SESSION["time_out_success"];
+                            unset($_SESSION["time_out_success"]);
                         ?>
                     </div> <?php
                 } ?>
@@ -447,10 +455,10 @@
                                                 }
             
                                                 if (isOvertime($time_out)) {
-                                                    $dt_time_out_start = new DateTime(date('G:i', $date->time_out_start()));
-                                                    $dt_time_out = new DateTime(date('G:i', strtotime($time_out)));
-                                                    $rendered_hours += $dt_time_out_start->diff($dt_time_out)->format('%h');
-                                                    $rendered_minutes = $dt_time_out_start->diff($dt_time_out)->format('%i');
+                                                    $dt_time_out_start = new DateTime(date("G:i", $date->time_out_start()));
+                                                    $dt_time_out = new DateTime(date("G:i", strtotime($time_out)));
+                                                    $rendered_hours += $dt_time_out_start->diff($dt_time_out)->format("%h");
+                                                    $rendered_minutes = $dt_time_out_start->diff($dt_time_out)->format("%i");
                                                     $rendered_hours += round($rendered_minutes/60, 1);
                                                 }
                                             }
@@ -797,17 +805,8 @@
                     } ?>
                 </div> <?php
             }           
-        } else { ?>
-            <div id="access-denied">
-                <div class="text-center">
-                    <i class="fa-solid fa-lock fa-3x text-warning mb-4"></i>
-                    <h3 class="fw-bold">Access Denied</h3>
-                    <p>
-                        <pre>Only Admin of WSAP IP can access this feature.</pre>
-                    </p>
-                    <a class="btn btn-secondary" href="dashboard.php">Return to Dashboard</a>
-                </div> 
-            </div> <?php
+        } else {
+            include_once "access_denied.php";
         } ?>
     </div>
 </div>

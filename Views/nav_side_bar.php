@@ -1,5 +1,5 @@
 <?php
-    function navSideBar($targetActive) { ?>
+    function navSideBar($target_active) { ?>
         <div class="side-nav border-end p-1 vh-100 position-fixed">
             <div class="d-flex align-items-center flex-column">
                 <img class="img-responsive" src="../Assets/img/Brand_Logo/WSAP.png" alt="">
@@ -8,7 +8,7 @@
             <ul class="side-nav-list px-1 mt-4">
                 <li>
                     <a <?php
-                    if ($targetActive == "dashboard") { ?>
+                    if ($target_active == "dashboard") { ?>
                         class="active" <?php
                     } else { ?>
                         class="inactive"
@@ -22,7 +22,7 @@
                 </li>
                 <li class="dropdown-toggler">
                     <a <?php
-                    if ($targetActive == "brands") { ?>
+                    if ($target_active == "brands") { ?>
                         class="active" <?php
                     } else { ?>
                         class="inactive"
@@ -63,7 +63,7 @@
                 -->
                 <li class="dropdown-toggler">
                     <a <?php
-                    if ($targetActive == "attendance") { ?>
+                    if ($target_active == "attendance") { ?>
                         class="active" <?php
                     } else { ?>
                         class="inactive" <?php
@@ -109,7 +109,7 @@
 
                 <li class="dropdown-toggler">
                     <a <?php
-                    if ($targetActive == "interns") { ?>
+                    if ($target_active == "interns") { ?>
                         class="active" <?php
                     } else { ?>
                         class="inactive" <?php
@@ -123,6 +123,7 @@
                         <li><a href="interns.php">Interns</a></li>
                         <li><a href="admins.php">Admins</a></li>
                         <li><a href="roles.php">Roles</a></li>
+                        <li><a href="assign_roles.php">Assign Roles</a></li>
                     </ul>
                 </li>
                 <!--

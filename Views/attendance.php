@@ -58,8 +58,8 @@
             }
 
             if ($db->rowCount() != 0 && $date->getDateValue() == strtotime($lts_att["att_date"])) {
-                $_SESSION['error'] = "You are already timed in!";
-                redirect('attendance.php');
+                $_SESSION["error"] = "You are already timed in!";
+                redirect("attendance.php");
                 exit();
             }
             
@@ -69,7 +69,7 @@
             $db->execute();
             $db->closeStmt();
         
-            redirect('attendance.php');
+            redirect("attendance.php");
             exit();
         }
     
@@ -111,10 +111,10 @@
                 }
 
                 if (isOvertime($time_out)) {
-                    $dt_time_out_start = new DateTime(date('G:i', $date->time_out_start()));
-                    $dt_time_out = new DateTime(date('G:i', strtotime($time_out)));
-                    $rendered_hours += $dt_time_out_start->diff($dt_time_out)->format('%h');
-                    $rendered_minutes = $dt_time_out_start->diff($dt_time_out)->format('%i');
+                    $dt_time_out_start = new DateTime(date("G:i", $date->time_out_start()));
+                    $dt_time_out = new DateTime(date("G:i", strtotime($time_out)));
+                    $rendered_hours += $dt_time_out_start->diff($dt_time_out)->format("%h");
+                    $rendered_minutes = $dt_time_out_start->diff($dt_time_out)->format("%i");
                     $rendered_hours += round($rendered_minutes/60, 1);
                 }
 
@@ -136,11 +136,11 @@
                 $db->execute();
                 $db->closeStmt();
 
-                redirect('attendance.php');
+                redirect("attendance.php");
                 exit();
             } else {
-                $_SESSION['error'] = "You are already timed out!";
-                redirect('attendance.php');
+                $_SESSION["error"] = "You are already timed out!";
+                redirect("attendance.php");
                 exit();
             }
         }
@@ -169,39 +169,70 @@
                         <li class="bg-danger text-light">AU - Absent Unexcused</li>
                         <li class="bg-primary text-light">AE - Absent Excused</li>
                     </ul>
+                    <h5 class="fs-intern fw-bold">Schedule Guide</h5>
+                    <ul class="attendance_legend">
+                        <li class="bg-success text-light">
+                            Regular Time in - 7:00 am to 7:59 am
+                        </li>
+                        <li class="bg-warning">
+                            Late Time in - 8:00 am to 8:24 am
+                        </li>
+                        <li class="bg-morning text-light">
+                            MS Time out - 12:00 pm to 12:59 pm
+                        </li>
+                        <li class="bg-afternoon text-light">
+                            AS Time in - 12:00 pm to 12:59 pm
+                        </li>
+                        <li class="bg-success text-light">
+                            Regular Time out - 5:00 pm to 5:24 pm
+                        </li>
+                        <li class="bg-indigo text-light">
+                            OT Time out - 6:00 pm to 9:24 pm
+                        </li>
+                    </ul>
                 </div>
             </div>
         </div>
 
-        <div class="row align-items-center mb-2">
-            <div class="col-md-12">
+        <div class="d-flex align-items-center mb-2">
+            <div>
                 <h3>My Attendance</h3>
             </div>
         </div>
 
-        <div class="col-md-12">
-            <div id="time-in-time-out-layout" class="d-flex">
-                <?php
-                    if (isset($_SESSION["intern_id"])) {
-                        if (isTimeInEnabled()) {
-                            $date->time_in_enabled();
-                        } else {
-                            $date->time_in_disabled();
+        <div>
+            <div id="time-in-time-out-layout" class="d-md-flex d-sm-inline-block">
+                <div class="my-2">
+                    <?php
+                        if (isset($_SESSION["intern_id"])) {
+                            if (isTimeInEnabled($lts_att["att_date"])) {
+                                $date->time_in_enabled();
+                            } else {
+                                $date->time_in_disabled();
+                            }
+                            
+                            if ($time_out_enabled) {
+                                $date->time_out_enabled();
+                            } else {
+                                $date->time_out_disabled();
+                            }
                         }
-                        
-                        if ($time_out_enabled) {
-                            $date->time_out_enabled();
-                        } else {
-                            $date->time_out_disabled();
-                        }
-                    }
-                ?>
+                    ?>
+                </div>
+                                
+                <div class="w-fit my-2 ms-auto">
+                    <a class="btn btn-primary"
+                        href="preview_pdf.php?intern_id=<?= strtoupper($_SESSION["intern_id"]) ?>"
+                        target="window">
+                        Preview DTR as PDF
+                    </a>
+                </div>
             </div> <?php
-                if (isset($_SESSION['error'])) { ?>
+                if (isset($_SESSION["error"])) { ?>
                     <div class="alert alert-danger attendance-alert text-danger my-2">
                         <?php
-                            echo $_SESSION['error'];
-                            unset($_SESSION['error']);
+                            echo $_SESSION["error"];
+                            unset($_SESSION["error"]);
                         ?>
                     </div> <?php
                 }
@@ -379,10 +410,10 @@
                                     }
 
                                     if (isOvertime($time_out)) {
-                                        $dt_time_out_start = new DateTime(date('G:i', $date->time_out_start()));
-                                        $dt_time_out = new DateTime(date('G:i', strtotime($time_out)));
-                                        $rendered_hours += $dt_time_out_start->diff($dt_time_out)->format('%h');
-                                        $rendered_minutes = $dt_time_out_start->diff($dt_time_out)->format('%i');
+                                        $dt_time_out_start = new DateTime(date("G:i", $date->time_out_start()));
+                                        $dt_time_out = new DateTime(date("G:i", strtotime($time_out)));
+                                        $rendered_hours += $dt_time_out_start->diff($dt_time_out)->format("%h");
+                                        $rendered_minutes = $dt_time_out_start->diff($dt_time_out)->format("%i");
                                         $rendered_hours += round($rendered_minutes/60, 1);
                                     }
                                 }

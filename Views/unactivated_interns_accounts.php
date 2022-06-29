@@ -38,11 +38,26 @@
             $db->execute();
             $db->closeStmt();
             
-            $_SESSION['personal_success'] = "Successfully added a record.";
+            $_SESSION["success"] = "Successfully added a record.";
         } else {
-            $_SESSION['personal_failed'] = "Please fill-out the required fields!";
+            $_SESSION["failed"] = "Please fill-out the required fields!";
         }
-        redirect('interns.php');
+        redirect("unactivated_interns_accounts.php");
+        exit();
+    }
+    
+    if (isset($_POST["removeAccount"])) {
+        if (!empty($_POST["intern_id"])) {    
+            $db->query("DELETE FROM intern_personal_information WHERE id=:intern_id");
+            $db->setInternId($_POST["intern_id"]);
+            $db->execute();
+            $db->closeStmt();
+            
+            $_SESSION["success"] = "Successfully removed an account.";
+        } else {
+            $_SESSION["failed"] = "Please fill-out the required fields!";
+        }
+        redirect("unactivated_interns_accounts.php");
         exit();
     }
 
@@ -81,26 +96,26 @@
             <?php include_once "profile_nav.php"; ?>
         </div>
         
-        <div class="row align-items-center mb-2">
-            <div class="col-md-12">
+        <div class="d-flex align-items-center mb-2">
+            <div>
                 <h3>Unactivated Interns' Account</h3>
             </div>
         </div> <?php
         if ($admin_roles_count != 0) {
-            if (isset($_SESSION['personal_success'])) { ?>
+            if (isset($_SESSION["success"])) { ?>
                 <div class="alert alert-success text-success">
                     <?php
-                        echo $_SESSION['personal_success'];
-                        unset($_SESSION['personal_success']);
+                        echo $_SESSION["success"];
+                        unset($_SESSION["success"]);
                     ?>
                 </div> <?php
             }
 
-            if (isset($_SESSION['personal_failed'])) { ?>
+            if (isset($_SESSION["failed"])) { ?>
                 <div class="alert alert-danger text-danger">
                     <?php
-                        echo $_SESSION['personal_failed'];
-                        unset($_SESSION['personal_failed']);
+                        echo $_SESSION["failed"];
+                        unset($_SESSION["failed"]);
                     ?>
                 </div> <?php
             } ?>
@@ -189,7 +204,7 @@
                                                         echo "Z-A";
                                                         break;
                                                 }
-                                            }?>
+                                            } ?>
                                         </button>
                                         <ul class="dropdown-menu me-2z" aria-labelledby="dropdownMenuButton1" name="sort">
                                             <li><a class="dropdown-item btn-smoke" <?php
@@ -216,7 +231,9 @@
                                 
                                 <div class="w-fit my-2 ms-auto">
                                     <button type="button" class="btn btn-primary" data-bs-toggle="modal" 
-                                        data-bs-target="#addInternModal">Add Intern</button>
+                                        data-bs-target="#addInternModal">
+                                        <i class="fa-solid fa-plus me-2"></i>Add Intern
+                                    </button>
                                 </div>
                             </div>
                         </div>
@@ -227,7 +244,7 @@
             <div class="row">
                 <div class="interns"> <?php
                         $sort = " ORDER BY intern_personal_information.last_name";
-                        if(!empty($_GET["sort"])) {
+                        if (!empty($_GET["sort"])) {
                             switch ($_GET["sort"]) {
                                 case "1":
                                     $sort = " ORDER BY last_name";
@@ -253,27 +270,67 @@
                         $db->execute();
 
                         while ($row = $db->fetch()) { ?>
-                            <div>
+                            <div class="modal fade" id="removeAccountModal<?= $row["id"] ?>" tabindex="-1"
+                                aria-labelledby="removeAccountModalLabel" aria-hidden="true">
+                                <div class="modal-dialog modal-dialog-centered">
+                                    <div class="modal-content">
+                                        <div class="modal-header">
+                                            <h5 class="modal-title" id="removeAccountModalLabel">Remove Account</h5>
+                                            <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Close"></button>
+                                        </div>
+                                        
+                                        <form action="<?= htmlspecialchars($_SERVER["PHP_SELF"]);?>" method="post">
+                                            <div class="modal-body">
+                                                <div class="intern text-center">
+                                                    <div class="top">
+                                                        <img class="img-intern mx-auto" src="<?php {
+                                                            if ($row["gender"] == 0) {
+                                                                echo "../Assets/img/profile_imgs/default_male.png";
+                                                            } else {
+                                                                echo "../Assets/img/profile_imgs/default_female.png";
+                                                            }
+                                                        } ?>">
+                                                    </div>
+                                                    <div class="summary-total mt-2 w-fit mx-auto">
+                                                        <h5 class="text-dark fs-regular mb-0">
+                                                            <?= $row["last_name"].", ".$row["first_name"] ?>
+                                                        </h5>
+                                                        <input type="text" name="intern_id" class="form-control text-center mt-2"
+                                                            value="<?= $row["id"] ?>" readonly>
+                                                    </div>
+                                                </div>
+                                            </div>
+
+                                            <div class="modal-footer">
+                                                <button type="submit" name="removeAccount" class="btn btn-danger">Remove</button>
+                                            </div>
+                                        </form>
+                                    </div>
+                                </div>
+                            </div>
+
+                            <div class="position-relative">
                                 <div class="intern text-center">
                                     <div class="top">
-                                        <img class="img-intern mx-auto" src="<?php {
+                                        <img class="img-intern mx-auto" src="<?php
                                             if ($row["gender"] == 0) {
                                                 echo "../Assets/img/profile_imgs/default_male.png";
                                             } else {
                                                 echo "../Assets/img/profile_imgs/default_female.png";
-                                            }
-                                        } ?>">
+                                            } ?>">
                                     </div>
                                     <div class="summary-total mt-2 w-fit mx-auto">
-                                        <h5 class="mb-0 text-dark">
+                                        <h5 class="mb-0 text-dark fs-regular">
                                             <?= $row["last_name"].", ".$row["first_name"] ?>
                                         </h5>
-                                        <h6><?= $row["id"] ?></h6>
-                                    </div>
-                                    <div class="bottom w-100 mt-3">
+                                        <h6 class="fs-f"><?= $row["id"] ?></h6>
                                     </div>
                                 </div>
-                            </div><?php
+                                <button class="btn btn-danger btn-sm top-right" data-bs-toggle="modal" 
+                                    data-bs-target="#removeAccountModal<?= $row["id"] ?>">
+                                    <i class="fa-solid fa-xmark fs-c"></i>
+                                </button>
+                            </div> <?php
                         } ?>
                 </div> <?php
                 if ($db->rowCount() == 0) { ?>
@@ -282,17 +339,8 @@
                     </div> <?php
                 } ?>
             </div> <?php
-        } else { ?>
-            <div id="access-denied">
-                <div class="text-center">
-                    <i class="fa-solid fa-lock fa-3x text-warning mb-4"></i>
-                    <h3 class="fw-bold">Access Denied</h3>
-                    <p>
-                        <pre>Only Admin of WSAP IP can access this feature.</pre>
-                    </p>
-                    <a class="btn btn-secondary" href="dashboard.php">Return to Dashboard</a>
-                </div> 
-            </div> <?php
+        } else {
+            include_once "access_denied.php";
         } ?>
     </div>
 </div>

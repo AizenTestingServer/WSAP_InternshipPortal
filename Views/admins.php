@@ -38,11 +38,11 @@
             $db->execute();
             $db->closeStmt();
             
-            $_SESSION['personal_success'] = "Successfully added a record.";
+            $_SESSION["personal_success"] = "Successfully added a record.";
         } else {
-            $_SESSION['personal_failed'] = "Please fill-out the required fields!";
+            $_SESSION["personal_failed"] = "Please fill-out the required fields!";
         }
-        redirect('admins.php');
+        redirect("admins.php");
         exit();
     }
 
@@ -89,8 +89,8 @@
             <?php include_once "profile_nav.php"; ?>
         </div>
         
-        <div class="row align-items-center mb-2">
-            <div class="col-md-12">
+        <div class="d-flex align-items-center mb-2">
+            <div>
                 <h3>Admins</h3>
             </div>
         </div>
