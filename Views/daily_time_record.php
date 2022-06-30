@@ -150,7 +150,7 @@
 
         $computed_rendered_hours = array(
             $rendered_hours,
-            $_SESSION["intern_id"]
+            $_GET["intern_id"]
         );
 
         $db->query("UPDATE intern_wsap_information SET rendered_hours=:rendered_hours 
@@ -169,6 +169,45 @@
     }
 
     if (isset($_POST["cancel"])) {
+        redirect("daily_time_record.php?intern_id=".$_GET["intern_id"]);
+        exit();
+    }
+    
+    if (isset($_POST["removeTimeOut"])) {
+        if (!empty($_POST["att_id"]) && !empty($_POST["rendered_hours"])) {
+            $attendance = array(
+                "NTO",
+                $_POST["att_id"]
+            );
+
+            $db->query("UPDATE attendance SET time_out=:time_out WHERE id=:id");
+            $db->timeOut($attendance);
+            $db->execute();
+            $db->closeStmt();
+
+            $db->query("SELECT * FROM intern_wsap_information WHERE id=:intern_id;");
+            $db->setInternId($_GET["intern_id"]);
+            $db->execute();
+            $wsap_info = $db->fetch();
+            
+            $rendered_hours = $wsap_info["rendered_hours"] - $_POST["rendered_hours"];
+
+            $computed_rendered_hours = array(
+                $rendered_hours,
+                $_GET["intern_id"]
+            );
+
+            $db->query("UPDATE intern_wsap_information SET rendered_hours=:rendered_hours 
+            WHERE id=:intern_id");
+            $db->updateRenderedHours($computed_rendered_hours);
+            $db->execute();
+            $db->closeStmt();
+            
+            $_SESSION["time_out_success"] = "Successfully removed the time out.";
+        } else {
+            $_SESSION["time_out_failed"] = "Please fill-out the required fields!";
+        }
+
         redirect("daily_time_record.php?intern_id=".$_GET["intern_id"]);
         exit();
     }
@@ -350,8 +389,7 @@
                             <th scope="col">Rendered Hours</th>
                         </tr>
                     </thead>
-                    <tbody>
-                        <?php
+                    <tbody> <?php
                         if (isset($_SESSION["intern_id"])) {
                             $db->query("SELECT * FROM attendance WHERE intern_id=:intern_id ORDER BY id DESC;");
                             $db->setInternId($_GET["intern_id"]);
@@ -360,8 +398,71 @@
                             $count = 0;
                             $conditions = array("AU", "AE", "MS", "AS", "OT", "OD", "L", "NTO");
                             while ($row = $db->fetch()) {
-                                $count++;  ?>
-                                <tr>
+                                $count++;
+
+                                $time_in = $row["time_in"];
+                                $time_out = $row["time_out"];
+
+                                $rendered_hours = 0;
+                                if (!empty($time_in) && !empty($time_out) && $time_out != "NTO") {
+                                    if (strlen($time_in) > 8) {
+                                        $time_in = substr($time_in, 0, 8);
+                                    }                                    
+                                    if (strlen($time_out) > 8) {
+                                        $time_out = substr($time_out, 0, 8);
+                                    }
+
+                                    if (isMorningShift($time_in, $time_out) || isAfternoonShift($time_in, $time_out)) {
+                                        $rendered_hours = 4;
+                                    } else {
+                                        $rendered_hours = 8;
+                                    }
+
+                                    if (isOvertime($time_out)) {
+                                        $dt_time_out_start = new DateTime(date("G:i", $date->time_out_start()));
+                                        $dt_time_out = new DateTime(date("G:i", strtotime($time_out)));
+                                        $rendered_hours += $dt_time_out_start->diff($dt_time_out)->format("%h");
+                                        $rendered_minutes = $dt_time_out_start->diff($dt_time_out)->format("%i");
+                                        $rendered_hours += round($rendered_minutes/60, 1);
+                                    }
+                                } ?>
+                                <tr> <?php
+                                    if ($time_out != "NTO") { ?>
+                                        <div class="modal fade" id="removeTimeOutModal<?= $row["id"] ?>" tabindex="-1"
+                                            aria-labelledby="removeTimeOutModalLabel" aria-hidden="true">
+                                            <div class="modal-dialog modal-dialog-centered">
+                                                <div class="modal-content">
+                                                    <div class="modal-header">
+                                                        <div class="modal-title" id="removeTimeOutModalLabel">
+                                                            <h5>Remove Time out</h5>
+                                                        </div>
+                                                        <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Close"></button>
+                                                    </div>
+                                                    
+                                                    <form method="post">
+                                                        <div class="modal-body">
+                                                            <div class="text-center px-5">
+                                                                <h6 class="text-dark mb-0">
+                                                                    By removing the time out, the rendered hours on its
+                                                                    day will be deducted to the Intern's total rendered hours.<br><br>
+                                                                    Do you still want to remove the time out?
+                                                                </h6>
+                                                                <input type="text" name="att_id" class="form-control text-center d-none mt-2"
+                                                                            value="<?= $row["id"] ?>" readonly>
+                                                                <input type="text" name="rendered_hours" class="form-control text-center d-none mt-2"
+                                                                            value="<?= $rendered_hours ?>" readonly>
+                                                            </div>
+                                                        </div>
+
+                                                        <div class="modal-footer">
+                                                            <button type="submit" name="removeTimeOut" class="btn btn-danger">Remove Time out</button>
+                                                        </div>
+                                                    </form>
+                                                </div>
+                                            </div>
+                                        </div> <?php
+                                    } ?>
+
                                     <th scope="row"><?= $count ?></th>
                                     <td><?= $row["att_date"] ?></td>
                                     <td><?= date("l", strtotime($row["att_date"])); ?></td>
@@ -435,45 +536,20 @@
                                             }
                                         } ?>
                                     </td>
+                                    <td><?= $rendered_hours ?></td>
                                     <td> <?php
-                                        $time_in = $row["time_in"];
-                                        $time_out = $row["time_out"];
-
-                                        $rendered_hours = 0;
-                                        if ($time_out != "NTO") {
-                                            if(!empty($time_in) && !empty($time_out)) {
-                                                if (strlen($time_in) > 8) {
-                                                    $time_in = substr($time_in, 0, 8);
-                                                }                                    
-                                                if (strlen($time_out) > 8) {
-                                                    $time_out = substr($time_out, 0, 8);
-                                                }
-                                                if (isMorningShift($time_in, $time_out) || isAfternoonShift($time_in, $time_out)) {
-                                                    $rendered_hours = 4;
-                                                } else {
-                                                    $rendered_hours = 8;
-                                                }
-            
-                                                if (isOvertime($time_out)) {
-                                                    $dt_time_out_start = new DateTime(date("G:i", $date->time_out_start()));
-                                                    $dt_time_out = new DateTime(date("G:i", strtotime($time_out)));
-                                                    $rendered_hours += $dt_time_out_start->diff($dt_time_out)->format("%h");
-                                                    $rendered_minutes = $dt_time_out_start->diff($dt_time_out)->format("%i");
-                                                    $rendered_hours += round($rendered_minutes/60, 1);
-                                                }
-                                            }
-                                        }
-                                        
-                                        echo $rendered_hours; ?>
-                                    </td> <?php
-                                    if ($time_out == "NTO") { ?>
-                                        <td>
+                                        if ($time_out == "NTO") { ?>
                                             <a class="btn btn-secondary btn-sm"
                                             href="daily_time_record.php?intern_id=<?= $_GET["intern_id"] ?>&id=<?= $row["id"] ?>">
                                                 <i class="fa-solid fa-pen fs-a"></i>
-                                            </a>
-                                        </td> <?php
-                                    } ?>
+                                            </a> <?php
+                                        } else if (!empty($time_out)) { ?>
+                                            <button class="btn btn-danger btn-sm" data-bs-toggle="modal" 
+                                                data-bs-target="#removeTimeOutModal<?= $row["id"] ?>">
+                                                <i class="fa-solid fa-xmark fs-a"></i>
+                                            </button> <?php
+                                        } ?>
+                                    </td>
                                 </tr> <?php
                             }
                         } ?>

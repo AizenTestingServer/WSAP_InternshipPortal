@@ -50,15 +50,81 @@
             </div>
         </div> <?php
         if ($admin_roles_count != 0) { ?>
-            <div>
-                <div class="row">
-                    
-                </div>
+            <div class="d-flex align-items-center mb-3">
+                <div class="dropdown align-center me-2">
+                    <button class="btn btn-light border-dark dropdown-toggle" type="button" id="dropdownMenuButton1"
+                        data-bs-toggle="dropdown" aria-expanded="false" name="department"> <?php
+                        if (!empty($_GET["month"]) && !empty($_GET["year"])) {
+                            echo "Custom";
+                        } else {
+                            echo "All Records";
+                        } ?>
+                    </button>
+                    <ul class="dropdown-menu" aria-labelledby="dropdownMenuButton1">
+                        <li>
+                            <a class="dropdown-item btn-smoke" href="calendar.php">
+                                All Records
+                            </a>
+                        </li>
+                        <li>
+                            <a class="dropdown-item btn-smoke"
+                                href="calendar.php?month=<?= $date->getMonthName() ?>&year=<?= $date->getYear() ?>">
+                                Custom
+                            </a>
+                        </li>
+                    </ul>
+                </div> <?php
+                if (!empty($_GET["month"]) && !empty($_GET["year"])) { ?>
+                    <div class="dropdown align-center me-2">
+                        <button class="btn btn-light border-dark dropdown-toggle" type="button" id="dropdownMenuButton1"
+                            data-bs-toggle="dropdown" aria-expanded="false" name="department">
+                            <?= $_GET["month"] ?>
+                        </button>
+                        <ul class="dropdown-menu" aria-labelledby="dropdownMenuButton1"> <?php
+                            foreach (getMonths() as $value) { ?>
+                                <li>
+                                    <a class="dropdown-item btn-smoke"
+                                        href="calendar.php?month=<?= $value ?>&year=<?= $_GET["year"] ?>">
+                                        <?= $value ?>
+                                    </a>
+                                </li> <?php
+                            } ?>
+                        </ul>
+                    </div>
+                    <div class="dropdown align-center me-2">
+                        <button class="btn btn-light border-dark dropdown-toggle" type="button" id="dropdownMenuButton1"
+                            data-bs-toggle="dropdown" aria-expanded="false" name="department">
+                            <?= $_GET["year"] ?>
+                        </button>
+                        <ul class="dropdown-menu" aria-labelledby="dropdownMenuButton1"> <?php
+                            for ($i = 2018; $i <= $date->getYear(); $i++) { ?>
+                                <li>
+                                    <a class="dropdown-item btn-smoke"
+                                        href="calendar.php?month=<?= $_GET["month"] ?>&year=<?= $i ?>">
+                                        <?= $i ?>
+                                    </a>
+                                </li> <?php
+                            } ?>
+                        </ul>
+                    </div> <?php
+                } ?>
             </div>
 
             <div class="calendar"> <?php
                 $records_db = new Database();
-                $records_db->query("SELECT DISTINCT att_date FROM attendance ORDER BY id DESC");
+                
+                if (!empty($_GET["month"]) && !empty($_GET["year"])) {
+                    $month_year = array($_GET["month"], $_GET["year"]);
+                    
+                    $records_db->query("SELECT DISTINCT att_date
+                    FROM attendance
+                    WHERE att_date LIKE CONCAT(:month, '%', :year)
+                    ORDER BY id DESC");
+                    $records_db->setMonthYear($month_year);
+                } else {
+                    $records_db->query("SELECT DISTINCT att_date
+                    FROM attendance ORDER BY id DESC");
+                }
                 $records_db->execute();
 
                 while ($row = $records_db->fetch()) { ?>
@@ -138,6 +204,11 @@
                     </a> <?php
                 } ?>
             </div> <?php
+            if ($records_db->rowCount() == 0) { ?>
+                <div class="w-100 text-center my-5">
+                    <h3>No Record</h3>
+                </div> <?php
+            }
         } else {
             include_once "access_denied.php";
         } ?>

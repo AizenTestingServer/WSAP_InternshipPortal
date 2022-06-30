@@ -13,6 +13,18 @@
         exit();
     }
 
+    if (isset($_SERVER['HTTPS']) && $_SERVER['HTTPS'] === 'on') {
+        $url = "https://";
+    } else {
+        $url = "http://";
+    }
+
+    // Append the host(domain name, ip) to the URL.   
+    $url.= $_SERVER['HTTP_HOST'];
+    
+    // Append the requested resource location to the URL   
+    $url.= $_SERVER['REQUEST_URI'];
+
     require_once "../Controllers/Database.php";
     require_once "../Controllers/Date.php";
 
@@ -38,18 +50,6 @@
     $db->execute();
 
     $intern_info = $db->fetch();
-
-    if (isset($_SERVER['HTTPS']) && $_SERVER['HTTPS'] === 'on') {
-        $url = "https://";
-    } else {
-        $url = "http://";
-    }
-
-    // Append the host(domain name, ip) to the URL.   
-    $url.= $_SERVER['HTTP_HOST'];
-    
-    // Append the requested resource location to the URL   
-    $url.= $_SERVER['REQUEST_URI'];
 
     if (isset($_POST["generatePDF"])) {
         $_SESSION["print"] = true;
@@ -100,7 +100,7 @@
                     </ul>
                 </div> <?php
 
-                if (!empty($_GET["month"])) { ?>
+                if (!empty($_GET["month"]) && !empty($_GET["year"])) { ?>
                     <div class="dropdown align-center me-2">
                         <button class="btn btn-light border-dark dropdown-toggle" type="button" id="dropdownMenuButton1"
                             data-bs-toggle="dropdown" aria-expanded="false" name="department">
@@ -160,16 +160,14 @@
                     SUBSTRING_INDEX(att_date, ' ', -1) AS year
                     FROM attendance WHERE intern_id=:intern_id AND
                     att_date LIKE CONCAT(:month, '%', :year);");
-                    $db->setInternId($_GET["intern_id"]);
                     $db->setMonthYear($month_year);
-                    $db->execute();
                 } else {
                     $db->query("SELECT DISTINCT SUBSTRING_INDEX(att_date, ' ', 1) AS month,
                     SUBSTRING_INDEX(att_date, ' ', -1) AS year
                     FROM attendance WHERE intern_id=:intern_id;");
-                    $db->setInternId($_GET["intern_id"]);
-                    $db->execute();
                 }
+                $db->setInternId($_GET["intern_id"]);
+                $db->execute();
 
                 $total_rendered_hours = 0;
                 

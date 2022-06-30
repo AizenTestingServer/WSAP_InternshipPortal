@@ -267,7 +267,7 @@
                                 $count++;  ?>
                                 <tr> <?php
                                     if ($row["admin_level"] < $current_level) { ?>
-                                        <div class="modal fade" id="removeRole<?= $row["intern_role_id"] ?>" tabindex="-1"
+                                        <div class="modal fade" id="removeRoleModal<?= $row["intern_role_id"] ?>" tabindex="-1"
                                             aria-labelledby="removeRoleModalLabel" aria-hidden="true">
                                             <div class="modal-dialog modal-dialog-centered">
                                                 <div class="modal-content">
@@ -338,7 +338,7 @@
                                     <td> <?php
                                         if ($row["admin_level"] < $current_level) { ?>
                                             <button class="btn btn-danger btn-sm" data-bs-toggle="modal" 
-                                                data-bs-target="#removeRole<?= $row["intern_role_id"] ?>">
+                                                data-bs-target="#removeRoleModal<?= $row["intern_role_id"] ?>">
                                                 <i class="fa-solid fa-xmark fs-a"></i>
                                             </button> <?php
                                         } else { ?>

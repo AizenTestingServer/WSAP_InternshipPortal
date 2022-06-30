@@ -7,6 +7,18 @@
         redirect("../index.php");
         exit();
     }
+
+    if (isset($_SERVER['HTTPS']) && $_SERVER['HTTPS'] === 'on') {
+        $url = "https://";
+    } else {
+        $url = "http://";
+    }
+
+    // Append the host(domain name, ip) to the URL.   
+    $url.= $_SERVER['HTTP_HOST'];
+    
+    // Append the requested resource location to the URL   
+    $url.= $_SERVER['REQUEST_URI'];
     
     require_once "../Controllers/Database.php";
     require_once "../Controllers/Date.php";
@@ -96,13 +108,19 @@
         } else {
             $_SESSION["role_failed"] = "Please fill-out the required fields!";
         }
-        redirect("role.php");
+        
+        redirect("$url");
         exit();
     }
 
     if (isset($_POST["reset"])) {
+        unset($_SESSION["name"]);
+        unset($_SESSION["brand"]);
+        unset($_SESSION["department"]);
+        unset($_SESSION["admin"]);
+        unset($_SESSION["level"]);
         
-        redirect("role.php");
+        redirect("$url");
         exit();
     }
 
@@ -263,18 +281,7 @@
                                     } else {
                                         echo 1;
                                     }
-                                } ?>" <?php
-                                if (!empty($_SESSION["admin"])) {
-                                    if ($_SESSION["admin"] == 0) { ?>
-                                        readonly <?php
-                                    }
-                                } else {
-                                    if (!empty($_GET["role_id"])) {
-                                        if ($value["admin"] == 0) { ?>
-                                            readonly <?php
-                                        }
-                                    }
-                                } ?>>
+                                } ?>">
                         </div>
                     </div> 
                     <div class="bottom-right">
@@ -286,7 +293,12 @@
                             echo "Save Changes";
                          } ?></button>
                     </div>
-                </form>
+                </form> <?php
+                unset($_SESSION["name"]);
+                unset($_SESSION["brand"]);
+                unset($_SESSION["department"]);
+                unset($_SESSION["admin"]);
+                unset($_SESSION["level"]); ?>
             </div>
         </div> <?php
         } else {
@@ -296,15 +308,35 @@
 </div>
 
 <script>
-    const adminLevel = document.getElementById("admin");
+    const adminElement = document.getElementById("admin");
     const levelElement = document.getElementById("level");
 
-    adminLevel.addEventListener("change", function(event) {
-        if (adminLevel.value == 1) {
+    var isAdmin;
+
+    <?php
+    if (!empty($_SESSION["admin"])) { ?>
+        isAdmin = <?= $_SESSION["admin"];
+    } else {
+        if (!empty($_GET["role_id"])) { ?>
+            isAdmin = <?= $value["admin"];
+        } else { ?>
+            isAdmin = 0; <?php
+        }
+    } ?>
+
+    adminElement.addEventListener("change", function(event) {
+        isAdmin = adminElement.value;
+        isAdminChanged();
+    });
+
+    function isAdminChanged() {
+        if (isAdmin == 1) {
             levelElement.removeAttribute("readonly");
-        } else if (adminLevel.value == 0) {
+        } else if (isAdmin == 0) {
             levelElement.value = 1;
             levelElement.setAttribute("readonly", "");
         }
-    });
+    }
+
+    isAdminChanged();
 </script>

@@ -172,22 +172,22 @@
                     <h5 class="fs-intern fw-bold">Schedule Guide</h5>
                     <ul class="attendance_legend">
                         <li class="bg-success text-light">
-                            Regular Time in - 7:00 am to 7:59 am
+                            Regular Time in - <?= regularTimeInSchedule() ?>
                         </li>
                         <li class="bg-warning">
-                            Late Time in - 8:00 am to 8:24 am
+                            Late Time in - <?= lateTimeInSchedule() ?>
                         </li>
                         <li class="bg-morning text-light">
-                            MS Time out - 12:00 pm to 12:59 pm
+                            MS Time out - <?= morningShiftTimeOutSchedule() ?>
                         </li>
                         <li class="bg-afternoon text-light">
-                            AS Time in - 12:00 pm to 12:59 pm
+                            AS Time in - <?= afternoonShiftTimeInSchedule() ?>
                         </li>
                         <li class="bg-success text-light">
-                            Regular Time out - 5:00 pm to 5:24 pm
+                            Regular Time out - <?= regularTimeOutSchedule() ?>
                         </li>
                         <li class="bg-indigo text-light">
-                            OT Time out - 6:00 pm to 9:24 pm
+                            OT Time out - <?= overTimeTimeOutSchedule() ?>
                         </li>
                     </ul>
                 </div>

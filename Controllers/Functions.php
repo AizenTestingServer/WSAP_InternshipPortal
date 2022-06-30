@@ -89,4 +89,40 @@
         return array("January", "February", "March", "April", "May", "June",
             "July", "August", "September", "October", "November", "December");
     }
+
+    function regularTimeInSchedule() {
+        $date = new Date();
+        return date("g:i a", $date->time_in_start())." to ".
+            date("g:i a", strtotime(date("g:i a", $date->morning_briefing())." - 1 minutes"));
+    }
+
+    function lateTimeInSchedule() {
+        $date = new Date();
+        return date("g:i a", $date->morning_briefing())." to ".
+            date("g:i a", strtotime(date("g:i a", $date->time_in_end())." - 1 minutes"));
+    }
+
+    function morningShiftTimeOutSchedule() {
+        $date = new Date();
+        return date("g:i a", $date->morning_shift_end())." to ".
+            date("g:i a", strtotime(date("g:i a", $date->afternoon_shift_start())." - 1 minutes"));
+    }
+
+    function afternoonShiftTimeInSchedule() {
+        $date = new Date();
+        return date("g:i a", $date->morning_shift_end())." to ".
+            date("g:i a", strtotime(date("g:i a", $date->afternoon_shift_start())." - 1 minutes"));
+    }
+
+    function regularTimeOutSchedule() {
+        $date = new Date();
+        return date("g:i a", $date->time_out_start())." to ".
+            date("g:i a", strtotime(date("g:i a", $date->time_out_end())." - 1 minutes"));
+    }
+
+    function overTimeTimeOutSchedule() {
+        $date = new Date();
+        return date("g:i a", $date->time_out_overtime_start())." to ".
+            date("g:i a", strtotime(date("g:i a", $date->time_out_overtime_end())." - 1 minutes"));
+    }
 ?>

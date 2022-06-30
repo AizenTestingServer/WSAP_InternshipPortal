@@ -1,5 +1,8 @@
 <?php
-    function navSideBar($target_active) { ?>
+    require_once "../Controllers/Date.php";
+
+    function navSideBar($target_active) {
+        $date = new Date(); ?>
         <div class="side-nav border-end p-1 vh-100 position-fixed">
             <div class="d-flex align-items-center flex-column">
                 <img class="img-responsive" src="../Assets/img/Brand_Logo/WSAP.png" alt="">
@@ -75,7 +78,7 @@
                     <ul class="dropdown-list">
                         <li><a href="attendance.php">My Attendance</a></li>
                         <li><a href="interns_attendance.php">Interns' Attendance</a></li>
-                        <li><a href="calendar.php">Calendar</a></li>
+                        <li><a href="calendar.php?month=<?= $date->getMonthName() ?>&year=<?= $date->getYear() ?>">Calendar</a></li>
                         <li><a href="daily_time_record.php">Interns' DTR</a></li>
                         <!-- 
                         <li><a href="attendance_it.php">IT Dept</a></li>
