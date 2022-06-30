@@ -345,7 +345,13 @@
                     <div class="indicator-head-container my-3">
                         <ul class="list-group list-group-horizontal list-unstyled fw-bold">
                             <li class="text-center" style="width: 100%;">
-                                <?= strtoupper($_GET["month"])." ".$_GET["year"] ?>
+                                <?php
+                                    if (!empty($_GET["month"]) && !empty($_GET["year"])) {
+                                        echo strtoupper($_GET["month"])." ".$_GET["year"];
+                                    } else {
+                                        echo strtoupper($date->getMonthName())." ".$date->getYear();
+                                    }
+                                ?>
                             </li>
                         </ul>
                         <p class="list-group-item text-center mb-0" style="width: 100%;">Official hours for arrival and departure</p>

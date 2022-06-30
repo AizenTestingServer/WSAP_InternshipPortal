@@ -77,7 +77,7 @@
       
                     $profile_image = array(
                         $image_path,
-                        strtoupper($_SESSION["intern_id"]),
+                        strtoupper($_GET["intern_id"]),
                     );
     
                     $db->query("UPDATE intern_wsap_information
@@ -119,7 +119,7 @@
             $middle_name,
             $gender,
             $birthday,
-            $_SESSION["intern_id"]);
+            $_GET["intern_id"]);
     
             $db->query("UPDATE intern_personal_information
             SET last_name=:last_name, first_name=:first_name, middle_name=:middle_name,
@@ -439,7 +439,12 @@
                                 <button class="btn btn-indigo" type="submit" name="savePersonal">Save Changes</button>
                                 <button class="btn btn-danger" name="resetPersonal">Reset</button>
                             </div>
-                        </form>
+                        </form> <?php
+                        unset($_SESSION["last_name"]);
+                        unset($_SESSION["first_name"]);
+                        unset($_SESSION["middle_name"]);
+                        unset($_SESSION["gender"]);
+                        unset($_SESSION["birthday"]); ?>
                     </div>
                 </div>
 
@@ -673,8 +678,13 @@
                             <div class="bottom-right">
                                 <button class="btn btn-indigo" type="submit" name="saveWSAP">Save Changes</button>
                                 <button class="btn btn-danger" name="resetWSAP">Reset</button>
-                            </div> 
-                        </form>
+                            </div>
+                        </form> <?php
+                        unset($_SESSION["dept_id"]);
+                        unset($_SESSION["status"]);
+                        unset($_SESSION["onboard_date"]);
+                        unset($_SESSION["rendered_hours"]);
+                        unset($_SESSION["target_rendering_hours"]); ?>
                     </div>
                 </div>
 

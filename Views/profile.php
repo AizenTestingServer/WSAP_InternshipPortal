@@ -500,7 +500,12 @@
                             <button class="btn btn-danger" name="resetPersonal">Reset</button>
                         </div> <?php
                     } ?>
-                </form>
+                </form> <?php
+                unset($_SESSION["last_name"]);
+                unset($_SESSION["first_name"]);
+                unset($_SESSION["middle_name"]);
+                unset($_SESSION["gender"]);
+                unset($_SESSION["birthday"]); ?>
             </div>
         </div>
 
@@ -757,7 +762,13 @@
                             <button class="btn btn-danger" name="resetWSAP">Reset</button>
                         </div> <?php
                     } ?>
-                </form>
+                </form> <?php
+                unset($_SESSION["dept_id"]);
+                unset($_SESSION["status"]);
+                unset($_SESSION["onboard_date"]);
+                unset($_SESSION["email_address"]);
+                unset($_SESSION["mobile_number"]);
+                unset($_SESSION["mobile_number_2"]); ?>
             </div>
         </div>
 
@@ -928,7 +939,12 @@
                             <button class="btn btn-danger" name="resetEducational">Reset</button>
                         </div> <?php
                     } ?>
-                </form>
+                </form> <?php
+                unset($_SESSION["university"]);
+                unset($_SESSION["university_abbreviation"]);
+                unset($_SESSION["course"]);
+                unset($_SESSION["course_abbreviation"]);
+                unset($_SESSION["year"]); ?>
             </div>
         </div>
 
