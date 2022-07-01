@@ -21,6 +21,7 @@
     intern_personal_information.id=:intern_id");
     $db->setInternId($_SESSION["intern_id"]);
     $db->execute();
+    $admin_info = $db->fetch();
     $admin_roles_count = $db->rowCount();
 
     if (!empty($_GET["intern_id"])) {
@@ -97,72 +98,90 @@
     }
 
     if (isset($_POST["submit"])) {
-       $time_out = $_POST["time_out_hr"].":".$_POST["time_out_min"]." ".$_POST["time_out_time_type"];
-        
-       $tmp_time_out = $time_out;
-        if (isMorningShift($selected_att["time_in"], $time_out)) {
-            $tmp_time_out =  $tmp_time_out." MS";
-        }
-        if (isAfternoonShift($selected_att["time_in"], $time_out)) {
-            $tmp_time_out =  $tmp_time_out." AS";
-        }
-        if (isOvertime($time_out)) {
-            $tmp_time_out =  $tmp_time_out." OT";
-        }
-        $time_out = $tmp_time_out;
-        
-        $attendance = array(
-            $time_out,
-            $selected_att["id"]
-        );
+        if (!empty($_POST["time_out_hr"]) && !empty($_POST["time_out_min"]) &&
+            !empty($_POST["time_out_time_type"]) && !empty($_POST["att_date"])) {
+        $time_out = $_POST["time_out_hr"].":".$_POST["time_out_min"]." ".$_POST["time_out_time_type"];
+            
+        $tmp_time_out = $time_out;
+            if (isMorningShift($selected_att["time_in"], $time_out)) {
+                $tmp_time_out =  $tmp_time_out." MS";
+            }
+            if (isAfternoonShift($selected_att["time_in"], $time_out)) {
+                $tmp_time_out =  $tmp_time_out." AS";
+            }
+            if (isOvertime($time_out)) {
+                $tmp_time_out =  $tmp_time_out." OT";
+            }
+            $time_out = $tmp_time_out;
+            
+            $attendance = array(
+                $time_out,
+                $selected_att["id"]
+            );
 
-        $db->query("UPDATE attendance SET time_out=:time_out WHERE id=:id");
-        $db->timeOut($attendance);
-        $db->execute();
-        $db->closeStmt();
-        
-        $time_in = $selected_att["time_in"];
+            $db->query("UPDATE attendance SET time_out=:time_out WHERE id=:id");
+            $db->timeOut($attendance);
+            $db->execute();
+            $db->closeStmt();
+            
+            $time_in = $selected_att["time_in"];
 
-        if (strlen($time_out) > 8) {
-            $time_out = substr($time_out, 0, 8);
-        }
-                            
-        if (isMorningShift($time_in, $time_out) || isAfternoonShift($time_in, $time_out)) {
-            $rendered_hours = 4;
+            if (strlen($time_out) > 8) {
+                $time_out = substr($time_out, 0, 8);
+            }
+                                
+            if (isMorningShift($time_in, $time_out) || isAfternoonShift($time_in, $time_out)) {
+                $rendered_hours = 4;
+            } else {
+                $rendered_hours = 8;
+            }
+
+            if (isOvertime($time_out)) {
+                $dt_time_out_start = new DateTime(date("G:i", $date->time_out_start()));
+                $dt_time_out = new DateTime(date("G:i", strtotime($time_out)));
+                $rendered_hours += $dt_time_out_start->diff($dt_time_out)->format("%h");
+                $rendered_minutes = $dt_time_out_start->diff($dt_time_out)->format("%i");
+                $rendered_hours += round($rendered_minutes/60, 1);
+            }
+
+            $db->query("SELECT * FROM intern_wsap_information WHERE id=:intern_id;");
+            $db->setInternId($_GET["intern_id"]);
+            $db->execute();
+            $wsap_info = $db->fetch();
+            
+            $rendered_hours += $wsap_info["rendered_hours"];
+
+            $computed_rendered_hours = array(
+                $rendered_hours,
+                $_GET["intern_id"]
+            );
+
+            $db->query("UPDATE intern_wsap_information SET rendered_hours=:rendered_hours 
+            WHERE id=:intern_id");
+            $db->updateRenderedHours($computed_rendered_hours);
+            $db->execute();
+            $db->closeStmt();
+                        
+            $log_value = $admin_info["last_name"].", ".$admin_info["first_name"].
+                " (".$admin_info["name"].") set the ".$_POST["att_date"]." time out of ".$value["last_name"].", ".$value["first_name"].".";
+
+            $log = array($date->getDateTime(),
+            strtoupper($_SESSION["intern_id"]),
+            $log_value);
+
+            $db->query("INSERT INTO audit_logs
+            VALUES (null, :timestamp, :intern_id, :log)");
+            $db->log($log);
+            $db->execute();
+            $db->closeStmt();
+            
+            $_SESSION["time_out_success"] = "Successfully setup the time out.";
+            unset($_SESSION["time_out_hr"]);
+            unset($_SESSION["time_out_min"]);
+            unset($_SESSION["time_out_time_type"]);
         } else {
-            $rendered_hours = 8;
+            $_SESSION["time_out_failed"] = "Please fill-out the required fields!";
         }
-
-        if (isOvertime($time_out)) {
-            $dt_time_out_start = new DateTime(date("G:i", $date->time_out_start()));
-            $dt_time_out = new DateTime(date("G:i", strtotime($time_out)));
-            $rendered_hours += $dt_time_out_start->diff($dt_time_out)->format("%h");
-            $rendered_minutes = $dt_time_out_start->diff($dt_time_out)->format("%i");
-            $rendered_hours += round($rendered_minutes/60, 1);
-        }
-
-        $db->query("SELECT * FROM intern_wsap_information WHERE id=:intern_id;");
-        $db->setInternId($_GET["intern_id"]);
-        $db->execute();
-        $wsap_info = $db->fetch();
-        
-        $rendered_hours += $wsap_info["rendered_hours"];
-
-        $computed_rendered_hours = array(
-            $rendered_hours,
-            $_GET["intern_id"]
-        );
-
-        $db->query("UPDATE intern_wsap_information SET rendered_hours=:rendered_hours 
-        WHERE id=:intern_id");
-        $db->updateRenderedHours($computed_rendered_hours);
-        $db->execute();
-        $db->closeStmt();
-        
-        $_SESSION["time_out_success"] = "Successfully setup the time out.";
-        unset($_SESSION["time_out_hr"]);
-        unset($_SESSION["time_out_min"]);
-        unset($_SESSION["time_out_time_type"]);
 
         redirect("daily_time_record.php?intern_id=".$_GET["intern_id"]);
         exit();
@@ -174,7 +193,7 @@
     }
     
     if (isset($_POST["removeTimeOut"])) {
-        if (!empty($_POST["att_id"]) && !empty($_POST["rendered_hours"])) {
+        if (!empty($_POST["att_id"]) && !empty($_POST["rendered_hours"]) && !empty($_POST["att_date"])) {
             $attendance = array(
                 "NTO",
                 $_POST["att_id"]
@@ -200,6 +219,19 @@
             $db->query("UPDATE intern_wsap_information SET rendered_hours=:rendered_hours 
             WHERE id=:intern_id");
             $db->updateRenderedHours($computed_rendered_hours);
+            $db->execute();
+            $db->closeStmt();
+                    
+            $log_value = $admin_info["last_name"].", ".$admin_info["first_name"].
+                " (".$admin_info["name"].") removed the ".$_POST["att_date"]." time out of ".$value["last_name"].", ".$value["first_name"].".";
+    
+            $log = array($date->getDateTime(),
+            strtoupper($_SESSION["intern_id"]),
+            $log_value);
+    
+            $db->query("INSERT INTO audit_logs
+            VALUES (null, :timestamp, :intern_id, :log)");
+            $db->log($log);
             $db->execute();
             $db->closeStmt();
             
@@ -357,6 +389,8 @@
                                                         } ?>>PM</option>
                                                 </select>
                                             </div>
+                                            <input type="text" name="att_date" class="form-control text-center d-none mt-2"
+                                                value="<?= $selected_att["att_date"] ?>" readonly>
                                         </div>
                                     </div>
                                 </div>
@@ -451,6 +485,8 @@
                                                                             value="<?= $row["id"] ?>" readonly>
                                                                 <input type="text" name="rendered_hours" class="form-control text-center d-none mt-2"
                                                                             value="<?= $rendered_hours ?>" readonly>
+                                                                <input type="text" name="att_date" class="form-control text-center d-none mt-2"
+                                                                            value="<?= $row["att_date"] ?>" readonly>
                                                             </div>
                                                         </div>
 
@@ -875,7 +911,7 @@
                     </div>
                      <?php
                     if ($db->rowCount() == 0) { ?>
-                        <div class="w-100 text-center my-5">
+                        <div class="att-no-record text-center my-5">
                             <h3>No Record</h3>
                         </div> <?php
                     } ?>

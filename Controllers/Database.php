@@ -75,6 +75,21 @@ class Database {
         $this->stmt->bindValue(":intern_id", $intern_id);
     }
 
+    function setAttDate($date) {
+        $this->stmt->bindValue(":att_date", $date);
+    }
+
+    function setMonthYear($month_year) {
+        $this->stmt->bindValue(":month", $month_year[0]);
+        $this->stmt->bindValue(":year", $month_year[1]);
+    }
+
+    function setDate($date_value) {
+        $this->stmt->bindValue(":day", $date_value[0]);
+        $this->stmt->bindValue(":month", $date_value[1]);
+        $this->stmt->bindValue(":year", $date_value[2]);
+    }
+
     function timeIn($attendance) {
         $this->stmt->bindValue(":intern_id", $attendance[0]);
         $this->stmt->bindValue(":att_date", $attendance[1]);
@@ -121,6 +136,7 @@ class Database {
         $this->stmt->bindValue(":last_name", $personal_info[1]);
         $this->stmt->bindValue(":first_name", $personal_info[2]);
         $this->stmt->bindValue(":middle_name", $personal_info[3]);
+        $this->stmt->bindValue(":gender", $personal_info[4]);
     }
 
     function setPersonalInfo($personal_info) {
@@ -191,15 +207,6 @@ class Database {
     function updatePassword($new_password) {
         $this->stmt->bindValue(":password", $new_password[0]);
         $this->stmt->bindValue(":intern_id", $new_password[1]);
-    }
-
-    function setAttDate($date) {
-        $this->stmt->bindValue(":att_date", $date);
-    }
-
-    function setMonthYear($month_year) {
-        $this->stmt->bindValue(":month", $month_year[0]);
-        $this->stmt->bindValue(":year", $month_year[1]);
     }
 
     function selectInternsAttendance($interns_attendance) {
@@ -289,6 +296,20 @@ class Database {
         $this->stmt->bindValue(":intern_id", $intern_roles[0]);
         $this->stmt->bindValue(":role_id", $intern_roles[1]);
         $this->stmt->bindValue(":role_type", $intern_roles[2]);
+    }
+
+    function log($log) {
+        $this->stmt->bindValue(":timestamp", $log[0]);
+        $this->stmt->bindValue(":intern_id", $log[1]);
+        $this->stmt->bindValue(":log", $log[2]);
+    }
+
+    function selectLog($log) {
+        $this->stmt->bindValue(":log", $log);
+    }
+
+    function selectDepartment($dept_name) {
+        $this->stmt->bindValue(":dept_name", $dept_name);
     }
 }
 

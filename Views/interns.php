@@ -21,20 +21,36 @@
     intern_personal_information.id=:intern_id");
     $db->setInternId($_SESSION["intern_id"]);
     $db->execute();
+    $admin_info = $db->fetch();
     $admin_roles_count = $db->rowCount();
     
     if (isset($_POST["btnAddIntern"])) {
-        if (!empty($_POST["lastName"]) && !empty($_POST["firstName"])) {
+        $last_name = ucwords(trim($_POST["lastName"]));
+        $first_name = ucwords(trim($_POST["firstName"]));
+        $middle_name = ucwords(trim($_POST["middleName"]));
+        $gender = $_POST["gender"];
+
+        if (!empty($last_name) && !empty($first_name)) {
             $intern_id = $date->getYear()."-".randomWord();
 
-            $personal_info = array($intern_id,
-            ucwords($_POST["lastName"]),
-            ucwords($_POST["firstName"]),
-            ucwords($_POST["middleName"]));
+            $personal_info = array($intern_id, $last_name, $first_name, $middle_name, $gender);
     
-            $db->query("INSERT INTO intern_personal_information (id, last_name, first_name, middle_name)
-            VALUES(:intern_id, :last_name, :first_name, :middle_name)");
+            $db->query("INSERT INTO intern_personal_information (id, last_name, first_name, middle_name, gender)
+            VALUES(:intern_id, :last_name, :first_name, :middle_name, :gender)");
             $db->insertPersonalInfo($personal_info);
+            $db->execute();
+            $db->closeStmt();
+                    
+            $log_value = $admin_info["last_name"].", ".$admin_info["first_name"].
+                " (".$admin_info["name"].") added an account for ".$last_name.", ".$first_name." (".$intern_id.").";
+    
+            $log = array($date->getDateTime(),
+            strtoupper($_SESSION["intern_id"]),
+            $log_value);
+    
+            $db->query("INSERT INTO audit_logs
+            VALUES (null, :timestamp, :intern_id, :log)");
+            $db->log($log);
             $db->execute();
             $db->closeStmt();
             
@@ -47,9 +63,22 @@
     }
     
     if (isset($_POST["removeAccount"])) {
-        if (!empty($_POST["intern_id"])) {    
+        if (!empty($_POST["intern_id"]) && !empty($_POST["fullName"])) {    
             $db->query("DELETE FROM intern_personal_information WHERE id=:intern_id");
             $db->setInternId($_POST["intern_id"]);
+            $db->execute();
+            $db->closeStmt();
+                    
+            $log_value = $admin_info["last_name"].", ".$admin_info["first_name"].
+                " (".$admin_info["name"].") removed the account of ".$_POST["fullName"].".";
+    
+            $log = array($date->getDateTime(),
+            strtoupper($_SESSION["intern_id"]),
+            $log_value);
+    
+            $db->query("INSERT INTO audit_logs
+            VALUES (null, :timestamp, :intern_id, :log)");
+            $db->log($log);
             $db->execute();
             $db->closeStmt();
             
@@ -110,10 +139,10 @@
             </div>
         </div>        
 
-        <div>
-            <form method="post">
-                <div class="row">
-                    <!--SEARCH BUTTON/TEXT-->
+        <div class="mb-2">
+            <div class="row">
+                <!--SEARCH BUTTON/TEXT-->
+                <form method="post">
                     <div class="col-lg-8 col-md-10 col-sm-12">
                         <div class="input-group mb-3">
                             <input type="text" class="form-control" placeholder="Search Intern" name="search_intern" value="<?php
@@ -126,25 +155,52 @@
                             </div>
                         </div>
                     </div>
-                    
-                    <div class="col-12 d-lg-flex d-md-inline-block">
-                        <div class="w-100 d-md-flex d-sm-flex">
-                            <div class="d-flex my-2">
-                                <!--DEPARTMENT DROPDOWN-->
-                                <div class="dropdown align-center me-2">
-                                    <button class="btn btn-light border-dark dropdown-toggle" type="button" id="dropdownMenuButton1"
-                                    data-bs-toggle="dropdown" aria-expanded="false" name="department"> <?php
-                                        if (empty($_GET["department"])) {
-                                            echo "All Departments";
-                                        } else {
-                                            echo $_GET["department"];
-                                        }?>
-                                    </button>
-                                    <ul class="dropdown-menu" aria-labelledby="dropdownMenuButton1">
+                <form>
+                
+                <div class="col-12 d-lg-flex d-md-inline-block">
+                    <div class="w-100 d-md-flex">
+                        <div class="d-flex my-2">
+                            <!--DEPARTMENT DROPDOWN-->
+                            <div class="dropdown align-center me-2">
+                                <button class="btn btn-light border-dark dropdown-toggle" type="button" id="dropdownMenuButton1"
+                                data-bs-toggle="dropdown" aria-expanded="false" name="department"> <?php
+                                    if (empty($_GET["department"])) {
+                                        echo "All Departments";
+                                    } else {
+                                        echo $_GET["department"];
+                                    } ?>
+                                </button>
+                                <ul class="dropdown-menu" aria-labelledby="dropdownMenuButton1">
+                                    <li><a class="dropdown-item btn-smoke" <?php
+                                    $parameters = "?";
+                                    if (!empty($_GET["search"])) {
+                                        $parameters = $parameters."search=".$_GET["search"];
+                                    }
+                                    
+                                    if (!empty($_GET["sort"])) {
+                                        if (strlen($parameters) > 1) { $parameters = $parameters."&"; }
+                                        $parameters = $parameters."sort=".$_GET["sort"];
+                                    }
+
+                                    if (strlen($parameters) > 1) { ?>
+                                        href="<?= "interns.php".$parameters ?>" <?php
+                                    } else { ?>
+                                        href="<?= "interns.php" ?>" <?php
+                                    } ?>> All Departments </a></li> <?php
+                                    
+                                    $db->query("SELECT * FROM departments ORDER BY name");
+                                    $db->execute();
+                                    
+                                    while ($row = $db->fetch()) { ?>
                                         <li><a class="dropdown-item btn-smoke" <?php
                                         $parameters = "?";
                                         if (!empty($_GET["search"])) {
                                             $parameters = $parameters."search=".$_GET["search"];
+                                        }
+
+                                        if (!empty($row["name"])) {
+                                            if (strlen($parameters) > 1) { $parameters = $parameters."&"; }
+                                            $parameters = $parameters."department=".$row["name"];
                                         }
                                         
                                         if (!empty($_GET["sort"])) {
@@ -156,218 +212,198 @@
                                             href="<?= "interns.php".$parameters ?>" <?php
                                         } else { ?>
                                             href="<?= "interns.php" ?>" <?php
-                                        } ?>> All Departments </a></li> <?php
-                                        
-                                        $db->query("SELECT * FROM departments ORDER BY name");
-                                        $db->execute();
-                                        
-                                        while ($row = $db->fetch()) { ?>
-                                            <li><a class="dropdown-item btn-smoke" <?php
-                                            $parameters = "?";
-                                            if (!empty($_GET["search"])) {
-                                                $parameters = $parameters."search=".$_GET["search"];
-                                            }
-
-                                            if (!empty($row["name"])) {
-                                                if (strlen($parameters) > 1) { $parameters = $parameters."&"; }
-                                                $parameters = $parameters."department=".$row["name"];
-                                            }
-                                            
-                                            if (!empty($_GET["sort"])) {
-                                                if (strlen($parameters) > 1) { $parameters = $parameters."&"; }
-                                                $parameters = $parameters."sort=".$_GET["sort"];
-                                            }
-
-                                            if (strlen($parameters) > 1) { ?>
-                                                href="<?= "interns.php".$parameters ?>" <?php
-                                            } else { ?>
-                                                href="<?= "interns.php" ?>" <?php
-                                            } ?>> <?= $row["name"] ?>
-                                            </a></li> <?php
-                                        } ?>
-                                    </ul>
-                                </div>
-                                <!--SORTING DROPDOWN-->
-                                <div class="dropdown me-2">
-                                    <button class="btn btn-light border-dark dropdown-toggle" type="button" id="dropdownMenuButton1"
-                                    data-bs-toggle="dropdown" aria-expanded="false"> <?php
-                                        if (empty($_GET["sort"])) {
-                                            echo "Default";
-                                        } else {
-                                            switch ($_GET["sort"]) {
-                                                case "1":
-                                                    echo "A-Z";
-                                                    break;
-                                                case "2":
-                                                    echo "Z-A";
-                                                    break;
-                                                case "3":
-                                                    echo "Oldest Intern";
-                                                    break;
-                                                case "4":
-                                                    echo "Newest Intern";
-                                                    break;
-                                            }
-                                        }?>
-                                    </button>
-                                    <ul class="dropdown-menu me-2z" aria-labelledby="dropdownMenuButton1" name="sort">
-                                        <li><a class="dropdown-item btn-smoke" <?php
-                                            $parameters = "?";
-                                            if (!empty($_GET["search"])) {
-                                                $parameters = $parameters."search=".$_GET["search"];
-                                            }
-
-                                            if (!empty($_GET["department"])) {
-                                                if (strlen($parameters) > 1) { $parameters = $parameters."&"; }
-                                                $parameters = $parameters."department=".$_GET["department"];
-                                            }
-
-                                            if (strlen($parameters) > 1) { ?>
-                                                href="<?= "interns.php".$parameters ?>" <?php
-                                            } else { ?>
-                                                href="<?= "interns.php" ?>" <?php
-                                            } ?>>Default</a></li>
-                                        <li><a class="dropdown-item btn-smoke" <?php
+                                        } ?>> <?= $row["name"] ?>
+                                        </a></li> <?php
+                                    } ?>
+                                </ul>
+                            </div>
+                            <!--SORTING DROPDOWN-->
+                            <div class="dropdown me-2">
+                                <button class="btn btn-light border-dark dropdown-toggle" type="button" id="dropdownMenuButton1"
+                                data-bs-toggle="dropdown" aria-expanded="false"> <?php
+                                    if (empty($_GET["sort"])) {
+                                        echo "Default";
+                                    } else {
+                                        switch ($_GET["sort"]) {
+                                            case "1":
+                                                echo "A-Z";
+                                                break;
+                                            case "2":
+                                                echo "Z-A";
+                                                break;
+                                            case "3":
+                                                echo "Oldest Intern";
+                                                break;
+                                            case "4":
+                                                echo "Newest Intern";
+                                                break;
+                                        }
+                                    }?>
+                                </button>
+                                <ul class="dropdown-menu me-2z" aria-labelledby="dropdownMenuButton1" name="sort">
+                                    <li><a class="dropdown-item btn-smoke" <?php
                                         $parameters = "?";
-                                            if (!empty($_GET["search"])) {
-                                                $parameters = $parameters."search=".$_GET["search"];
-                                            }
+                                        if (!empty($_GET["search"])) {
+                                            $parameters = $parameters."search=".$_GET["search"];
+                                        }
 
-                                            if (!empty($_GET["department"])) {
-                                                if (strlen($parameters) > 1) { $parameters = $parameters."&"; }
-                                                $parameters = $parameters."department=".$_GET["department"];
-                                            }
-
+                                        if (!empty($_GET["department"])) {
                                             if (strlen($parameters) > 1) { $parameters = $parameters."&"; }
-                                            $parameters = $parameters."sort=1";
+                                            $parameters = $parameters."department=".$_GET["department"];
+                                        }
 
-                                            if (strlen($parameters) > 1) { ?>
-                                                href="<?= "interns.php".$parameters ?>" <?php
-                                            } else { ?>
-                                                href="<?= "interns.php" ?>" <?php
-                                            } ?>>A-Z</a></li>
-                                        <li><a class="dropdown-item btn-smoke" <?php
+                                        if (strlen($parameters) > 1) { ?>
+                                            href="<?= "interns.php".$parameters ?>" <?php
+                                        } else { ?>
+                                            href="<?= "interns.php" ?>" <?php
+                                        } ?>>Default</a></li>
+                                    <li><a class="dropdown-item btn-smoke" <?php
+                                    $parameters = "?";
+                                        if (!empty($_GET["search"])) {
+                                            $parameters = $parameters."search=".$_GET["search"];
+                                        }
+
+                                        if (!empty($_GET["department"])) {
+                                            if (strlen($parameters) > 1) { $parameters = $parameters."&"; }
+                                            $parameters = $parameters."department=".$_GET["department"];
+                                        }
+
+                                        if (strlen($parameters) > 1) { $parameters = $parameters."&"; }
+                                        $parameters = $parameters."sort=1";
+
+                                        if (strlen($parameters) > 1) { ?>
+                                            href="<?= "interns.php".$parameters ?>" <?php
+                                        } else { ?>
+                                            href="<?= "interns.php" ?>" <?php
+                                        } ?>>A-Z</a></li>
+                                    <li><a class="dropdown-item btn-smoke" <?php
+                                    $parameters = "?";
+                                        if (!empty($_GET["search"])) {
+                                            $parameters = $parameters."search=".$_GET["search"];
+                                        }
+
+                                        if (!empty($_GET["department"])) {
+                                            if (strlen($parameters) > 1) { $parameters = $parameters."&"; }
+                                            $parameters = $parameters."department=".$_GET["department"];
+                                        }
+                                        
+                                        if (strlen($parameters) > 1) { $parameters = $parameters."&"; }
+                                        $parameters = $parameters."sort=2";
+
+                                        if (strlen($parameters) > 1) { ?>
+                                            href="<?= "interns.php".$parameters ?>" <?php
+                                        } else { ?>
+                                            href="<?= "interns.php" ?>" <?php
+                                        } ?>>Z-A</a></li>
+                                    <li><a class="dropdown-item btn-smoke" <?php
                                         $parameters = "?";
-                                            if (!empty($_GET["search"])) {
-                                                $parameters = $parameters."search=".$_GET["search"];
-                                            }
+                                        if (!empty($_GET["search"])) {
+                                            $parameters = $parameters."search=".$_GET["search"];
+                                        }
 
-                                            if (!empty($_GET["department"])) {
-                                                if (strlen($parameters) > 1) { $parameters = $parameters."&"; }
-                                                $parameters = $parameters."department=".$_GET["department"];
-                                            }
-                                            
+                                        if (!empty($_GET["department"])) {
                                             if (strlen($parameters) > 1) { $parameters = $parameters."&"; }
-                                            $parameters = $parameters."sort=2";
+                                            $parameters = $parameters."department=".$_GET["department"];
+                                        }
+                                        
+                                        if (strlen($parameters) > 1) { $parameters = $parameters."&"; }
+                                        $parameters = $parameters."sort=3";
 
-                                            if (strlen($parameters) > 1) { ?>
-                                                href="<?= "interns.php".$parameters ?>" <?php
-                                            } else { ?>
-                                                href="<?= "interns.php" ?>" <?php
-                                            } ?>>Z-A</a></li>
-                                        <li><a class="dropdown-item btn-smoke" <?php
-                                            $parameters = "?";
-                                            if (!empty($_GET["search"])) {
-                                                $parameters = $parameters."search=".$_GET["search"];
-                                            }
+                                        if (strlen($parameters) > 1) { ?>
+                                            href="<?= "interns.php".$parameters ?>" <?php
+                                        } else { ?>
+                                            href="<?= "interns.php" ?>" <?php
+                                        } ?>>Oldest Intern</a></li>
+                                    <li><a class="dropdown-item btn-smoke" <?php
+                                        $parameters = "?";
+                                        if (!empty($_GET["search"])) {
+                                            $parameters = $parameters."search=".$_GET["search"];
+                                        }
 
-                                            if (!empty($_GET["department"])) {
-                                                if (strlen($parameters) > 1) { $parameters = $parameters."&"; }
-                                                $parameters = $parameters."department=".$_GET["department"];
-                                            }
-                                            
+                                        if (!empty($_GET["department"])) {
                                             if (strlen($parameters) > 1) { $parameters = $parameters."&"; }
-                                            $parameters = $parameters."sort=3";
+                                            $parameters = $parameters."department=".$_GET["department"];
+                                        }
+                                        
+                                        if (strlen($parameters) > 1) { $parameters = $parameters."&"; }
+                                        $parameters = $parameters."sort=4";
 
-                                            if (strlen($parameters) > 1) { ?>
-                                                href="<?= "interns.php".$parameters ?>" <?php
-                                            } else { ?>
-                                                href="<?= "interns.php" ?>" <?php
-                                            } ?>>Oldest Intern</a></li>
-                                        <li><a class="dropdown-item btn-smoke" <?php
-                                            $parameters = "?";
-                                            if (!empty($_GET["search"])) {
-                                                $parameters = $parameters."search=".$_GET["search"];
-                                            }
+                                        if (strlen($parameters) > 1) { ?>
+                                            href="<?= "interns.php".$parameters ?>" <?php
+                                        } else { ?>
+                                            href="<?= "interns.php" ?>" <?php
+                                        } ?>>Newest Intern</a></li>
+                                </ul>
+                            </div>
+                        </div> <?php
+                        if ($admin_roles_count != 0) { ?>
+                            <div class="modal fade" id="addInternModal" tabindex="-1" aria-labelledby="addInternModalLabel" aria-hidden="true">
+                                <div class="modal-dialog modal-dialog-centered">
+                                    <div class="modal-content">
+                                        <div class="modal-header">
+                                            <h5 class="modal-title" id="addInternModalLabel">Add Intern</h5>
+                                            <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Close"></button>
+                                        </div>
 
-                                            if (!empty($_GET["department"])) {
-                                                if (strlen($parameters) > 1) { $parameters = $parameters."&"; }
-                                                $parameters = $parameters."department=".$_GET["department"];
-                                            }
-                                            
-                                            if (strlen($parameters) > 1) { $parameters = $parameters."&"; }
-                                            $parameters = $parameters."sort=4";
-
-                                            if (strlen($parameters) > 1) { ?>
-                                                href="<?= "interns.php".$parameters ?>" <?php
-                                            } else { ?>
-                                                href="<?= "interns.php" ?>" <?php
-                                            } ?>>Newest Intern</a></li>
-                                    </ul>
-                                </div>
-                            </div> <?php
-                            if ($admin_roles_count != 0) { ?>
-                                <div class="modal fade" id="addInternModal" tabindex="-1" aria-labelledby="addInternModalLabel" aria-hidden="true">
-                                    <div class="modal-dialog modal-dialog-centered">
-                                        <div class="modal-content">
-                                            <div class="modal-header">
-                                                <h5 class="modal-title" id="addInternModalLabel">Add Intern</h5>
-                                                <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Close"></button>
-                                            </div>
-
-                                            <form action="<?= htmlspecialchars($_SERVER["PHP_SELF"]);?>" method="post">
-                                                <div class="modal-body">
-                                                    <div class="row">
-                                                        <!-- <div class="col-6 user_input my-1">
-                                                            <label class="text-indigo mb-2" for="intern_id">Intern ID</label>
-                                                            <div class="input-group">
-                                                                <input type="text" name="intern_id" class="form-control" disabled>
-                                                                <div class="input-group-append">
-                                                                    <button type="button" class="btn btn-smoke border-dark">Regen</button>
-                                                                </div>
+                                        <form action="<?= htmlspecialchars($_SERVER["PHP_SELF"]);?>" method="post">
+                                            <div class="modal-body">
+                                                <div class="row">
+                                                    <!-- <div class="col-6 user_input my-1">
+                                                        <label class="mb-2" for="intern_id">Intern ID</label>
+                                                        <div class="input-group">
+                                                            <input type="text" name="intern_id" class="form-control" disabled>
+                                                            <div class="input-group-append">
+                                                                <button type="button" class="btn btn-smoke border-dark">Regen</button>
                                                             </div>
-                                                        </div> -->
-                                                        <div class="col-12 user_input my-1">
-                                                            <label class="mb-2" for="lastName">Last Name
-                                                                <span class="text-danger">*</span>
-                                                            </label>
-                                                            <input type="text" name="lastName" class="form-control" maxLength="32">
                                                         </div>
-                                                        <div class="col-12 user_input my-1">
-                                                            <label class="text-indigo mb-2" for="firstName">First Name
-                                                                <span class="text-danger">*</span>
-                                                            </label>
-                                                            <input type="text" name="firstName" class="form-control" maxLength="32">
-                                                        </div>
-                                                        <div class="col-12 user_input my-1">
-                                                            <label class="text-indigo mb-2" for="middleName">Middle Name</label>
-                                                            <input type="text" name="middleName" class="form-control" maxLength="32">
-                                                        </div>
+                                                    </div> -->
+                                                    <div class="col-12 user_input my-1">
+                                                        <label class="mb-2" for="lastName">Last Name
+                                                            <span class="text-danger">*</span>
+                                                        </label>
+                                                        <input type="text" name="lastName" class="form-control" maxLength="32">
+                                                    </div>
+                                                    <div class="col-12 user_input my-1">
+                                                        <label class="mb-2" for="firstName">First Name
+                                                            <span class="text-danger">*</span>
+                                                        </label>
+                                                        <input type="text" name="firstName" class="form-control" maxLength="32">
+                                                    </div>
+                                                    <div class="col-12 user_input my-1">
+                                                        <label class="mb-2" for="middleName">Middle Name</label>
+                                                        <input type="text" name="middleName" class="form-control" maxLength="32">
+                                                    </div>
+                                                    <div class="col-12 user_input my-1">
+                                                        <label class="mb-2" for="gender">Gender</label>
+                                                        <select name="gender" class="form-select">
+                                                            <option value="0">Male</option>
+                                                            <option value="1">Female</option>
+                                                        </select>
                                                     </div>
                                                 </div>
+                                            </div>
 
-                                                <div class="modal-footer">
-                                                    <button type="submit" name="btnAddIntern" class="btn btn-success">Submit</button>
-                                                </div>
-                                            </form>
-                                        </div>
+                                            <div class="modal-footer">
+                                                <button type="submit" name="btnAddIntern" class="btn btn-success">Submit</button>
+                                            </div>
+                                        </form>
                                     </div>
                                 </div>
-                                
-                                <div class="w-fit my-2 ms-auto">
-                                    <button type="button" class="btn btn-primary" data-bs-toggle="modal" 
-                                        data-bs-target="#addInternModal">
-                                        <i class="fa-solid fa-plus me-2"></i>Add Intern
-                                    </button>
-                                    <a class="btn btn-secondary" href="edit_profile.php">
-                                        <i class="fa-solid fa-pen me-2"></i>Edit Profile
-                                    </a>
-                                </div> <?php
-                            } ?>
-                        </div>
+                            </div>
+                            
+                            <div class="w-fit my-2 ms-auto">
+                                <button type="button" class="btn btn-primary" data-bs-toggle="modal" 
+                                    data-bs-target="#addInternModal">
+                                    <i class="fa-solid fa-plus me-2"></i>Add Intern
+                                </button>
+                                <a class="btn btn-secondary" href="edit_profile.php">
+                                    <i class="fa-solid fa-pen me-2"></i>Edit Profile
+                                </a>
+                            </div> <?php
+                        } ?>
                     </div>
                 </div>
-            </form>
+            </div>
         </div> <?php
         if (isset($_SESSION["success"])) { ?>
             <div class="alert alert-success text-success">
@@ -395,13 +431,26 @@
                 </div>
 
                 <div class="interns"> <?php
+                    $full_name_condition = "";
+                    if (!empty($_GET["search"])) {
+                        $full_name_condition = " AND (CONCAT(last_name, ' ', first_name) LIKE CONCAT( '%', :intern_name, '%') OR
+                        CONCAT(first_name, ' ', last_name) LIKE CONCAT( '%', :intern_name, '%'))";
+                    }
+
                     $db->query("SELECT * FROM intern_personal_information
                     WHERE (SELECT COUNT(*) FROM intern_accounts
-                    WHERE intern_accounts.id=intern_personal_information.id) = 0
-                    ORDER BY last_name");
+                    WHERE intern_accounts.id=intern_personal_information.id) = 0".$full_name_condition.
+                    " ORDER BY last_name LIMIT 5");
+                    
+                    if (strlen($full_name_condition) > 0) {
+                        $db->selectInterns($_GET["search"]);
+                    }
+                    
                     $db->execute();
 
-                    while ($row = $db->fetch()) { ?>
+                    $count = 0;
+                    while ($row = $db->fetch()) {
+                        $count++; ?>
                         <div class="modal fade" id="removeAccountModal<?= $row["id"] ?>" tabindex="-1"
                             aria-labelledby="removeAccountModalLabel" aria-hidden="true">
                             <div class="modal-dialog modal-dialog-centered">
@@ -427,8 +476,11 @@
                                                     <h5 class="text-dark fs-regular mb-0">
                                                         <?= $row["last_name"].", ".$row["first_name"] ?>
                                                     </h5>
-                                                    <input type="text" name="intern_id" class="form-control text-center mt-2"
+                                                    <h6 class="fs-f"><?= $row["id"] ?></h6>
+                                                    <input type="text" name="intern_id" class="form-control text-center d-none mt-2"
                                                         value="<?= $row["id"] ?>" readonly>
+                                                    <input type="text" name="fullName" class="form-control text-center d-none mt-2"
+                                                        value="<?= $row["last_name"].", ".$row["first_name"] ?>" readonly>
                                                 </div>
                                             </div>
                                         </div>
@@ -441,7 +493,22 @@
                             </div>
                         </div>
 
-                        <div class="position-relative">
+                        <div class="limited-card position-relative <?php
+                            if ($count == 5) {
+                                echo "d-xxl-block";
+                            }
+                            if ($count == 4) {
+                                echo "d-xl-block";
+                            }
+                            if ($count == 3) {
+                                echo "d-lg-block";
+                            }
+                            if ($count == 2) {
+                                echo "d-md-block";
+                            }
+                            if ($count == 1) {
+                                echo "d-block";
+                            } ?>">
                             <div class="intern text-center">
                                 <div class="top">
                                     <img class="img-intern mx-auto" src="<?php

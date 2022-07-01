@@ -101,12 +101,12 @@
                                 <div class="col-lg-12">
                                     <div class="row">
                                         <div class="col-lg-6 col-md-6 col-sm-6 user_input my-1">
-                                            <label class="text-indigo mb-2" for="password">Password
+                                            <label class="mb-2" for="password">Password
                                                 <span class="text-danger">*</span></label>
                                             <input type="password" name="password" class="form-control" maxLength="16">
                                         </div>
                                         <div class="col-lg-6 col-md-6 col-sm-6 user_input my-1">
-                                            <label class="text-indigo mb-2" for="confirm_password">Confirm Password
+                                            <label class="mb-2" for="confirm_password">Confirm Password
                                                 <span class="text-danger">*</span></label>
                                             <input type="password" name="confirm_password" class="form-control" maxLength="16">
                                         </div>

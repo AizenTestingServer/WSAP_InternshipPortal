@@ -37,8 +37,8 @@
 
     if (isset($_POST["search"])) {
         $parameters = "?";
-        if (!empty($_POST["search_intern"])) {
-            $parameters = $parameters."search=".$_POST["search_intern"];
+        if (!empty($_POST["search_role"])) {
+            $parameters = $parameters."search=".$_POST["search_role"];
         }
 
         if (!empty($_GET["department"])) {
@@ -96,7 +96,7 @@
                         <!--SEARCH BUTTON/TEXT-->
                         <div class="col-lg-8 col-md-10 col-sm-12">
                             <div class="input-group mb-3">
-                                <input type="text" class="form-control" placeholder="Search Role" name="search_intern" value="<?php
+                                <input type="text" class="form-control" placeholder="Search Role" name="search_role" value="<?php
                                 if (!empty($_GET["search"])) {
                                     echo $_GET["search"];
                                 } ?>">

@@ -694,7 +694,7 @@ a.dt-button {
     align-items: center;
 }
 
-#attendance-table, .attendance-alert, #time-in-time-out-layout {
+#attendance-table, .attendance-alert, #time-in-time-out-layout, .att-no-record {
     width: calc(100% - 310px);
 }
 
@@ -772,6 +772,10 @@ a.dt-button {
     top: 0;
 }
 
+.limited-card {
+    display: none;
+}
+
 @media (min-width: 0px) {
     .intern.info {
         margin-top: 230px;
@@ -783,17 +787,17 @@ a.dt-button {
     .interns-attendance, .interns {
         grid-template-columns: repeat(1, 1fr);
     }
+    
+    .intern.info {
+        margin-top: 230px;
+        width: 100%;
+    }
 
     .w-sm-fit {
         width: fit-content;
     }
 
     .w-sm-100 {
-        width: 100%;
-    }
-    
-    .intern.info {
-        margin-top: 230px;
         width: 100%;
     }
 }
@@ -803,6 +807,15 @@ a.dt-button {
         grid-template-columns: repeat(2, 1fr);
     }
 
+    .limited-card.d-md-initial {
+        display: initial;
+    }
+    
+    .intern.info {
+        margin-top: 0;
+        width: calc(100% - 310px);
+    }
+
     .w-md-fit {
         width: fit-content;
     }
@@ -810,16 +823,15 @@ a.dt-button {
     .w-md-100 {
         width: 100%;
     }
-    
-    .intern.info {
-        margin-top: 0;
-        width: calc(100% - 310px);
-    }
 }
 
 @media (min-width: 992px) {
     .interns-attendance, .interns {
         grid-template-columns: repeat(3, 1fr);
+    }
+
+    .limited-card.d-lg-initial {
+        display: initial;
     }
 
     .w-lg-fit {
@@ -835,11 +847,19 @@ a.dt-button {
     .interns-attendance, .interns {
         grid-template-columns: repeat(4, 1fr);
     }
+
+    .limited-card.d-xl-initial {
+        display: initial;
+    }
 }
 
 @media (min-width: 1400px) {
     .interns-attendance, .interns {
         grid-template-columns: repeat(5, 1fr);
+    }
+
+    .limited-card.d-xxl-initial {
+        display: initial;
     }
 }
 
@@ -863,7 +883,7 @@ a.dt-button {
         width: 100%;
     }
 
-    #attendance-table, .attendance-alert {
+    #attendance-table, .attendance-alert, .att-no-record  {
         width: 100%;
     }
 }

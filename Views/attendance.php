@@ -426,7 +426,7 @@
             </tbody>
         </table> <?php
         if ($db->rowCount() == 0) { ?>
-            <div class="w-100 text-center my-5">
+            <div class="att-no-record text-center my-5">
                 <h3>No Record</h3>
             </div> <?php
         } ?>

@@ -26,9 +26,24 @@
     intern_personal_information.id=:intern_id");
     $db->setInternId($_SESSION["intern_id"]);
     $db->execute();
+    $admin_info = $db->fetch();
     $admin_roles_count = $db->rowCount();
 
     if ($admin_roles_count != 0) {
+        $db->query("SELECT intern_personal_information.id AS intern_id, intern_personal_information.*, intern_wsap_information.*, departments.*
+        FROM intern_personal_information, intern_wsap_information, departments
+        WHERE intern_personal_information.id = intern_wsap_information.id AND
+        intern_wsap_information.department_id = departments.id AND
+        intern_personal_information.id=:intern_id");
+        $db->setInternId($_GET["intern_id"]);
+        $db->execute();
+        $value = $db->fetch();
+
+        $db->query("SELECT * FROM roles WHERE id=:id");
+        $db->setId($_GET["role_id"]);
+        $db->execute();
+        $role = $db->fetch();
+
         $assign_role = array($_GET["intern_id"],
         $_GET["role_id"],
         0);
@@ -36,6 +51,19 @@
         $db->query("INSERT INTO intern_roles
         VALUES(null, :intern_id, :role_id, :role_type)");
         $db->assignRole($assign_role);
+        $db->execute();
+        $db->closeStmt();
+                    
+        $log_value = $admin_info["last_name"].", ".$admin_info["first_name"].
+            " (".$admin_info["name"].") assigned the ".$role["name"]." role to ".$value["last_name"].", ".$value["first_name"].".";
+
+        $log = array($date->getDateTime(),
+        strtoupper($_SESSION["intern_id"]),
+        $log_value);
+
+        $db->query("INSERT INTO audit_logs
+        VALUES (null, :timestamp, :intern_id, :log)");
+        $db->log($log);
         $db->execute();
         $db->closeStmt();
         

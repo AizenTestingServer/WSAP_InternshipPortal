@@ -8,7 +8,7 @@
                 <img class="img-responsive" src="../Assets/img/Brand_Logo/WSAP.png" alt="">
                 <span class="fw-bold">WSAP IP</span>
             </div>
-            <ul class="side-nav-list px-1 mt-4">
+            <ul class="side-nav-list px-1 mt-4 text-center">
                 <li>
                     <a <?php
                     if ($target_active == "dashboard") { ?>
@@ -75,7 +75,7 @@
                             <i class="fa-solid fa-clock fa-2x"></i>
                         </div> Attendance
                     </a>
-                    <ul class="dropdown-list">
+                    <ul class="dropdown-list text-start">
                         <li><a href="attendance.php">My Attendance</a></li>
                         <li><a href="interns_attendance.php">Interns' Attendance</a></li>
                         <li><a href="calendar.php?month=<?= $date->getMonthName() ?>&year=<?= $date->getYear() ?>">Calendar</a></li>
@@ -121,13 +121,27 @@
                             <i class="fa-solid fa-users fa-2x"></i>
                         </div> Interns
                     </a>
-                    <ul class="dropdown-list">
+                    <ul class="dropdown-list text-start">
                         <li><a href="profile.php">My Profile</a></li>
                         <li><a href="interns.php">Interns</a></li>
                         <li><a href="admins.php">Admins</a></li>
                         <li><a href="roles.php">Roles</a></li>
                         <li><a href="assign_roles.php">Assign Roles</a></li>
                     </ul>
+                </li>
+                <li>
+                    <a <?php
+                    if ($target_active == "auditLogs") { ?>
+                        class="active" <?php
+                    } else { ?>
+                        class="inactive"
+                        href="audit_logs.php?day=<?= $date->getDay() ?>&month=<?= $date->getMonthName() ?>&year=<?= $date->getYear() ?>" <?php
+                    } ?>>
+                        <div class="icon-container">
+                            <i class="fa-solid fa-book fa-2x"></i>
+                        </div>
+                        Audit Logs
+                    </a>
                 </li>
                 <!--
                 <li><a href="help.php">

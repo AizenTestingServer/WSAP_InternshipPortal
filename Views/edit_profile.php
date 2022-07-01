@@ -21,6 +21,7 @@
     intern_personal_information.id=:intern_id");
     $db->setInternId($_SESSION["intern_id"]);
     $db->execute();
+    $admin_info = $db->fetch();
     $admin_roles_count = $db->rowCount();
 
     $current_level = 0;
@@ -86,6 +87,19 @@
                     $db->execute();
                     $db->closeStmt();
                     
+                    $log_value = $admin_info["last_name"].", ".$admin_info["first_name"].
+                        " (".$admin_info["name"].") uploaded an image for ".$value["last_name"].", ".$value["first_name"].".";
+
+                    $log = array($date->getDateTime(),
+                    strtoupper($_SESSION["intern_id"]),
+                    $log_value);
+        
+                    $db->query("INSERT INTO audit_logs
+                    VALUES (null, :timestamp, :intern_id, :log)");
+                    $db->log($log);
+                    $db->execute();
+                    $db->closeStmt();
+                    
                     $_SESSION["upload_success"] = "The file has been uploaded successfully.";
                 } else {
                     $_SESSION["upload_failed"] = "The file must be an image!";
@@ -125,6 +139,19 @@
             SET last_name=:last_name, first_name=:first_name, middle_name=:middle_name,
             gender=:gender, birthday=:birthday WHERE id=:intern_id");
             $db->setPersonalInfo($personal_info);
+            $db->execute();
+            $db->closeStmt();
+                    
+            $log_value = $admin_info["last_name"].", ".$admin_info["first_name"].
+                " (".$admin_info["name"].") updated the personal information of ".$value["last_name"].", ".$value["first_name"].".";
+
+            $log = array($date->getDateTime(),
+            strtoupper($_SESSION["intern_id"]),
+            $log_value);
+
+            $db->query("INSERT INTO audit_logs
+            VALUES (null, :timestamp, :intern_id, :log)");
+            $db->log($log);
             $db->execute();
             $db->closeStmt();
             
@@ -180,6 +207,19 @@
             $db->setWSAPInfo2($wsap_info);
             $db->execute();
             $db->closeStmt();
+                    
+            $log_value = $admin_info["last_name"].", ".$admin_info["first_name"].
+                " (".$admin_info["name"].") updated the WSAP information of ".$value["last_name"].", ".$value["first_name"].".";
+
+            $log = array($date->getDateTime(),
+            strtoupper($_SESSION["intern_id"]),
+            $log_value);
+
+            $db->query("INSERT INTO audit_logs
+            VALUES (null, :timestamp, :intern_id, :log)");
+            $db->log($log);
+            $db->execute();
+            $db->closeStmt();
             
             $_SESSION["wsap_success"] = "Successfully saved the changes.";
             unset($_SESSION["dept_id"]);
@@ -212,6 +252,19 @@
         $db->updatePassword($reset_password);
         $db->execute();
         $db->closeStmt();
+                    
+        $log_value = $admin_info["last_name"].", ".$admin_info["first_name"].
+            " (".$admin_info["name"].") reset the password of ".$value["last_name"].", ".$value["first_name"].".";
+
+        $log = array($date->getDateTime(),
+        strtoupper($_SESSION["intern_id"]),
+        $log_value);
+
+        $db->query("INSERT INTO audit_logs
+        VALUES (null, :timestamp, :intern_id, :log)");
+        $db->log($log);
+        $db->execute();
+        $db->closeStmt();
         
         $_SESSION["reset_success"] = "Successfully reset the password of an intern.";
 
@@ -220,9 +273,22 @@
     }
     
     if (isset($_POST["removeRole"])) {
-        if (!empty($_POST["intern_role_id"])) {
+        if (!empty($_POST["intern_role_id"]) && !empty($_POST["role_name"])) {
             $db->query("DELETE FROM intern_roles WHERE id=:id");
             $db->setId($_POST["intern_role_id"]);
+            $db->execute();
+            $db->closeStmt();
+                    
+            $log_value = $admin_info["last_name"].", ".$admin_info["first_name"].
+                " (".$admin_info["name"].") removed the ".$_POST["role_name"]." role of ".$value["last_name"].", ".$value["first_name"].".";
+    
+            $log = array($date->getDateTime(),
+            strtoupper($_SESSION["intern_id"]),
+            $log_value);
+    
+            $db->query("INSERT INTO audit_logs
+            VALUES (null, :timestamp, :intern_id, :log)");
+            $db->log($log);
             $db->execute();
             $db->closeStmt();
             
@@ -294,7 +360,7 @@
 
                     <div class="col-lg-4 col-md-5 p-4 pb-0 text-center">
                         <form method="post" enctype="multipart/form-data">
-                            <label for="image" class="form-label text-indigo fw-bold w-100">Photo</label>
+                            <label for="image" class="form-label fw-bold w-100">Photo</label>
                             <img class="mb-2" id="output" src="<?php {
                                     if ($value["image"] == null || strlen($value["image"]) == 0) {
                                         if ($value["gender"] == 0) {
@@ -368,7 +434,7 @@
                                                 } ?>" maxLength="32">
                                         </div>
                                         <div class="col-lg-4 col-md-12 user_input my-1">
-                                            <label class="text-indigo mb-2" for="firstName">First Name
+                                            <label class="mb-2" for="firstName">First Name
                                                 <span class="text-danger">*</span>
                                             </label>
                                             <input type="text" name="firstName" class="form-control"
@@ -380,7 +446,7 @@
                                                 } ?>" maxLength="32">
                                         </div>
                                         <div class="col-lg-4 col-md-12 user_input my-1">
-                                            <label class="text-indigo mb-2" for="middleName">Middle Name</label>
+                                            <label class="mb-2" for="middleName">Middle Name</label>
                                             <input type="text" name="middleName" class="form-control"
                                             value="<?php
                                                 if (isset($_SESSION["middle_name"])) {
@@ -480,12 +546,12 @@
                                         <div class="col-lg-12">
                                             <div class="row">
                                                 <div class="col-lg-4 col-md-6 col-sm-6 user_input my-1">
-                                                    <label class="text-indigo mb-2" for="intern_id">Intern ID</label>
+                                                    <label class="mb-2" for="intern_id">Intern ID</label>
                                                     <input type="text" name="intern_id" class="form-control text-uppercase"
                                                         value="<?= $value["id"]; ?>" disabled>
                                                 </div>
                                                 <div class="col-lg-4 col-md-6 col-sm-6 user_input my-1">
-                                                    <label class="text-indigo mb-2" for="department">Department</label>
+                                                    <label class="mb-2" for="department">Department</label>
                                                     <select name="department" class="form-select"> <?php
                                                         $db->query("SELECT * FROM departments ORDER BY name");
                                                         $db->execute();
@@ -607,13 +673,13 @@
                                                     disabled>
                                                 </div>
                                                 <div class="col-lg-3 col-md-6 col-sm-6 user_input my-1">
-                                                    <label class="text-indigo mb-2" for="renderedHours">Rendered Hours
+                                                    <label class="mb-2" for="renderedHours">Rendered Hours
                                                 <span class="text-danger">*</span></label>
                                                     <input type="number" name="renderedHours" class="form-control"
                                                         value="<?= $value["rendered_hours"]; ?>">
                                                 </div>
                                                 <div class="col-lg-3 col-md-6 col-sm-6 user_input my-1">
-                                                    <label class="text-indigo mb-2" for="targetRenderingHours">Target Rendering Hours
+                                                    <label class="mb-2" for="targetRenderingHours">Target Rendering Hours
                                                 <span class="text-danger">*</span></label>
                                                     <input type="number" name="targetRenderingHours" class="form-control"
                                                         value="<?= $value["target_rendering_hours"]; ?>">
@@ -626,7 +692,7 @@
                                 <div class="col-lg-12">
                                     <div class="row mt-2 mb-4">
                                         <div class="col-lg-4 col-md-6 col-sm-6 user_input my-1">
-                                            <label class="text-indigo mb-2" for="emailAddress">Email Address</label>
+                                            <label class="mb-2" for="emailAddress">Email Address</label>
                                             <input name="emailAddress" class="form-control"
                                                 value="<?php if(isset($_SESSION["email_address"])) {
                                                         echo $_SESSION["email_address"];
@@ -638,7 +704,7 @@
                                                     } ?>>
                                         </div>
                                         <div class="col-lg-4 col-md-6 col-sm-6 user_input my-1">
-                                            <label class="text-indigo mb-2" for="mobileNumber">Mobile Number</label>
+                                            <label class="mb-2" for="mobileNumber">Mobile Number</label>
                                             <div class="input-group">
                                                 <div class="input-group-prepend">
                                                     <span class="input-group-text">+63</span>
@@ -655,7 +721,7 @@
                                             </div>
                                         </div>
                                         <div class="col-lg-4 col-md-6 col-sm-6 user_input my-1">
-                                            <label class="text-indigo mb-2" for="mobileNumber2">Mobile Number 2</label>
+                                            <label class="mb-2" for="mobileNumber2">Mobile Number 2</label>
                                             <div class="input-group">
                                                 <div class="input-group-prepend">
                                                     <span class="input-group-text">+63</span>
@@ -702,7 +768,7 @@
                                     <div class="col-lg-12">
                                         <div class="row">
                                             <div class="col-lg-6 col-md-12 user_input my-1">
-                                                <label class="text-indigo mb-2" for="university">University</label>
+                                                <label class="mb-2" for="university">University</label>
                                                 <input type="text" name="university" class="form-control"
                                                     value="<?php if(isset($_SESSION["university"])) {
                                                     echo $_SESSION["university"];
@@ -714,7 +780,7 @@
                                                     } ?>>
                                             </div>
                                             <div class="col-lg-6 col-md-12 user_input my-1">
-                                                <label class="text-indigo mb-2" for="course">Course</label>
+                                                <label class="mb-2" for="course">Course</label>
                                                 <input type="text" name="course" class="form-control"
                                                     value="<?php if(isset($_SESSION["course"])) {
                                                     echo $_SESSION["course"];
@@ -726,7 +792,7 @@
                                                     } ?>>
                                             </div>
                                             <div class="col-lg-4 col-md-6 col-sm-6 user_input my-1">
-                                                <label class="text-indigo mb-2" for="university_abbreviation">University Abbreviation</label>
+                                                <label class="mb-2" for="university_abbreviation">University Abbreviation</label>
                                                 <input type="text" name="university_abbreviation" class="form-control"
                                                     value="<?php if(isset($_SESSION["university_abbreviation"])) {
                                                     echo $_SESSION["university_abbreviation"];
@@ -738,7 +804,7 @@
                                                     } ?>>
                                             </div>
                                             <div class="col-lg-4 col-md-6 col-sm-6 user_input my-1">
-                                                <label class="text-indigo mb-2" for="course_abbreviation">Course Abbreviation</label>
+                                                <label class="mb-2" for="course_abbreviation">Course Abbreviation</label>
                                                 <input type="text" name="course_abbreviation" class="form-control"
                                                     value="<?php if(isset($_SESSION["course_abbreviation"])) {
                                                     echo $_SESSION["course_abbreviation"];
@@ -849,7 +915,7 @@
                                     <div class="col-lg-12">
                                         <div class="row">
                                             <div class="col-lg-3 col-md-6 col-sm-6 user_input my-1">
-                                                <label class="text-indigo mb-2" for="date_activated">Date Activated</label>
+                                                <label class="mb-2" for="date_activated">Date Activated</label>
                                                 <input type="date" name="date_activated" class="form-control"
                                                     value="<?= $value["date_activated"]; ?>" disabled>
                                             </div>
@@ -986,6 +1052,8 @@
                                                                         } ?></h6>
                                                                     <input type="text" name="intern_role_id" class="form-control text-center d-none mt-2"
                                                                         value="<?= $row["intern_role_id"] ?>" readonly>
+                                                                    <input type="text" name="role_name" class="form-control text-center d-none mt-2"
+                                                                        value="<?= $row["role_name"] ?>" readonly>
                                                                 </div>
                                                             </div>
                                                         </div>

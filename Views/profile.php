@@ -320,7 +320,7 @@
 
             <div class="col-lg-4 col-md-5 p-4 pb-0 text-center">
                 <form method="post" enctype="multipart/form-data">
-                    <label for="image" class="form-label text-indigo fw-bold w-100">Photo</label>
+                    <label for="image" class="form-label fw-bold w-100">Photo</label>
                     <img class="mb-2" id="output" src="<?php {
                             if ($value["image"] == null || strlen($value["image"]) == 0) {
                                 if ($value["gender"] == 0) {
@@ -409,7 +409,7 @@
                                         } ?>>
                                 </div>
                                 <div class="col-lg-4 col-md-12 user_input my-1">
-                                    <label class="text-indigo mb-2" for="firstName">First Name <?php
+                                    <label class="mb-2" for="firstName">First Name <?php
                                         if (empty($_GET["intern_id"])) { ?>
                                             <span class="text-danger">*</span> <?php
                                         } ?>
@@ -426,7 +426,7 @@
                                         } ?>>
                                 </div>
                                 <div class="col-lg-4 col-md-12 user_input my-1">
-                                    <label class="text-indigo mb-2" for="middleName">Middle Name</label>
+                                    <label class="mb-2" for="middleName">Middle Name</label>
                                     <input type="text" name="middleName" class="form-control"
                                     value="<?php
                                         if (isset($_SESSION["middle_name"])) {
@@ -541,12 +541,12 @@
                                 <div class="col-lg-12">
                                     <div class="row">
                                         <div class="col-lg-4 col-md-6 col-sm-6 user_input my-1">
-                                            <label class="text-indigo mb-2" for="intern_id">Intern ID</label>
+                                            <label class="mb-2" for="intern_id">Intern ID</label>
                                             <input type="text" name="intern_id" class="form-control text-uppercase"
                                                 value="<?= $value["id"]; ?>" disabled>
                                         </div>
                                         <div class="col-lg-4 col-md-6 col-sm-6 user_input my-1">
-                                            <label class="text-indigo mb-2" for="department">Department</label>
+                                            <label class="mb-2" for="department">Department</label>
                                             <select name="department" class="form-select" <?php
                                                 if (!empty($_GET["intern_id"])) { ?>
                                                     disabled <?php
@@ -679,12 +679,12 @@
                                             disabled>
                                         </div>
                                         <div class="col-lg-3 col-md-6 col-sm-6 user_input my-1">
-                                            <label class="text-indigo mb-2" for="renderedHours">Rendered Hours</label>
+                                            <label class="mb-2" for="renderedHours">Rendered Hours</label>
                                             <input type="number" name="renderedHours" class="form-control"
                                                 value="<?= $value["rendered_hours"]; ?>" disabled>
                                         </div>
                                         <div class="col-lg-3 col-md-6 col-sm-6 user_input my-1">
-                                            <label class="text-indigo mb-2" for="targetRenderingHours">Target Rendering Hours</label>
+                                            <label class="mb-2" for="targetRenderingHours">Target Rendering Hours</label>
                                             <input type="number" name="targetRenderingHours" class="form-control"
                                                 value="<?= $value["target_rendering_hours"]; ?>" disabled>
                                         </div>
@@ -699,7 +699,7 @@
                                     mb-4 <?php
                                 } ?>">
                                 <div class="col-lg-4 col-md-6 col-sm-6 user_input my-1">
-                                    <label class="text-indigo mb-2" for="emailAddress">Email Address <?php
+                                    <label class="mb-2" for="emailAddress">Email Address <?php
                                         if (empty($_GET["intern_id"])) { ?>
                                             <span class="text-danger">*</span> <?php
                                         } ?>
@@ -715,7 +715,7 @@
                                             } ?>>
                                 </div>
                                 <div class="col-lg-4 col-md-6 col-sm-6 user_input my-1">
-                                    <label class="text-indigo mb-2" for="mobileNumber">Mobile Number <?php
+                                    <label class="mb-2" for="mobileNumber">Mobile Number <?php
                                         if (empty($_GET["intern_id"])) { ?>
                                             <span class="text-danger">*</span> <?php
                                         } ?>
@@ -736,7 +736,7 @@
                                     </div>
                                 </div>
                                 <div class="col-lg-4 col-md-6 col-sm-6 user_input my-1">
-                                    <label class="text-indigo mb-2" for="mobileNumber2">Mobile Number 2</label>
+                                    <label class="mb-2" for="mobileNumber2">Mobile Number 2</label>
                                     <div class="input-group">
                                         <div class="input-group-prepend">
                                             <span class="input-group-text">+63</span>
@@ -807,7 +807,7 @@
                                 <div class="col-lg-12">
                                     <div class="row">
                                         <div class="col-lg-6 col-md-12 user_input my-1">
-                                            <label class="text-indigo mb-2" for="university">University <?php
+                                            <label class="mb-2" for="university">University <?php
                                                 if (empty($_GET["intern_id"])) { ?>
                                                     <span class="text-danger">*</span> <?php
                                                 } ?>
@@ -823,7 +823,7 @@
                                                 } ?>>
                                         </div>
                                         <div class="col-lg-6 col-md-12 user_input my-1">
-                                            <label class="text-indigo mb-2" for="course">Course <?php
+                                            <label class="mb-2" for="course">Course <?php
                                                 if (empty($_GET["intern_id"])) { ?>
                                                     <span class="text-danger">*</span> <?php
                                                 } ?>
@@ -839,7 +839,7 @@
                                                 } ?>>
                                         </div>
                                         <div class="col-lg-4 col-md-6 col-sm-6 user_input my-1">
-                                            <label class="text-indigo mb-2" for="university_abbreviation">University Abbreviation <?php
+                                            <label class="mb-2" for="university_abbreviation">University Abbreviation <?php
                                                 if (empty($_GET["intern_id"])) { ?>
                                                     <span class="text-danger">*</span> <?php
                                                 } ?>
@@ -855,7 +855,7 @@
                                                 } ?>>
                                         </div>
                                         <div class="col-lg-4 col-md-6 col-sm-6 user_input my-1">
-                                            <label class="text-indigo mb-2" for="course_abbreviation">Course Abbreviation <?php
+                                            <label class="mb-2" for="course_abbreviation">Course Abbreviation <?php
                                                 if (empty($_GET["intern_id"])) { ?>
                                                     <span class="text-danger">*</span> <?php
                                                 } ?>
@@ -983,23 +983,23 @@
                                 <div class="col-lg-12">
                                     <div class="row">
                                         <div class="col-lg-3 col-md-6 col-sm-6 user_input my-1">
-                                            <label class="text-indigo mb-2" for="date_activated">Date Activated</label>
+                                            <label class="mb-2" for="date_activated">Date Activated</label>
                                             <input type="date" name="date_activated" class="form-control"
                                                 value="<?= $value["date_activated"]; ?>" disabled>
                                         </div> <?php
                                         if (empty($_GET["intern_id"])) { ?>
                                             <div class="col-lg-3 col-md-6 col-sm-6 user_input my-1">
-                                                <label class="text-indigo mb-2" for="new_password">New Password
+                                                <label class="mb-2" for="new_password">New Password
                                                     <span class="text-danger">*</span></label>
                                                 <input type="password" name="new_password" class="form-control" maxLength="16">
                                             </div>
                                             <div class="col-lg-3 col-md-6 col-sm-6 user_input my-1">
-                                                <label class="text-indigo mb-2" for="confirm_password">Confirm Password
+                                                <label class="mb-2" for="confirm_password">Confirm Password
                                                     <span class="text-danger">*</span></label>
                                                 <input type="password" name="confirm_password" class="form-control" maxLength="16">
                                             </div>
                                             <div class="col-lg-3 col-md-6 col-sm-6 user_input my-1">
-                                                <label class="text-indigo mb-2" for="current_password">Current Password
+                                                <label class="mb-2" for="current_password">Current Password
                                                     <span class="text-danger">*</span></label>
                                                 <input type="password" name="current_password" class="form-control" maxLength="16">
                                             </div> <?php

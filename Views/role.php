@@ -30,9 +30,11 @@
     FROM intern_personal_information, intern_roles, roles
     WHERE intern_personal_information.id=intern_roles.intern_id AND
     intern_roles.role_id=roles.id AND roles.admin=1 AND
-    intern_personal_information.id=:intern_id");
+    intern_personal_information.id=:intern_id
+    ORDER BY admin_level DESC LIMIT 1");
     $db->setInternId($_SESSION["intern_id"]);
     $db->execute();
+    $admin_info = $db->fetch();
     $admin_roles_count = $db->rowCount();
 
     $current_level = 0;
@@ -48,7 +50,8 @@
     }
 
     if (!empty($_GET["role_id"])) {
-        $db->query("SELECT roles.*, roles.name AS role_name, roles.id AS role_id, brands.*, brands.name AS brand_name, departments.*, departments.name AS dept_name
+        $db->query("SELECT roles.*, roles.name AS role_name, roles.id AS role_id,
+        brands.*, brands.name AS brand_name, departments.*, departments.name AS dept_name
         FROM roles LEFT JOIN brands ON roles.brand_id = brands.id LEFT JOIN departments ON roles.department_id = departments.id
         WHERE roles.id=:role_id");
         $db->setRoleId($_GET["role_id"]);
@@ -76,6 +79,9 @@
                     $db->insertRole($roles);
                     $db->execute();
                     $db->closeStmt();
+
+                    $log_value = $admin_info["last_name"].", ".$admin_info["first_name"].
+                        " (".$admin_info["name"].") added the ".$_POST["name"]." role.";
     
                     $_SESSION["role_success"] = "Successfully added a role.";
                 } else {
@@ -91,9 +97,23 @@
                     $db->updateRole($roles);
                     $db->execute();
                     $db->closeStmt();
+
+                    $log_value = $admin_info["last_name"].", ".$admin_info["first_name"].
+                        " (".$admin_info["name"].") updated the ".$value["role_name"]." role.";
     
                     $_SESSION["role_success"] = "Successfully saved the changes.";
                 }
+                
+                $log = array($date->getDateTime(),
+                strtoupper($_SESSION["intern_id"]),
+                $log_value);
+    
+                $db->query("INSERT INTO audit_logs
+                VALUES (null, :timestamp, :intern_id, :log)");
+                $db->log($log);
+                $db->execute();
+                $db->closeStmt();
+
                 unset($_SESSION["name"]);
                 unset($_SESSION["brand"]);
                 unset($_SESSION["department"]);
@@ -191,7 +211,7 @@
                                 } ?>" maxLength="64">
                         </div>
                         <div class="col-3 user_input my-1">
-                            <label class="text-indigo mb-2" for="brand">Brand</label>
+                            <label class="mb-2" for="brand">Brand</label>
                             <select name="brand" class="form-select">
                                 <option value="0" selected>No Brand</option> <?php
                                 $db->query("SELECT * FROM brands ORDER BY name");
@@ -214,7 +234,7 @@
                             </select>
                         </div>
                         <div class="col-3 user_input my-1">
-                            <label class="text-indigo mb-2" for="department">Department</label>
+                            <label class="mb-2" for="department">Department</label>
                             <select name="department" class="form-select">
                                 <option value="0" selected>No Department</option> <?php
                                 $db->query("SELECT * FROM departments ORDER BY name");
@@ -237,7 +257,7 @@
                             </select>
                         </div>
                         <div class="col-2 user_input my-1">
-                            <label class="text-indigo mb-2" for="admin">Admin</label>
+                            <label class="mb-2" for="admin">Admin</label>
                             <select id="admin" name="admin" class="form-select">
                                 <option value="0" <?php
                                     if (!empty($_SESSION["admin"])) {
@@ -268,7 +288,7 @@
                             </select>
                         </div>
                         <div class="col-1 user_input my-1">
-                            <label class="text-indigo mb-2" for="level">Level
+                            <label class="mb-2" for="level">Level
                                 <span class="text-danger">*</span>
                             </label>
                             <input id="level" type="number" name="level" class="form-control"

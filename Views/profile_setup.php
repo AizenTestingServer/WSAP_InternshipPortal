@@ -156,6 +156,19 @@
                                             $db->closeStmt();
             
                                             move_uploaded_file($tmp_name, $image_path);
+                    
+                                            $log_value = $last_name.", ".$first_name.
+                                                "'s (".$_SESSION["intern_id"].") account has been activated.";
+                                    
+                                            $log = array($date->getDateTime(),
+                                            strtoupper($_SESSION["intern_id"]),
+                                            $log_value);
+                                    
+                                            $db->query("INSERT INTO audit_logs
+                                            VALUES (null, :timestamp, :intern_id, :log)");
+                                            $db->log($log);
+                                            $db->execute();
+                                            $db->closeStmt();
                                             
                                             $_SESSION["setup_success"] = "Successfully setup the profile.";
                                             $_SESSION["password"] = $_POST["password"];
@@ -232,7 +245,7 @@
                     </h6>
                 </div>
 
-                <div class="col-lg-4 col-md-5 p-4 pb-0 text-center"><label for="image" class="form-label text-indigo fw-bold w-100">Photo</label>
+                <div class="col-lg-4 col-md-5 p-4 pb-0 text-center"><label for="image" class="form-label fw-bold w-100">Photo</label>
                     <img class="mb-2" id="output"  src="<?php
                         if (isset($_SESSION["gender"])) {
                             if ($_SESSION["gender"] == 0) {
@@ -264,7 +277,7 @@
                                         } ?>" maxLength="32">
                                 </div>
                                 <div class="col-lg-4 col-md-12 user_input my-1">
-                                    <label class="text-indigo mb-2" for="firstName">First Name
+                                    <label class="mb-2" for="firstName">First Name
                                         <span class="text-danger">*</span>
                                     </label>
                                     <input type="text" name="firstName" class="form-control"
@@ -276,7 +289,7 @@
                                         } ?>" maxLength="32">
                                 </div>
                                 <div class="col-lg-4 col-md-12 user_input my-1">
-                                    <label class="text-indigo mb-2" for="middleName">Middle Name</label>
+                                    <label class="mb-2" for="middleName">Middle Name</label>
                                     <input type="text" name="middleName" class="form-control"
                                     value="<?php
                                         if (isset($_SESSION["middle_name"])) {
@@ -342,12 +355,12 @@
                                 <div class="col-lg-12">
                                     <div class="row">
                                         <div class="col-lg-4 col-md-6 col-sm-6 user_input my-1">
-                                            <label class="text-indigo mb-2" for="intern_id">Intern ID</label>
+                                            <label class="mb-2" for="intern_id">Intern ID</label>
                                             <input type="text" name="intern_id" class="form-control text-uppercase"
                                                 value="<?= $value["id"]; ?>" disabled>
                                         </div>
                                         <div class="col-lg-4 col-md-6 col-sm-6 user_input my-1">
-                                            <label class="text-indigo mb-2" for="department">Department</label>
+                                            <label class="mb-2" for="department">Department</label>
                                             <select name="department" class="form-select"> <?php
                                                 $db->query("SELECT * FROM departments ORDER BY name");
                                                 $db->execute();
@@ -430,7 +443,7 @@
                                                 } ?>">
                                         </div>
                                         <div class="col-lg-6 col-md-6 col-sm-6 user_input my-1">
-                                            <label class="text-indigo mb-2" for="targetRenderingHours">
+                                            <label class="mb-2" for="targetRenderingHours">
                                                 Target Rendering Hours
                                                 <span class="text-danger">*</span>
                                             </label>
@@ -446,14 +459,14 @@
                         <div class="col-lg-12">
                             <div class="row mt-2">
                                 <div class="col-lg-4 col-md-6 col-sm-6 user_input my-1">
-                                    <label class="text-indigo mb-2" for="emailAddress">Email Address
+                                    <label class="mb-2" for="emailAddress">Email Address
                                         <span class="text-danger">*</span></label>
                                     <input name="emailAddress" class="form-control"
                                         value="<?php if(isset($_SESSION["email_address"])) {
                                             echo $_SESSION["email_address"]; } ?>" maxLength="64">
                                 </div>
                                 <div class="col-lg-4 col-md-6 col-sm-6 user_input my-1">
-                                    <label class="text-indigo mb-2" for="mobileNumber">Mobile Number
+                                    <label class="mb-2" for="mobileNumber">Mobile Number
                                         <span class="text-danger">*</span></label>
                                     <div class="input-group">
                                         <div class="input-group-prepend">
@@ -465,7 +478,7 @@
                                     </div>
                                 </div>
                                 <div class="col-lg-4 col-md-6 col-sm-6 user_input my-1">
-                                    <label class="text-indigo mb-2" for="mobileNumber2">Mobile Number 2</label>
+                                    <label class="mb-2" for="mobileNumber2">Mobile Number 2</label>
                                     <div class="input-group">
                                         <div class="input-group-prepend">
                                             <span class="input-group-text">+63</span>
@@ -496,28 +509,28 @@
                                 <div class="col-lg-12">
                                     <div class="row">
                                         <div class="col-lg-6 col-md-12 user_input my-1">
-                                            <label class="text-indigo mb-2" for="university">University
+                                            <label class="mb-2" for="university">University
                                                 <span class="text-danger">*</span></label>
                                             <input type="text" name="university" class="form-control"
                                                 value="<?php if(isset($_SESSION["university"])) {
                                                     echo $_SESSION["university"]; } ?>" maxLength="64">
                                         </div>
                                         <div class="col-lg-6 col-md-12 user_input my-1">
-                                            <label class="text-indigo mb-2" for="course">Course
+                                            <label class="mb-2" for="course">Course
                                                 <span class="text-danger">*</span></label>
                                             <input type="text" name="course" class="form-control"
                                                 value="<?php if(isset($_SESSION["course"])) {
                                                     echo $_SESSION["course"]; } ?>" maxLength="64">
                                         </div>
                                         <div class="col-lg-4 col-md-6 col-sm-6 user_input my-1">
-                                            <label class="text-indigo mb-2" for="university_abbreviation">University Abbreviation
+                                            <label class="mb-2" for="university_abbreviation">University Abbreviation
                                                 <span class="text-danger">*</span></label>
                                             <input type="text" name="university_abbreviation" class="form-control"
                                                 value="<?php if(isset($_SESSION["university_abbreviation"])) {
                                                     echo $_SESSION["university_abbreviation"]; } ?>" maxLength="16">
                                         </div>
                                         <div class="col-lg-4 col-md-6 col-sm-6 user_input my-1">
-                                            <label class="text-indigo mb-2" for="course_abbreviation">Course Abbreviation
+                                            <label class="mb-2" for="course_abbreviation">Course Abbreviation
                                                 <span class="text-danger">*</span></label>
                                             <input type="text" name="course_abbreviation" class="form-control"
                                                 value="<?php if(isset($_SESSION["course_abbreviation"])) {
@@ -583,12 +596,12 @@
                                 <div class="col-lg-12">
                                     <div class="row">
                                         <div class="col-lg-6 col-md-6 col-sm-6 user_input my-1">
-                                            <label class="text-indigo mb-2" for="password">Password
+                                            <label class="mb-2" for="password">Password
                                                 <span class="text-danger">*</span></label>
                                             <input type="password" name="password" class="form-control" maxLength="16">
                                         </div>
                                         <div class="col-lg-6 col-md-6 col-sm-6 user_input my-1">
-                                            <label class="text-indigo mb-2" for="confirm_password">Confirm Password
+                                            <label class="mb-2" for="confirm_password">Confirm Password
                                                 <span class="text-danger">*</span></label>
                                             <input type="password" name="confirm_password" class="form-control" maxLength="16">
                                         </div>

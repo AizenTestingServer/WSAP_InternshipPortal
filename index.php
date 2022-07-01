@@ -14,9 +14,11 @@
         exit();
     }
 
-    require_once "./Controllers/Database.php";   
+    require_once "./Controllers/Database.php";  
+    require_once "./Controllers/Date.php";
 
     $db = new Database();
+    $date = new Date();
 
     if (isset($_POST["signIn"])) {
         if (!empty($_POST["intern_id"]) && !empty($_POST["password"])) {
@@ -33,11 +35,24 @@
             while ($row = $db->fetch()) {
                 if ($row["id"] == strtoupper($_POST["intern_id"]) && $row["password"] == md5($_POST["password"])) {
                     $signedIn = true;
+                    $value = $row;
                     break;
                 }
             }
 
             if ($signedIn) {
+                $log_value = $value["last_name"].", ".$value["first_name"]." (".$value["id"].") has signed in.";
+
+                $log = array($date->getDateTime(),
+                $value["id"],
+                $log_value);
+
+                $db->query("INSERT INTO audit_logs
+                VALUES (null, :timestamp, :intern_id, :log)");
+                $db->log($log);
+                $db->execute();
+                $db->closeStmt();
+
                 $_SESSION["intern_id"] = $_POST["intern_id"];
                 $_SESSION["password"] = $_POST["password"];
                 unset($_SESSION["intern_id_temp"]);

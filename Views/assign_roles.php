@@ -21,6 +21,7 @@
     intern_personal_information.id=:intern_id");
     $db->setInternId($_SESSION["intern_id"]);
     $db->execute();
+    $admin_info = $db->fetch();
     $admin_roles_count = $db->rowCount();
 
     $current_level = 0;
@@ -50,9 +51,9 @@
 
     if (isset($_POST["searchRole"])) {
         $parameters = "?intern_id=".$_GET["intern_id"];
-        if (!empty($_POST["search_intern"])) {
+        if (!empty($_POST["search_role"])) {
             if (strlen($parameters) > 1) { $parameters = $parameters."&"; }
-            $parameters = $parameters."search=".$_POST["search_intern"];
+            $parameters = $parameters."search=".$_POST["search_role"];
         }
 
         if (!empty($_GET["department"])) {
@@ -88,6 +89,19 @@
         if (!empty($_POST["intern_role_id"])) {
             $db->query("DELETE FROM intern_roles WHERE id=:id");
             $db->setId($_POST["intern_role_id"]);
+            $db->execute();
+            $db->closeStmt();
+                    
+            $log_value = $admin_info["last_name"].", ".$admin_info["first_name"].
+                " (".$admin_info["name"].") removed the ".$_POST["role_name"]." role of ".$value["last_name"].", ".$value["first_name"].".";
+    
+            $log = array($date->getDateTime(),
+            strtoupper($_SESSION["intern_id"]),
+            $log_value);
+    
+            $db->query("INSERT INTO audit_logs
+            VALUES (null, :timestamp, :intern_id, :log)");
+            $db->log($log);
             $db->execute();
             $db->closeStmt();
             
@@ -364,7 +378,7 @@
                             <!--SEARCH BUTTON/TEXT-->
                             <div class="col-lg-8 col-md-10 col-sm-12">
                                 <div class="input-group mb-3">
-                                    <input type="text" class="form-control" placeholder="Search Role" name="search_intern" value="<?php
+                                    <input type="text" class="form-control" placeholder="Search Role" name="search_role" value="<?php
                                     if (!empty($_GET["search"])) {
                                         echo $_GET["search"];
                                     } ?>">

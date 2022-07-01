@@ -8,6 +8,10 @@
             return date("g:i a");
         }
 
+        function getDateTime() {
+            return date("F j, Y g:i a");
+        }
+
         function getHour() {
             return date("g");
         }
@@ -37,7 +41,7 @@
         }
 
         function getDay() {
-            return date("d");
+            return date("j");
         }
 
         function getDateValue() {
