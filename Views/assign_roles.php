@@ -209,7 +209,7 @@
                                 </p> <?php
                             }   else if ($value["status"] == 4) { ?>
                                 <p class="bg-dark text-light rounded w-fit m-auto px-2 pt-1 pb-1 fs-d">
-                                    Withdrew
+                                    Withdrawn
                                 </p> <?php
                             }   else if ($value["status"] == 6) { ?>
                                 <p class="bg-danger text-light rounded w-fit m-auto px-2 pt-1 pb-1 fs-d">
@@ -1119,7 +1119,7 @@
                                             </p> <?php
                                         }   else if ($row["status"] == 4) { ?>
                                             <p class="bg-dark text-light rounded w-fit m-auto px-2 pt-1 pb-1 fs-d">
-                                            Withdrew
+                                            Withdrawn
                                             </p> <?php
                                         }   else if ($row["status"] == 6) { ?>
                                             <p class="bg-danger text-light rounded w-fit m-auto px-2 pt-1 pb-1">

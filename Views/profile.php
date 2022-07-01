@@ -611,7 +611,7 @@
                                                     if ($value["status"] == 3) { ?>
                                                         selected <?php
                                                     }
-                                                } ?>>Withdrew</option>
+                                                } ?>>Withdrawn</option>
                                                 <option value="4" <?php
                                                 if (isset($_SESSION["status"])) {
                                                     if ($_SESSION["status"] == 4) { ?>

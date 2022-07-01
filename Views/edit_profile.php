@@ -610,7 +610,7 @@
                                                             if ($value["status"] == 3) { ?>
                                                                 selected <?php
                                                             }
-                                                        } ?>>Withdrew</option>
+                                                        } ?>>Withdrawn</option>
                                                         <option value="4" <?php
                                                         if (isset($_SESSION["status"])) {
                                                             if ($_SESSION["status"] == 4) { ?>
@@ -1410,7 +1410,7 @@
                                             </p> <?php
                                         }   else if ($row["status"] == 4) { ?>
                                             <p class="bg-dark text-light rounded w-fit m-auto px-2 pt-1 pb-1 fs-d">
-                                            Withdrew
+                                            Withdrawn
                                             </p> <?php
                                         }   else if ($row["status"] == 6) { ?>
                                             <p class="bg-danger text-light rounded w-fit m-auto px-2 pt-1 pb-1">
