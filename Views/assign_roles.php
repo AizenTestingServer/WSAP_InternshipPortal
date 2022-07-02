@@ -165,7 +165,7 @@
         </div>  <?php
         if ($admin_roles_count != 0) {
             if (!empty($_GET["intern_id"])) { ?>
-                <div class="w-100 d-md-flex w-fit mb-4">
+                <div class="w-100 d-md-flex p-3 w-fit">
                     <div class="top me-md-2">
                         <img class="img-intern mx-auto d-block" src="<?php {
                             if ($value["image"] == null || strlen($value["image"]) == 0) {
@@ -227,7 +227,7 @@
                     </a>
                 </div>
 
-                <div id="roles" class="row rounded shadow my-4 pb-4 position-relative">
+                <div id="roles" class="row rounded shadow mb-4 pb-4 position-relative">
                     <div class="rounded shadow px-0">
                         <h6 class="d-block text-light px-3 pt-2 pb-2 bg-indigo rounded mb-0">
                             Current Roles

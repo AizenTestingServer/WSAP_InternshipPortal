@@ -1127,8 +1127,13 @@
                                 </div>
                             </div>
                             
-                            <div class="col-12 d-lg-flex d-md-inline-block">
-                                <div class="w-100 d-md-flex d-sm-flex">
+                            <div class="col-12">
+                                <div class="d-md-flex d-sm-inline-block">
+                                    <div class="my-2">
+                                        <a class="btn btn-secondary me-2" href="interns.php">
+                                            <i class="fa-solid fa-arrow-left me-2"></i>Back to Interns
+                                        </a>
+                                    </div>
                                     <div class="d-flex my-2">
                                         <!--DEPARTMENT DROPDOWN-->
                                         <div class="dropdown align-center me-2">

@@ -404,65 +404,76 @@
                     </div> <?php
                 } ?>
 
-                <div class="d-flex align-items-center mb-3">
-                    <div class="dropdown align-center me-2">
-                        <button class="btn btn-light border-dark dropdown-toggle" type="button" id="dropdownMenuButton1"
-                            data-bs-toggle="dropdown" aria-expanded="false" name="department"> <?php
-                            if (!empty($_GET["month"]) && !empty($_GET["year"])) {
-                                echo "Custom";
-                            } else {
-                                echo "All Records";
-                            } ?>
-                        </button>
-                        <ul class="dropdown-menu" aria-labelledby="dropdownMenuButton1">
-                            <li>
-                                <a class="dropdown-item btn-smoke" href="daily_time_record.php?intern_id=<?= $_GET["intern_id"] ?>">
-                                    All Records
-                                </a>
-                            </li>
-                            <li>
-                                <a class="dropdown-item btn-smoke"
-                                    href="daily_time_record.php?intern_id=<?= $_GET["intern_id"] ?>&month=<?= $date->getMonthName() ?>&year=<?= $date->getYear() ?>">
-                                    Custom
-                                </a>
-                            </li>
-                        </ul>
-                    </div> <?php
-                    if (!empty($_GET["month"]) && !empty($_GET["year"])) { ?>
-                        <div class="dropdown align-center me-2">
-                            <button class="btn btn-light border-dark dropdown-toggle" type="button" id="dropdownMenuButton1"
-                                data-bs-toggle="dropdown" aria-expanded="false" name="department">
-                                <?= $_GET["month"] ?>
-                            </button>
-                            <ul class="dropdown-menu" aria-labelledby="dropdownMenuButton1"> <?php
-                                foreach (getMonths() as $value) { ?>
-                                    <li>
-                                        <a class="dropdown-item btn-smoke"
-                                            href="daily_time_record.php?intern_id=<?= $_GET["intern_id"] ?>&month=<?= $value ?>&year=<?= $_GET["year"] ?>">
-                                            <?= $value ?>
-                                        </a>
-                                    </li> <?php
-                                } ?>
-                            </ul>
+                <div class="w-100 d-md-flex d-md-inline-block align-items-end mb-3">
+                    <div class="d-lg-flex d-md-inline-block">
+                        <div class="my-2">
+                            <a class="btn btn-secondary me-2" href="daily_time_record.php">
+                                <i class="fa-solid fa-arrow-left me-2"></i>Back to Interns' DTR
+                            </a>
                         </div>
-                        <div class="dropdown align-center me-2">
-                            <button class="btn btn-light border-dark dropdown-toggle" type="button" id="dropdownMenuButton1"
-                                data-bs-toggle="dropdown" aria-expanded="false" name="department">
-                                <?= $_GET["year"] ?>
-                            </button>
-                            <ul class="dropdown-menu" aria-labelledby="dropdownMenuButton1"> <?php
-                                for ($i = 2018; $i <= $date->getYear(); $i++) { ?>
+
+                        
+                        <div class="d-flex my-2">
+                            <div class="dropdown align-center me-2">
+                                <button class="btn btn-light border-dark dropdown-toggle" type="button" id="dropdownMenuButton1"
+                                    data-bs-toggle="dropdown" aria-expanded="false" name="department"> <?php
+                                    if (!empty($_GET["month"]) && !empty($_GET["year"])) {
+                                        echo "Custom";
+                                    } else {
+                                        echo "All Records";
+                                    } ?>
+                                </button>
+                                <ul class="dropdown-menu" aria-labelledby="dropdownMenuButton1">
+                                    <li>
+                                        <a class="dropdown-item btn-smoke" href="daily_time_record.php?intern_id=<?= $_GET["intern_id"] ?>">
+                                            All Records
+                                        </a>
+                                    </li>
                                     <li>
                                         <a class="dropdown-item btn-smoke"
-                                            href="daily_time_record.php?intern_id=<?= $_GET["intern_id"] ?>&month=<?= $_GET["month"] ?>&year=<?= $i ?>">
-                                            <?= $i ?>
+                                            href="daily_time_record.php?intern_id=<?= $_GET["intern_id"] ?>&month=<?= $date->getMonthName() ?>&year=<?= $date->getYear() ?>">
+                                            Custom
                                         </a>
-                                    </li> <?php
-                                } ?>
-                            </ul>
-                        </div> <?php
-                    }
-            
+                                    </li>
+                                </ul>
+                            </div> <?php
+                            if (!empty($_GET["month"]) && !empty($_GET["year"])) { ?>
+                                <div class="dropdown align-center me-2">
+                                    <button class="btn btn-light border-dark dropdown-toggle" type="button" id="dropdownMenuButton1"
+                                        data-bs-toggle="dropdown" aria-expanded="false" name="department">
+                                        <?= $_GET["month"] ?>
+                                    </button>
+                                    <ul class="dropdown-menu" aria-labelledby="dropdownMenuButton1"> <?php
+                                        foreach (getMonths() as $value) { ?>
+                                            <li>
+                                                <a class="dropdown-item btn-smoke"
+                                                    href="daily_time_record.php?intern_id=<?= $_GET["intern_id"] ?>&month=<?= $value ?>&year=<?= $_GET["year"] ?>">
+                                                    <?= $value ?>
+                                                </a>
+                                            </li> <?php
+                                        } ?>
+                                    </ul>
+                                </div>
+                                <div class="dropdown align-center me-2">
+                                    <button class="btn btn-light border-dark dropdown-toggle" type="button" id="dropdownMenuButton1"
+                                        data-bs-toggle="dropdown" aria-expanded="false" name="department">
+                                        <?= $_GET["year"] ?>
+                                    </button>
+                                    <ul class="dropdown-menu" aria-labelledby="dropdownMenuButton1"> <?php
+                                        for ($i = 2018; $i <= $date->getYear(); $i++) { ?>
+                                            <li>
+                                                <a class="dropdown-item btn-smoke"
+                                                    href="daily_time_record.php?intern_id=<?= $_GET["intern_id"] ?>&month=<?= $_GET["month"] ?>&year=<?= $i ?>">
+                                                    <?= $i ?>
+                                                </a>
+                                            </li> <?php
+                                        } ?>
+                                    </ul>
+                                </div> <?php
+                            } ?>
+                        </div>
+                    </div> <?php
+                    
                     $nto_array = array($_SESSION["intern_id"], "NTO");
                     $db->query("SELECT COUNT(*) as count FROM attendance
                     WHERE intern_id=:intern_id AND time_out=:time_out");
@@ -470,7 +481,7 @@
                     $db->execute();
                     $nto_value = $db->fetch(); ?>
                                         
-                    <div class="w-fit ms-auto"> <?php
+                    <div class="w-fit ms-auto my-2"> <?php
                         if ($nto_value["count"] == 0) { ?>
                             <a class="btn btn-primary"
                                 href="preview_pdf.php?intern_id=<?= strtoupper($_SESSION["intern_id"]) ?>"
