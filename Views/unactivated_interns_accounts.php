@@ -380,7 +380,8 @@
                             </div> <?php
                         } ?>
                 </div> <?php
-                if ($db->rowCount() == 0) { ?>
+                if ($db->rowCount() == 0) { 
+                    $interns_info_text .= "+ \"No Record\"\n"; ?>
                     <div class="w-100 text-center my-5">
                         <h3>No Record</h3>
                     </div> <?php
@@ -395,6 +396,7 @@
     function copyRecords() {
         var copyText = <?= $interns_info_text; ?>;
         navigator.clipboard.writeText(copyText.trim());
+        alert("The records are copied to clipboard.");
     }
 </script>
 <?php
