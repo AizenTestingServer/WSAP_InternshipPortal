@@ -22,29 +22,6 @@
     $db->setInternId($_SESSION["intern_id"]);
     $db->execute();
     $admin_roles_count = $db->rowCount();
-    
-    if (isset($_POST["btnAddAdmin"])) {
-        if (!empty($_POST["lastName"]) && !empty($_POST["firstName"])) {
-            $intern_id = $date->getYear()."-".randomWord();
-
-            $personal_info = array($intern_id,
-            ucwords($_POST["lastName"]),
-            ucwords($_POST["firstName"]),
-            ucwords($_POST["middleName"]));
-    
-            $db->query("INSERT INTO intern_personal_information (id, last_name, first_name, middle_name)
-            VALUES(:intern_id, :last_name, :first_name, :middle_name)");
-            $db->insertPersonalInfo($personal_info);
-            $db->execute();
-            $db->closeStmt();
-            
-            $_SESSION["personal_success"] = "Successfully added a record.";
-        } else {
-            $_SESSION["personal_failed"] = "Please fill-out the required fields!";
-        }
-        redirect("admins.php");
-        exit();
-    }
 
     if (isset($_POST["search"])) {
         $parameters = "?";

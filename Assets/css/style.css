@@ -182,7 +182,6 @@ body {
     margin: 0 auto;
     z-index: 2;
     background: rgb(255, 255, 255);
-
 }
 
 .text-uppercase {
@@ -681,7 +680,7 @@ a.dt-button {
     align-items: center;
 }
 
-#attendance-table, .attendance-alert, #time-in-time-out-layout, .att-no-record {
+#attendance-table, .attendance-alert, #time-in-time-out-layout, .att-no-record, .att-ctrl-buttons {
     width: calc(100% - 310px);
 }
 
@@ -870,7 +869,7 @@ a.dt-button {
         width: 100%;
     }
 
-    #attendance-table, .attendance-alert, .att-no-record  {
+    #attendance-table, .attendance-alert, .att-no-record, .att-ctrl-buttons  {
         width: 100%;
     }
 }

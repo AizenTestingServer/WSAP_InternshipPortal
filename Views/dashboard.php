@@ -262,7 +262,7 @@
 
                     <?php $record_count = 0; ?>
                     <div class="daily_task"> <?php
-                        if (isTimeInEnabled($lts_att["att_date"])) { $record_count++; ?>
+                        if (isTimeInEnabled($lts_att["att_date"]) && $intern_wsap_info["status"] == 1) { $record_count++; ?>
                             <div class="task-box">
                                 <div class="task-box-status">
                                     <div class="d-flex justify-content-between">
@@ -285,7 +285,7 @@
                             </div> <?php
                         }
                         
-                        if ($remind_time_out) { $record_count++; ?>
+                        if ($remind_time_out && $intern_wsap_info["status"] == 1) { $record_count++; ?>
                             <div class="task-box">
                                 <div class="task-box-status">
                                     <div class="d-flex justify-content-between">

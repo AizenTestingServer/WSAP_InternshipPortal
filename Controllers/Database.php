@@ -102,6 +102,11 @@ class Database {
         $this->stmt->bindValue(":id", $attendance[1]);
     }
 
+    function selectInternIdAndTimeOut($value) {
+        $this->stmt->bindValue(":intern_id", $value[0]);
+        $this->stmt->bindValue(":time_out", $value[1]);
+    }
+
     function setAbsent($attendance) {
         $this->stmt->bindValue(":time_in", $attendance[0]);
         $this->stmt->bindValue(":time_out", $attendance[1]);
@@ -178,6 +183,13 @@ class Database {
         $this->stmt->bindValue(":rendered_hours", $wsap_info[3]);
         $this->stmt->bindValue(":target_rendering_hours", $wsap_info[4]);
         $this->stmt->bindValue(":intern_id", $wsap_info[5]);
+    }
+
+    function setWSAPInfo3($wsap_info) {
+        $this->stmt->bindValue(":email_address", $wsap_info[1]);
+        $this->stmt->bindValue(":mobile_number", $wsap_info[2]);
+        $this->stmt->bindValue(":mobile_number_2", $wsap_info[3]);
+        $this->stmt->bindValue(":intern_id", $wsap_info[4]);
     }
 
     function insertEducationalInfo($educational_info) {

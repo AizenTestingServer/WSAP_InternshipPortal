@@ -89,9 +89,9 @@
     }
 
     if (isset($_POST["savePersonal"])) {
-        $last_name = ucwords(trim($_POST["lastName"]));
-        $first_name = ucwords(trim($_POST["firstName"]));
-        $middle_name = ucwords(trim($_POST["middleName"]));
+        $last_name = toProper(fullTrim($_POST["lastName"]));
+        $first_name = toProper(fullTrim($_POST["firstName"]));
+        $middle_name = toProper(fullTrim($_POST["middleName"]));
         $gender = $_POST["gender"];
         $birthday = $_POST["birthday"];
 
@@ -141,43 +141,31 @@
     }
 
     if (isset($_POST["saveWSAP"])) {
-        $dept_id = $_POST["department"];
-        $status = $_POST["status"];
-        $onboard_date = $_POST["onboardDate"];
-        $email_address = trim($_POST["emailAddress"]);
+        $email_address = fullTrim($_POST["emailAddress"]);
         $mobile_number = $_POST["mobileNumber"];
         $mobile_number_2 = $_POST["mobileNumber2"];
 
-        $_SESSION["dept_id"] = $dept_id;
-        $_SESSION["status"] = $status;
-        $_SESSION["onboard_date"] = $onboard_date;
         $_SESSION["email_address"] = $email_address;
         $_SESSION["mobile_number"] = $mobile_number;
         $_SESSION["mobile_number_2"] = $mobile_number_2;
         
-        if (!empty($onboard_date) && !empty($email_address) && !empty($mobile_number)) {
+        if (!empty($email_address) && !empty($mobile_number)) {
             if (isValidEmail($email_address)) {
                 if (isValidMobileNumber($mobile_number) &&
                     (empty($mobile_number_2) || isValidMobileNumber($mobile_number_2))) {
-                    $wsap_info = array($dept_id,
-                    $status,
-                    $onboard_date,
-                    $email_address,
+                    $wsap_info = array($email_address,
                     $mobile_number,
                     $mobile_number_2,
                     $_SESSION["intern_id"]);
             
                     $db->query("UPDATE intern_wsap_information
-                    SET department_id=:dept_id, status=:status, onboard_date=:onboard_date, email_address=:email_address,
-                    mobile_number=:mobile_number, mobile_number_2=:mobile_number_2 WHERE id=:intern_id");
-                    $db->setWSAPInfo($wsap_info);
+                    SET email_address=:email_address, mobile_number=:mobile_number, mobile_number_2=:mobile_number_2
+                    WHERE id=:intern_id");
+                    $db->setWSAPInfo3($wsap_info);
                     $db->execute();
                     $db->closeStmt();
                     
                     $_SESSION["wsap_success"] = "Successfully saved the changes.";
-                    unset($_SESSION["dept_id"]);
-                    unset($_SESSION["status"]);
-                    unset($_SESSION["onboard_date"]);
                     unset($_SESSION["email_address"]);
                     unset($_SESSION["mobile_number"]);
                     unset($_SESSION["mobile_number_2"]);
@@ -195,9 +183,6 @@
     }
 
     if (isset($_POST["resetWSAP"])) {
-        unset($_SESSION["dept_id"]);
-        unset($_SESSION["status"]);
-        unset($_SESSION["onboard_date"]);
         unset($_SESSION["email_address"]);
         unset($_SESSION["mobile_number"]);
         unset($_SESSION["mobile_number_2"]);
@@ -207,10 +192,10 @@
     }
 
     if (isset($_POST["saveEducational"])) {
-        $university = trim($_POST["university"]);
-        $university_abbreviation = trim($_POST["university_abbreviation"]);
-        $course = trim($_POST["course"]);
-        $course_abbreviation = trim($_POST["course_abbreviation"]);
+        $university = fullTrim($_POST["university"]);
+        $university_abbreviation = fullTrim($_POST["university_abbreviation"]);
+        $course = fullTrim($_POST["course"]);
+        $course_abbreviation = fullTrim($_POST["course_abbreviation"]);
         $year = $_POST["year"];
 
         $_SESSION["university"] = $university;
@@ -397,7 +382,10 @@
                                             <span class="text-danger">*</span> <?php
                                         } ?>
                                     </label>
-                                    <input type="text" name="lastName" class="form-control"
+                                    <input type="text" name="lastName" class="form-control <?php
+                                        if (!empty($_GET["intern_id"])) { ?>
+                                            fw-bold <?php
+                                        } ?>"
                                     value="<?php
                                         if (isset($_SESSION["last_name"])) {
                                             echo $_SESSION["last_name"];
@@ -414,7 +402,10 @@
                                             <span class="text-danger">*</span> <?php
                                         } ?>
                                     </label>
-                                    <input type="text" name="firstName" class="form-control"
+                                    <input type="text" name="firstName" class="form-control <?php
+                                        if (!empty($_GET["intern_id"])) { ?>
+                                            fw-bold <?php
+                                        } ?>"
                                     value="<?php
                                         if (isset($_SESSION["first_name"])) {
                                             echo $_SESSION["first_name"];
@@ -427,7 +418,10 @@
                                 </div>
                                 <div class="col-lg-4 col-md-12 user_input my-1">
                                     <label class="mb-2" for="middleName">Middle Name</label>
-                                    <input type="text" name="middleName" class="form-control"
+                                    <input type="text" name="middleName" class="form-control <?php
+                                        if (!empty($_GET["intern_id"])) { ?>
+                                            fw-bold <?php
+                                        } ?>"
                                     value="<?php
                                         if (isset($_SESSION["middle_name"])) {
                                             echo $_SESSION["middle_name"];
@@ -452,7 +446,10 @@
                                             <span class="text-danger">*</span> <?php
                                         } ?>
                                     </label>
-                                    <input type="date" name="birthday" class="form-control"
+                                    <input type="date" name="birthday" class="form-control <?php
+                                        if (!empty($_GET["intern_id"])) { ?>
+                                            fw-bold <?php
+                                        } ?>"
                                     value="<?php
                                         if (isset($_SESSION["birthday"])) {
                                             echo $_SESSION["birthday"];
@@ -465,7 +462,10 @@
                                 </div>
                                 <div class="col-lg-4 col-md-12 user_input my-1">
                                     <label class="mb-2" for="gender">Gender</label>
-                                    <select name="gender" class="form-select" <?php
+                                    <select name="gender" class="form-select <?php
+                                            if (!empty($_GET["intern_id"])) { ?>
+                                                fw-bold <?php
+                                            } ?>" <?php
                                         if (!empty($_GET["intern_id"])) { ?>
                                             disabled <?php
                                         } ?>>
@@ -542,106 +542,45 @@
                                     <div class="row">
                                         <div class="col-lg-4 col-md-6 col-sm-6 user_input my-1">
                                             <label class="mb-2" for="intern_id">Intern ID</label>
-                                            <input type="text" name="intern_id" class="form-control text-uppercase"
+                                            <input type="text" name="intern_id" class="form-control text-uppercase fw-bold"
                                                 value="<?= $value["id"]; ?>" disabled>
                                         </div>
                                         <div class="col-lg-4 col-md-6 col-sm-6 user_input my-1">
                                             <label class="mb-2" for="department">Department</label>
-                                            <select name="department" class="form-select" <?php
-                                                if (!empty($_GET["intern_id"])) { ?>
-                                                    disabled <?php
-                                                } ?>> <?php
-                                                $db->query("SELECT * FROM departments ORDER BY name");
+                                            <select name="department" class="form-select fw-bold" disabled> <?php
+                                                $db->query("SELECT * FROM departments WHERE id=:id ORDER BY name");
+                                                $db->setId($value["department_id"]);
                                                 $db->execute();
 
                                                 while ($row = $db->fetch()) { ?>
-                                                <option <?php
-                                                    if (isset($_SESSION["dept_id"])) {
-                                                        if ($_SESSION["dept_id"] == $row["id"]) { ?> selected <?php }
-                                                    } else {
-                                                        if ($value["department_id"] == $row["id"]) { ?>
-                                                            selected <?php
-                                                        }
-                                                    } ?> value="<?= $row["id"] ?>"><?= $row["name"] ?> </option> <?php
+                                                    <option value="<?= $row["id"] ?>" selected><?= $row["name"] ?> </option> <?php
                                                 } ?>
                                             </select>
                                         </div>
                                         <div class="col-lg-4 col-md-6 col-sm-6 user_input my-1">
                                             <label class="mb-2" for="status">Status</label>
-                                            <select name="status" class="form-select" <?php
-                                                if (!empty($_GET["intern_id"])) { ?>
-                                                    disabled <?php
-                                                } ?>>
-                                            <option value="0" <?php
-                                                if (isset($_SESSION["status"])) {
-                                                    if ($_SESSION["status"] == 0) { ?>
-                                                        selected <?php
-                                                    }
-                                                } else {
-                                                    if ($value["status"] == 0) { ?>
-                                                        selected <?php
-                                                    }
-                                                } ?>>Inactive</option>
-                                                <option value="1" <?php
-                                                if (isset($_SESSION["status"])) {
-                                                    if ($_SESSION["status"] == 1) { ?>
-                                                        selected <?php
-                                                    }
-                                                } else {
-                                                    if ($value["status"] == 1) { ?>
-                                                        selected <?php
-                                                    }
-                                                } ?>>Active</option>
-                                                <option value="2" <?php
-                                                if (isset($_SESSION["status"])) {
-                                                    if ($_SESSION["status"] == 2) { ?>
-                                                        selected <?php
-                                                    }
-                                                } else {
-                                                    if ($value["status"] == 2) { ?>
-                                                        selected <?php
-                                                    }
-                                                } ?>>Offboarded</option>
-                                                <option value="3" <?php
-                                                if (isset($_SESSION["status"])) {
-                                                    if ($_SESSION["status"] == 3) { ?>
-                                                        selected <?php
-                                                    }
-                                                } else {
-                                                    if ($value["status"] == 3) { ?>
-                                                        selected <?php
-                                                    }
-                                                } ?>>Withdrawn</option>
-                                                <option value="4" <?php
-                                                if (isset($_SESSION["status"])) {
-                                                    if ($_SESSION["status"] == 4) { ?>
-                                                        selected <?php
-                                                    }
-                                                } else {
-                                                    if ($value["status"] == 4) { ?>
-                                                        selected <?php
-                                                    }
-                                                } ?>>Extended</option>
-                                                <option value="5" <?php
-                                                if (isset($_SESSION["status"])) {
-                                                    if ($_SESSION["status"] == 5) { ?>
-                                                        selected <?php
-                                                    }
-                                                } else {
-                                                    if ($value["status"] == 5) { ?>
-                                                        selected <?php
-                                                    }
-                                                } ?>>Suspended</option>
-                                                <option value="6" <?php
-                                                if (isset($_SESSION["status"])) {
-                                                    if ($_SESSION["status"] == 6) { ?>
-                                                        selected <?php
-                                                    }
-                                                } else {
-                                                    if ($value["status"] == 6) { ?>
-                                                        selected <?php
-                                                    }
-                                                } ?>>Terminated</option>
+                                            <select name="status" class="form-select fw-bold" disabled> <?php
+                                            if ($value["status"] == 0) { ?>
+                                                <option value="0" selected>Inactive</option> <?php
+                                            }
+                                            if ($value["status"] == 1) { ?>
+                                                <option value="0" selected>Active</option> <?php
+                                            }
+                                            if ($value["status"] == 2) { ?>
+                                                <option value="0" selected>Offboarded</option> <?php
+                                            }
+                                            if ($value["status"] == 3) { ?>
+                                                <option value="0" selected>Withdrawn</option> <?php
+                                            }
+                                            if ($value["status"] == 4) { ?>
+                                                <option value="0" selected>Extended</option> <?php
+                                            }
+                                            if ($value["status"] == 5) { ?>
+                                                <option value="0" selected>Suspended</option> <?php
+                                            }
+                                            if ($value["status"] == 6) { ?>
+                                                <option value="0" selected>Terminated</option> <?php
+                                            } ?>
                                             </select>
                                         </div>
                                     </div>
@@ -655,21 +594,13 @@
                                                     <span class="text-danger">*</span> <?php
                                                 } ?>
                                             </label>
-                                            <input type="date" name="onboardDate" class="form-control"
-                                            value="<?php
-                                                if (isset($_SESSION["onboard_date"])) {
-                                                    echo $_SESSION["onboard_date"];
-                                                } else {
-                                                    echo date("Y-m-d", strtotime($value["onboard_date"]));
-                                                } ?>" <?php
-                                                if (!empty($_GET["intern_id"])) { ?>
-                                                    disabled <?php
-                                                } ?>>
+                                            <input type="date" name="onboardDate" class="form-control fw-bold"
+                                            value="<?= date("Y-m-d", strtotime($value["onboard_date"])) ?>" disabled>
                                         </div>
                                         <div class="col-lg-3 col-md-6 col-sm-6 user_input my-1">
                                             <label class="mb-2" for="offboardDate">Estimated Offboard Date
                                             </label>
-                                            <input type="text" name="offboardDate" class="form-control"
+                                            <input type="text" name="offboardDate" class="form-control fw-bold"
                                             value="<?php
                                             $rendering_days = round(($value["target_rendering_hours"]-$value["rendered_hours"])/8);
                                             $estimated_weekends = ceil(($rendering_days/5) * 2);
@@ -680,12 +611,12 @@
                                         </div>
                                         <div class="col-lg-3 col-md-6 col-sm-6 user_input my-1">
                                             <label class="mb-2" for="renderedHours">Rendered Hours</label>
-                                            <input type="number" name="renderedHours" class="form-control"
+                                            <input type="number" name="renderedHours" class="form-control fw-bold"
                                                 value="<?= $value["rendered_hours"]; ?>" disabled>
                                         </div>
                                         <div class="col-lg-3 col-md-6 col-sm-6 user_input my-1">
                                             <label class="mb-2" for="targetRenderingHours">Target Rendering Hours</label>
-                                            <input type="number" name="targetRenderingHours" class="form-control"
+                                            <input type="number" name="targetRenderingHours" class="form-control fw-bold"
                                                 value="<?= $value["target_rendering_hours"]; ?>" disabled>
                                         </div>
                                     </div>
@@ -704,7 +635,10 @@
                                             <span class="text-danger">*</span> <?php
                                         } ?>
                                     </label>
-                                    <input name="emailAddress" class="form-control"
+                                    <input name="emailAddress" class="form-control <?php
+                                            if (!empty($_GET["intern_id"])) { ?>
+                                                fw-bold <?php
+                                            } ?>"
                                         value="<?php if(isset($_SESSION["email_address"])) {
                                                 echo $_SESSION["email_address"];
                                             } else {
@@ -724,7 +658,10 @@
                                         <div class="input-group-prepend">
                                             <span class="input-group-text">+63</span>
                                         </div>
-                                        <input type="phone" name="mobileNumber" class="form-control"
+                                        <input type="phone" name="mobileNumber" class="form-control <?php
+                                            if (!empty($_GET["intern_id"])) { ?>
+                                                fw-bold <?php
+                                            } ?>"
                                         value="<?php if(isset($_SESSION["mobile_number"])) {
                                                 echo $_SESSION["mobile_number"];
                                             } else {
@@ -741,7 +678,10 @@
                                         <div class="input-group-prepend">
                                             <span class="input-group-text">+63</span>
                                         </div>
-                                        <input type="phone" name="mobileNumber2" class="form-control"
+                                        <input type="phone" name="mobileNumber2" class="form-control <?php
+                                            if (!empty($_GET["intern_id"])) { ?>
+                                                fw-bold <?php
+                                            } ?>"
                                         value="<?php if(isset($_SESSION["mobile_number_2"])) {
                                                 echo $_SESSION["mobile_number_2"];
                                             } else {
@@ -812,7 +752,10 @@
                                                     <span class="text-danger">*</span> <?php
                                                 } ?>
                                             </label>
-                                            <input type="text" name="university" class="form-control"
+                                            <input type="text" name="university" class="form-control <?php
+                                                if (!empty($_GET["intern_id"])) { ?>
+                                                    fw-bold <?php
+                                                } ?>"
                                                 value="<?php if(isset($_SESSION["university"])) {
                                                 echo $_SESSION["university"];
                                                 } else {
@@ -828,7 +771,10 @@
                                                     <span class="text-danger">*</span> <?php
                                                 } ?>
                                             </label>
-                                            <input type="text" name="course" class="form-control"
+                                            <input type="text" name="course" class="form-control <?php
+                                                if (!empty($_GET["intern_id"])) { ?>
+                                                    fw-bold <?php
+                                                } ?>"
                                                 value="<?php if(isset($_SESSION["course"])) {
                                                 echo $_SESSION["course"];
                                                 } else {
@@ -844,7 +790,10 @@
                                                     <span class="text-danger">*</span> <?php
                                                 } ?>
                                             </label>
-                                            <input type="text" name="university_abbreviation" class="form-control"
+                                            <input type="text" name="university_abbreviation" class="form-control <?php
+                                                if (!empty($_GET["intern_id"])) { ?>
+                                                    fw-bold <?php
+                                                } ?>"
                                                 value="<?php if(isset($_SESSION["university_abbreviation"])) {
                                                 echo $_SESSION["university_abbreviation"];
                                                 } else {
@@ -860,7 +809,10 @@
                                                     <span class="text-danger">*</span> <?php
                                                 } ?>
                                             </label>
-                                            <input type="text" name="course_abbreviation" class="form-control"
+                                            <input type="text" name="course_abbreviation" class="form-control <?php
+                                                if (!empty($_GET["intern_id"])) { ?>
+                                                    fw-bold <?php
+                                                } ?>"
                                                 value="<?php if(isset($_SESSION["course_abbreviation"])) {
                                                 echo $_SESSION["course_abbreviation"];
                                                 } else {
@@ -872,7 +824,10 @@
                                         </div>
                                         <div class="col-lg-4 col-md-6 col-sm-6 user_input my-1">
                                             <label class="mb-2" for="year">Year</label>
-                                            <select name="year" class="form-select" <?php
+                                            <select name="year" class="form-select <?php
+                                                if (!empty($_GET["intern_id"])) { ?>
+                                                    fw-bold <?php
+                                                } ?>" <?php
                                                 if (!empty($_GET["intern_id"])) { ?>
                                                     disabled <?php
                                                 } ?>>
@@ -984,7 +939,7 @@
                                     <div class="row">
                                         <div class="col-lg-3 col-md-6 col-sm-6 user_input my-1">
                                             <label class="mb-2" for="date_activated">Date Activated</label>
-                                            <input type="date" name="date_activated" class="form-control"
+                                            <input type="date" name="date_activated" class="form-control fw-bold"
                                                 value="<?= $value["date_activated"]; ?>" disabled>
                                         </div> <?php
                                         if (empty($_GET["intern_id"])) { ?>

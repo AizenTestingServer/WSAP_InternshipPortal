@@ -9,7 +9,8 @@
     }
 
     if (empty($_GET["intern_id"])) {
-        redirect("interns_attendance.php");
+        redirect("attendance.php");
+        //redirect("preview_pdf.php?intern_id=".strtoupper($_SESSION["intern_id"]));
         exit();
     }
 
@@ -30,6 +31,18 @@
 
     $db = new Database();
     $date = new Date();
+
+    $nto_array = array($_SESSION["intern_id"], "NTO");
+    $db->query("SELECT COUNT(*) as count FROM attendance
+    WHERE intern_id=:intern_id AND time_out=:time_out");
+    $db->selectInternIdAndTimeOut($nto_array);
+    $db->execute();
+    $nto_value = $db->fetch();
+
+    if ($nto_value["count"] != 0) {
+        redirect("attendance.php");
+        exit();
+    }
     
     $db->query("SELECT intern_personal_information.*, intern_roles.*, roles.*
     FROM intern_personal_information, intern_roles, roles

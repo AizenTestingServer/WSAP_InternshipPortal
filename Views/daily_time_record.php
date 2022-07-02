@@ -280,7 +280,7 @@
         </div> <?php
         if ($admin_roles_count != 0) {
             if (!empty($_GET["intern_id"])) { ?>
-                <div class="intern info d-md-flex w-fit" style="height: 230px">
+                <div class="intern info d-md-flex p-3 w-fit" style="height: 230px">
                     <div class="top me-md-2">
                         <img class="img-intern mx-auto d-block" src="<?php {
                             if ($value["image"] == null || strlen($value["image"]) == 0) {
@@ -333,14 +333,6 @@
                             } ?>
                         </div>
                     </div>
-                </div>
-                                
-                <div class="w-fit my-2 ms-auto">
-                    <a class="btn btn-primary"
-                        href="preview_pdf.php?intern_id=<?= $_GET["intern_id"] ?>"
-                        target="window">
-                        Preview DTR as PDF
-                    </a>
                 </div> <?php
                         
                 if (!empty($_GET["id"]) && $selected_att["time_out"] == "NTO" &&
@@ -412,6 +404,93 @@
                     </div> <?php
                 } ?>
 
+                <div class="d-flex align-items-center mb-3">
+                    <div class="dropdown align-center me-2">
+                        <button class="btn btn-light border-dark dropdown-toggle" type="button" id="dropdownMenuButton1"
+                            data-bs-toggle="dropdown" aria-expanded="false" name="department"> <?php
+                            if (!empty($_GET["month"]) && !empty($_GET["year"])) {
+                                echo "Custom";
+                            } else {
+                                echo "All Records";
+                            } ?>
+                        </button>
+                        <ul class="dropdown-menu" aria-labelledby="dropdownMenuButton1">
+                            <li>
+                                <a class="dropdown-item btn-smoke" href="daily_time_record.php?intern_id=<?= $_GET["intern_id"] ?>">
+                                    All Records
+                                </a>
+                            </li>
+                            <li>
+                                <a class="dropdown-item btn-smoke"
+                                    href="daily_time_record.php?intern_id=<?= $_GET["intern_id"] ?>&month=<?= $date->getMonthName() ?>&year=<?= $date->getYear() ?>">
+                                    Custom
+                                </a>
+                            </li>
+                        </ul>
+                    </div> <?php
+                    if (!empty($_GET["month"]) && !empty($_GET["year"])) { ?>
+                        <div class="dropdown align-center me-2">
+                            <button class="btn btn-light border-dark dropdown-toggle" type="button" id="dropdownMenuButton1"
+                                data-bs-toggle="dropdown" aria-expanded="false" name="department">
+                                <?= $_GET["month"] ?>
+                            </button>
+                            <ul class="dropdown-menu" aria-labelledby="dropdownMenuButton1"> <?php
+                                foreach (getMonths() as $value) { ?>
+                                    <li>
+                                        <a class="dropdown-item btn-smoke"
+                                            href="daily_time_record.php?intern_id=<?= $_GET["intern_id"] ?>&month=<?= $value ?>&year=<?= $_GET["year"] ?>">
+                                            <?= $value ?>
+                                        </a>
+                                    </li> <?php
+                                } ?>
+                            </ul>
+                        </div>
+                        <div class="dropdown align-center me-2">
+                            <button class="btn btn-light border-dark dropdown-toggle" type="button" id="dropdownMenuButton1"
+                                data-bs-toggle="dropdown" aria-expanded="false" name="department">
+                                <?= $_GET["year"] ?>
+                            </button>
+                            <ul class="dropdown-menu" aria-labelledby="dropdownMenuButton1"> <?php
+                                for ($i = 2018; $i <= $date->getYear(); $i++) { ?>
+                                    <li>
+                                        <a class="dropdown-item btn-smoke"
+                                            href="daily_time_record.php?intern_id=<?= $_GET["intern_id"] ?>&month=<?= $_GET["month"] ?>&year=<?= $i ?>">
+                                            <?= $i ?>
+                                        </a>
+                                    </li> <?php
+                                } ?>
+                            </ul>
+                        </div> <?php
+                    }
+            
+                    $nto_array = array($_SESSION["intern_id"], "NTO");
+                    $db->query("SELECT COUNT(*) as count FROM attendance
+                    WHERE intern_id=:intern_id AND time_out=:time_out");
+                    $db->selectInternIdAndTimeOut($nto_array);
+                    $db->execute();
+                    $nto_value = $db->fetch(); ?>
+                                        
+                    <div class="w-fit ms-auto"> <?php
+                        if ($nto_value["count"] == 0) { ?>
+                            <a class="btn btn-primary"
+                                href="preview_pdf.php?intern_id=<?= strtoupper($_SESSION["intern_id"]) ?>"
+                                target="window">
+                                Preview DTR as PDF
+                            </a> <?php
+                        } else { ?>
+                            <a class="btn btn-primary disabled">
+                                Preview DTR as PDF
+                            </a> <?php
+                        } ?>
+                    </div>
+                </div> <?php
+                
+                if ($nto_value["count"] != 0) { ?>
+                    <div class="w-100">
+                        <p class="text-danger w-fit ms-auto fw-bold">Please settle the NTO first.</p>
+                    </div> <?php
+                } ?>
+
                 <table class="table caption-top fs-d text-center">
                     <thead>
                         <tr>
@@ -424,9 +503,17 @@
                         </tr>
                     </thead>
                     <tbody> <?php
-                        if (isset($_SESSION["intern_id"])) {
-                            $db->query("SELECT * FROM attendance WHERE intern_id=:intern_id ORDER BY id DESC;");
-                            $db->setInternId($_GET["intern_id"]);
+                        if (isset($_SESSION["intern_id"])) {           
+                            if (!empty($_GET["month"]) && !empty($_GET["year"])) {
+                                $month_year = array($_GET["month"], $_GET["year"]);
+                                
+                                $db->query("SELECT * FROM attendance WHERE intern_id=:intern_id AND
+                                att_date LIKE CONCAT(:month, '%', :year) ORDER BY id DESC");
+                                $db->setMonthYear($month_year);
+                            } else {
+                                $db->query("SELECT * FROM attendance WHERE intern_id=:intern_id ORDER BY id DESC");
+                            }
+                            $db->setInternId($_SESSION["intern_id"]);
                             $db->execute();
 
                             $count = 0;

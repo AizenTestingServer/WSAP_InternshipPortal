@@ -29,6 +29,22 @@
         return preg_match("/^[A-Za-z0-9]*$/", $password);
     }
 
+    function fullTrim($string) {
+        $splitted_string = explode(" ", $string);
+        $trimmed_string = array();
+        
+        foreach ($splitted_string as $string) {
+            if (!empty(trim($string))) {
+                array_push($trimmed_string, trim($string));
+            }
+        }
+        return implode(" ", $trimmed_string);
+    }
+
+    function toProper($string) {
+        return ucwords(strtolower($string));
+    }
+
     function atMorningShift() {
         $date = new Date();
         return $date->getDateTimeValue() < $date->morning_shift_end();

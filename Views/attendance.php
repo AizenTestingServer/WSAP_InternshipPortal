@@ -14,6 +14,13 @@
     $db = new Database();
     $date = new Date();
 
+    $db->query("SELECT * FROM intern_wsap_information
+    WHERE id=:intern_id");
+    $db->setInternId($_SESSION["intern_id"]);
+    $db->execute();
+
+    $intern_wsap_info = $db->fetch();
+
     if (isset($_SESSION["intern_id"])) {
         $db->query("SELECT * FROM attendance WHERE intern_id=:intern_id ORDER BY id DESC LIMIT 1;");
         $db->setInternId($_SESSION["intern_id"]);
@@ -205,13 +212,13 @@
                 <div class="my-2">
                     <?php
                         if (isset($_SESSION["intern_id"])) {
-                            if (isTimeInEnabled($lts_att["att_date"])) {
+                            if (isTimeInEnabled($lts_att["att_date"]) && $intern_wsap_info["status"] == 1) {
                                 $date->time_in_enabled();
                             } else {
                                 $date->time_in_disabled();
                             }
                             
-                            if ($time_out_enabled) {
+                            if ($time_out_enabled && $intern_wsap_info["status"] == 1) {
                                 $date->time_out_enabled();
                             } else {
                                 $date->time_out_disabled();
@@ -219,23 +226,21 @@
                         }
                     ?>
                 </div>
-                                
-                <div class="w-fit my-2 ms-auto">
-                    <a class="btn btn-primary"
-                        href="preview_pdf.php?intern_id=<?= strtoupper($_SESSION["intern_id"]) ?>"
-                        target="window">
-                        Preview DTR as PDF
-                    </a>
-                </div>
             </div> <?php
-                if (isset($_SESSION["error"])) { ?>
-                    <div class="alert alert-danger attendance-alert text-danger my-2">
-                        <?php
-                            echo $_SESSION["error"];
-                            unset($_SESSION["error"]);
-                        ?>
-                    </div> <?php
-                }
+
+            if ($intern_wsap_info["status"] != 1) { ?>
+                <div class="w-fit my-2 ms-2">
+                    <p class="text-danger fw-bold">Only an active intern can time in and time out.</p>
+                </div> <?php
+            }
+            if (isset($_SESSION["error"])) { ?>
+                <div class="alert alert-danger attendance-alert text-danger my-2">
+                    <?php
+                        echo $_SESSION["error"];
+                        unset($_SESSION["error"]);
+                    ?>
+                </div> <?php
+            }
             ?>
         </div>
 
@@ -294,6 +299,93 @@
             </div>
         </div>
 
+        <div class="att-ctrl-buttons d-flex align-items-center mb-3">
+            <div class="dropdown align-center me-2">
+                <button class="btn btn-light border-dark dropdown-toggle" type="button" id="dropdownMenuButton1"
+                    data-bs-toggle="dropdown" aria-expanded="false" name="department"> <?php
+                    if (!empty($_GET["month"]) && !empty($_GET["year"])) {
+                        echo "Custom";
+                    } else {
+                        echo "All Records";
+                    } ?>
+                </button>
+                <ul class="dropdown-menu" aria-labelledby="dropdownMenuButton1">
+                    <li>
+                        <a class="dropdown-item btn-smoke" href="attendance.php">
+                            All Records
+                        </a>
+                    </li>
+                    <li>
+                        <a class="dropdown-item btn-smoke"
+                            href="attendance.php?month=<?= $date->getMonthName() ?>&year=<?= $date->getYear() ?>">
+                            Custom
+                        </a>
+                    </li>
+                </ul>
+            </div> <?php
+            if (!empty($_GET["month"]) && !empty($_GET["year"])) { ?>
+                <div class="dropdown align-center me-2">
+                    <button class="btn btn-light border-dark dropdown-toggle" type="button" id="dropdownMenuButton1"
+                        data-bs-toggle="dropdown" aria-expanded="false" name="department">
+                        <?= $_GET["month"] ?>
+                    </button>
+                    <ul class="dropdown-menu" aria-labelledby="dropdownMenuButton1"> <?php
+                        foreach (getMonths() as $value) { ?>
+                            <li>
+                                <a class="dropdown-item btn-smoke"
+                                    href="attendance.php?month=<?= $value ?>&year=<?= $_GET["year"] ?>">
+                                    <?= $value ?>
+                                </a>
+                            </li> <?php
+                        } ?>
+                    </ul>
+                </div>
+                <div class="dropdown align-center me-2">
+                    <button class="btn btn-light border-dark dropdown-toggle" type="button" id="dropdownMenuButton1"
+                        data-bs-toggle="dropdown" aria-expanded="false" name="department">
+                        <?= $_GET["year"] ?>
+                    </button>
+                    <ul class="dropdown-menu" aria-labelledby="dropdownMenuButton1"> <?php
+                        for ($i = 2018; $i <= $date->getYear(); $i++) { ?>
+                            <li>
+                                <a class="dropdown-item btn-smoke"
+                                    href="attendance.php?month=<?= $_GET["month"] ?>&year=<?= $i ?>">
+                                    <?= $i ?>
+                                </a>
+                            </li> <?php
+                        } ?>
+                    </ul>
+                </div> <?php
+            }
+            
+            $nto_array = array($_SESSION["intern_id"], "NTO");
+            $db->query("SELECT COUNT(*) as count FROM attendance
+            WHERE intern_id=:intern_id AND time_out=:time_out");
+            $db->selectInternIdAndTimeOut($nto_array);
+            $db->execute();
+            $nto_value = $db->fetch(); ?>
+                                
+            <div class="w-fit ms-auto"> <?php
+                if ($nto_value["count"] == 0) { ?>
+                    <a class="btn btn-primary"
+                        href="preview_pdf.php?intern_id=<?= strtoupper($_SESSION["intern_id"]) ?>"
+                        target="window">
+                        Preview DTR as PDF
+                    </a> <?php
+                } else { ?>
+                    <a class="btn btn-primary disabled">
+                        Preview DTR as PDF
+                    </a> <?php
+                } ?>
+            </div>
+        </div> <?php
+                
+        if ($nto_value["count"] != 0) { ?>
+            <div class="att-ctrl-buttons">
+                <p class="text-danger w-fit ms-auto fw-bold">Please settle the NTO first.</p>
+            </div> <?php
+        } ?>
+
         <table id="attendance-table" class="table caption-top fs-d text-center mt-2">
             <thead>
                 <tr>
@@ -307,8 +399,16 @@
             </thead>
             <tbody>
                 <?php
-                if (isset($_SESSION["intern_id"])) {
-                    $db->query("SELECT * FROM attendance WHERE intern_id=:intern_id ORDER BY id DESC");
+                if (isset($_SESSION["intern_id"])) {                
+                    if (!empty($_GET["month"]) && !empty($_GET["year"])) {
+                        $month_year = array($_GET["month"], $_GET["year"]);
+                        
+                        $db->query("SELECT * FROM attendance WHERE intern_id=:intern_id AND
+                        att_date LIKE CONCAT(:month, '%', :year) ORDER BY id DESC");
+                        $db->setMonthYear($month_year);
+                    } else {
+                        $db->query("SELECT * FROM attendance WHERE intern_id=:intern_id ORDER BY id DESC");
+                    }
                     $db->setInternId($_SESSION["intern_id"]);
                     $db->execute();
 

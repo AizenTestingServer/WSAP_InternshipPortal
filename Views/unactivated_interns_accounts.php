@@ -25,9 +25,9 @@
     $admin_roles_count = $db->rowCount();
     
     if (isset($_POST["btnAddIntern"])) {
-        $last_name = ucwords(trim($_POST["lastName"]));
-        $first_name = ucwords(trim($_POST["firstName"]));
-        $middle_name = ucwords(trim($_POST["middleName"]));
+        $last_name = toProper(fullTrim($_POST["lastName"]));
+        $first_name = toProper(fullTrim($_POST["firstName"]));
+        $middle_name = toProper(fullTrim($_POST["middleName"]));
         $gender = $_POST["gender"];
 
         if (!empty($last_name) && !empty($first_name)) {

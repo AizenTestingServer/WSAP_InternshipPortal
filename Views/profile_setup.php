@@ -21,9 +21,9 @@
     $value = $db->fetch();
 
     if (isset($_POST["setProfile"]) &&  isset($_FILES["image"])) {
-        $last_name = ucwords(trim($_POST["lastName"]));
-        $first_name = ucwords(trim($_POST["firstName"]));
-        $middle_name = ucwords(trim($_POST["middleName"]));
+        $last_name = toProper(fullTrim($_POST["lastName"]));
+        $first_name = toProper(fullTrim($_POST["firstName"]));
+        $middle_name = toProper(fullTrim($_POST["middleName"]));
         $gender = $_POST["gender"];
         $birthday = $_POST["birthday"];
         
@@ -31,14 +31,14 @@
         $status = $_POST["status"];
         $onboard_date = $_POST["onboardDate"];
         $target_rendering_hours = $_POST["targetRenderingHours"];
-        $email_address = trim($_POST["emailAddress"]);
+        $email_address = fullTrim($_POST["emailAddress"]);
         $mobile_number = $_POST["mobileNumber"];
         $mobile_number_2 = $_POST["mobileNumber2"];
         
-        $university = trim($_POST["university"]);
-        $university_abbreviation = trim($_POST["university_abbreviation"]);
-        $course = trim($_POST["course"]);
-        $course_abbreviation = trim($_POST["course_abbreviation"]);
+        $university = fullTrim($_POST["university"]);
+        $university_abbreviation = fullTrim($_POST["university_abbreviation"]);
+        $course = fullTrim($_POST["course"]);
+        $course_abbreviation = fullTrim($_POST["course_abbreviation"]);
         $year = $_POST["year"];
 
         $_SESSION["last_name"] = $last_name;
@@ -356,7 +356,7 @@
                                     <div class="row">
                                         <div class="col-lg-4 col-md-6 col-sm-6 user_input my-1">
                                             <label class="mb-2" for="intern_id">Intern ID</label>
-                                            <input type="text" name="intern_id" class="form-control text-uppercase"
+                                            <input type="text" name="intern_id" class="form-control text-uppercase fw-bold"
                                                 value="<?= $value["id"]; ?>" disabled>
                                         </div>
                                         <div class="col-lg-4 col-md-6 col-sm-6 user_input my-1">
