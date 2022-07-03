@@ -143,6 +143,21 @@
                 $db->execute();
                 $db->closeStmt();
 
+                if ($rendered_hours >= $wsap_info["target_rendering_hours"]) {
+                    $offboard_date = date("Y-m-d", strtotime($date->getDate()));
+
+                    $offboard_date_value = array(
+                        $offboard_date,
+                        $_SESSION["intern_id"]
+                    );
+    
+                    $db->query("UPDATE intern_wsap_information SET offboard_date=:offboard_date
+                    WHERE id=:intern_id");
+                    $db->setOffboardDate($offboard_date_value);
+                    $db->execute();
+                    $db->closeStmt();
+                }
+
                 redirect("attendance.php");
                 exit();
             } else {
@@ -154,7 +169,7 @@
     }
 
     require_once "../Templates/header_view.php";
-    setTitle("WSAP IP Attendance");
+    setTitle("My Attendance");
 ?>
 
 <div class="my-container">

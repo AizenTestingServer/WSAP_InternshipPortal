@@ -54,7 +54,7 @@
     }
 
     require_once "../Templates/header_view.php";
-    setTitle("WSAP IP Admins");
+    setTitle("Admins");
 ?>
 <div class="my-container"> 
     <?php
@@ -73,9 +73,9 @@
         </div>
         
         <div>
-            <form method="post">
-                <div class="row">
-                    <!--SEARCH BUTTON/TEXT-->
+            <div class="row">
+                <!--SEARCH BUTTON/TEXT-->
+                <form method="post">
                     <div class="col-lg-8 col-md-10 col-sm-12">
                         <div class="input-group mb-3">
                             <input type="text" class="form-control" placeholder="Search Admin" name="search_admin" value="<?php
@@ -88,25 +88,52 @@
                             </div>
                         </div>
                     </div>
-                    
-                    <div class="col-12 d-lg-flex d-md-inline-block">
-                        <div class="w-100 d-md-flex d-sm-flex">
-                            <div class="d-flex my-2">
-                                <!--DEPARTMENT DROPDOWN-->
-                                <div class="dropdown align-center me-2">
-                                    <button class="btn btn-light border-dark dropdown-toggle" type="button" id="dropdownMenuButton1"
-                                    data-bs-toggle="dropdown" aria-expanded="false" name="department"> <?php
-                                        if (empty($_GET["department"])) {
-                                            echo "All Departments";
-                                        } else {
-                                            echo $_GET["department"];
-                                        }?>
-                                    </button>
-                                    <ul class="dropdown-menu" aria-labelledby="dropdownMenuButton1">
+                </form>
+                
+                <div class="col-12 d-lg-flex d-md-inline-block">
+                    <div class="w-100 d-md-flex d-sm-flex">
+                        <div class="d-flex my-2">
+                            <!--DEPARTMENT DROPDOWN-->
+                            <div class="dropdown align-center me-2">
+                                <button class="btn btn-light border-dark dropdown-toggle" type="button" id="dropdownMenuButton1"
+                                data-bs-toggle="dropdown" aria-expanded="false" name="department"> <?php
+                                    if (empty($_GET["department"])) {
+                                        echo "All Departments";
+                                    } else {
+                                        echo $_GET["department"];
+                                    }?>
+                                </button>
+                                <ul class="dropdown-menu" aria-labelledby="dropdownMenuButton1">
+                                    <li><a class="dropdown-item btn-smoke" <?php
+                                    $parameters = "?";
+                                    if (!empty($_GET["search"])) {
+                                        $parameters = $parameters."search=".$_GET["search"];
+                                    }
+                                    
+                                    if (!empty($_GET["sort"])) {
+                                        if (strlen($parameters) > 1) { $parameters = $parameters."&"; }
+                                        $parameters = $parameters."sort=".$_GET["sort"];
+                                    }
+
+                                    if (strlen($parameters) > 1) { ?>
+                                        href="<?= "admins.php".$parameters ?>" <?php
+                                    } else { ?>
+                                        href="<?= "admins.php" ?>" <?php
+                                    } ?>> All Departments </a></li> <?php
+                                    
+                                    $db->query("SELECT * FROM departments ORDER BY name");
+                                    $db->execute();
+                                    
+                                    while ($row = $db->fetch()) { ?>
                                         <li><a class="dropdown-item btn-smoke" <?php
                                         $parameters = "?";
                                         if (!empty($_GET["search"])) {
                                             $parameters = $parameters."search=".$_GET["search"];
+                                        }
+
+                                        if (!empty($row["name"])) {
+                                            if (strlen($parameters) > 1) { $parameters = $parameters."&"; }
+                                            $parameters = $parameters."department=".$row["name"];
                                         }
                                         
                                         if (!empty($_GET["sort"])) {
@@ -118,160 +145,133 @@
                                             href="<?= "admins.php".$parameters ?>" <?php
                                         } else { ?>
                                             href="<?= "admins.php" ?>" <?php
-                                        } ?>> All Departments </a></li> <?php
-                                        
-                                        $db->query("SELECT * FROM departments ORDER BY name");
-                                        $db->execute();
-                                        
-                                        while ($row = $db->fetch()) { ?>
-                                            <li><a class="dropdown-item btn-smoke" <?php
-                                            $parameters = "?";
-                                            if (!empty($_GET["search"])) {
-                                                $parameters = $parameters."search=".$_GET["search"];
-                                            }
-
-                                            if (!empty($row["name"])) {
-                                                if (strlen($parameters) > 1) { $parameters = $parameters."&"; }
-                                                $parameters = $parameters."department=".$row["name"];
-                                            }
-                                            
-                                            if (!empty($_GET["sort"])) {
-                                                if (strlen($parameters) > 1) { $parameters = $parameters."&"; }
-                                                $parameters = $parameters."sort=".$_GET["sort"];
-                                            }
-
-                                            if (strlen($parameters) > 1) { ?>
-                                                href="<?= "admins.php".$parameters ?>" <?php
-                                            } else { ?>
-                                                href="<?= "admins.php" ?>" <?php
-                                            } ?>> <?= $row["name"] ?>
-                                            </a></li> <?php
-                                        } ?>
-                                    </ul>
-                                </div>
-                                <!--SORTING DROPDOWN-->
-                                <div class="dropdown me-2">
-                                    <button class="btn btn-light border-dark dropdown-toggle" type="button" id="dropdownMenuButton1"
-                                    data-bs-toggle="dropdown" aria-expanded="false"> <?php
-                                        if (empty($_GET["sort"])) {
-                                            echo "Default";
-                                        } else {
-                                            switch ($_GET["sort"]) {
-                                                case "1":
-                                                    echo "A-Z";
-                                                    break;
-                                                case "2":
-                                                    echo "Z-A";
-                                                    break;
-                                                case "3":
-                                                    echo "Oldest Intern";
-                                                    break;
-                                                case "4":
-                                                    echo "Newest Intern";
-                                                    break;
-                                            }
-                                        }?>
-                                    </button>
-                                    <ul class="dropdown-menu me-2z" aria-labelledby="dropdownMenuButton1" name="sort">
-                                        <li><a class="dropdown-item btn-smoke" <?php
-                                            $parameters = "?";
-                                            if (!empty($_GET["search"])) {
-                                                $parameters = $parameters."search=".$_GET["search"];
-                                            }
-
-                                            if (!empty($_GET["department"])) {
-                                                if (strlen($parameters) > 1) { $parameters = $parameters."&"; }
-                                                $parameters = $parameters."department=".$_GET["department"];
-                                            }
-
-                                            if (strlen($parameters) > 1) { ?>
-                                                href="<?= "admins.php".$parameters ?>" <?php
-                                            } else { ?>
-                                                href="<?= "admins.php" ?>" <?php
-                                            } ?>>Default</a></li>
-                                        <li><a class="dropdown-item btn-smoke" <?php
+                                        } ?>> <?= $row["name"] ?>
+                                        </a></li> <?php
+                                    } ?>
+                                </ul>
+                            </div>
+                            <!--SORTING DROPDOWN-->
+                            <div class="dropdown me-2">
+                                <button class="btn btn-light border-dark dropdown-toggle" type="button" id="dropdownMenuButton1"
+                                data-bs-toggle="dropdown" aria-expanded="false"> <?php
+                                    if (empty($_GET["sort"])) {
+                                        echo "Default";
+                                    } else {
+                                        switch ($_GET["sort"]) {
+                                            case "1":
+                                                echo "A-Z";
+                                                break;
+                                            case "2":
+                                                echo "Z-A";
+                                                break;
+                                            case "3":
+                                                echo "Oldest Intern";
+                                                break;
+                                            case "4":
+                                                echo "Newest Intern";
+                                                break;
+                                        }
+                                    }?>
+                                </button>
+                                <ul class="dropdown-menu me-2z" aria-labelledby="dropdownMenuButton1" name="sort">
+                                    <li><a class="dropdown-item btn-smoke" <?php
                                         $parameters = "?";
-                                            if (!empty($_GET["search"])) {
-                                                $parameters = $parameters."search=".$_GET["search"];
-                                            }
+                                        if (!empty($_GET["search"])) {
+                                            $parameters = $parameters."search=".$_GET["search"];
+                                        }
 
-                                            if (!empty($_GET["department"])) {
-                                                if (strlen($parameters) > 1) { $parameters = $parameters."&"; }
-                                                $parameters = $parameters."department=".$_GET["department"];
-                                            }
-
+                                        if (!empty($_GET["department"])) {
                                             if (strlen($parameters) > 1) { $parameters = $parameters."&"; }
-                                            $parameters = $parameters."sort=1";
+                                            $parameters = $parameters."department=".$_GET["department"];
+                                        }
 
-                                            if (strlen($parameters) > 1) { ?>
-                                                href="<?= "admins.php".$parameters ?>" <?php
-                                            } else { ?>
-                                                href="<?= "admins.php" ?>" <?php
-                                            } ?>>A-Z</a></li>
-                                        <li><a class="dropdown-item btn-smoke" <?php
+                                        if (strlen($parameters) > 1) { ?>
+                                            href="<?= "admins.php".$parameters ?>" <?php
+                                        } else { ?>
+                                            href="<?= "admins.php" ?>" <?php
+                                        } ?>>Default</a></li>
+                                    <li><a class="dropdown-item btn-smoke" <?php
+                                    $parameters = "?";
+                                        if (!empty($_GET["search"])) {
+                                            $parameters = $parameters."search=".$_GET["search"];
+                                        }
+
+                                        if (!empty($_GET["department"])) {
+                                            if (strlen($parameters) > 1) { $parameters = $parameters."&"; }
+                                            $parameters = $parameters."department=".$_GET["department"];
+                                        }
+
+                                        if (strlen($parameters) > 1) { $parameters = $parameters."&"; }
+                                        $parameters = $parameters."sort=1";
+
+                                        if (strlen($parameters) > 1) { ?>
+                                            href="<?= "admins.php".$parameters ?>" <?php
+                                        } else { ?>
+                                            href="<?= "admins.php" ?>" <?php
+                                        } ?>>A-Z</a></li>
+                                    <li><a class="dropdown-item btn-smoke" <?php
+                                    $parameters = "?";
+                                        if (!empty($_GET["search"])) {
+                                            $parameters = $parameters."search=".$_GET["search"];
+                                        }
+
+                                        if (!empty($_GET["department"])) {
+                                            if (strlen($parameters) > 1) { $parameters = $parameters."&"; }
+                                            $parameters = $parameters."department=".$_GET["department"];
+                                        }
+                                        
+                                        if (strlen($parameters) > 1) { $parameters = $parameters."&"; }
+                                        $parameters = $parameters."sort=2";
+
+                                        if (strlen($parameters) > 1) { ?>
+                                            href="<?= "admins.php".$parameters ?>" <?php
+                                        } else { ?>
+                                            href="<?= "admins.php" ?>" <?php
+                                        } ?>>Z-A</a></li>
+                                    <li><a class="dropdown-item btn-smoke" <?php
                                         $parameters = "?";
-                                            if (!empty($_GET["search"])) {
-                                                $parameters = $parameters."search=".$_GET["search"];
-                                            }
+                                        if (!empty($_GET["search"])) {
+                                            $parameters = $parameters."search=".$_GET["search"];
+                                        }
 
-                                            if (!empty($_GET["department"])) {
-                                                if (strlen($parameters) > 1) { $parameters = $parameters."&"; }
-                                                $parameters = $parameters."department=".$_GET["department"];
-                                            }
-                                            
+                                        if (!empty($_GET["department"])) {
                                             if (strlen($parameters) > 1) { $parameters = $parameters."&"; }
-                                            $parameters = $parameters."sort=2";
+                                            $parameters = $parameters."department=".$_GET["department"];
+                                        }
+                                        
+                                        if (strlen($parameters) > 1) { $parameters = $parameters."&"; }
+                                        $parameters = $parameters."sort=3";
 
-                                            if (strlen($parameters) > 1) { ?>
-                                                href="<?= "admins.php".$parameters ?>" <?php
-                                            } else { ?>
-                                                href="<?= "admins.php" ?>" <?php
-                                            } ?>>Z-A</a></li>
-                                        <li><a class="dropdown-item btn-smoke" <?php
-                                            $parameters = "?";
-                                            if (!empty($_GET["search"])) {
-                                                $parameters = $parameters."search=".$_GET["search"];
-                                            }
+                                        if (strlen($parameters) > 1) { ?>
+                                            href="<?= "admins.php".$parameters ?>" <?php
+                                        } else { ?>
+                                            href="<?= "admins.php" ?>" <?php
+                                        } ?>>Oldest Intern</a></li>
+                                    <li><a class="dropdown-item btn-smoke" <?php
+                                        $parameters = "?";
+                                        if (!empty($_GET["search"])) {
+                                            $parameters = $parameters."search=".$_GET["search"];
+                                        }
 
-                                            if (!empty($_GET["department"])) {
-                                                if (strlen($parameters) > 1) { $parameters = $parameters."&"; }
-                                                $parameters = $parameters."department=".$_GET["department"];
-                                            }
-                                            
+                                        if (!empty($_GET["department"])) {
                                             if (strlen($parameters) > 1) { $parameters = $parameters."&"; }
-                                            $parameters = $parameters."sort=3";
+                                            $parameters = $parameters."department=".$_GET["department"];
+                                        }
+                                        
+                                        if (strlen($parameters) > 1) { $parameters = $parameters."&"; }
+                                        $parameters = $parameters."sort=4";
 
-                                            if (strlen($parameters) > 1) { ?>
-                                                href="<?= "admins.php".$parameters ?>" <?php
-                                            } else { ?>
-                                                href="<?= "admins.php" ?>" <?php
-                                            } ?>>Oldest Intern</a></li>
-                                        <li><a class="dropdown-item btn-smoke" <?php
-                                            $parameters = "?";
-                                            if (!empty($_GET["search"])) {
-                                                $parameters = $parameters."search=".$_GET["search"];
-                                            }
-
-                                            if (!empty($_GET["department"])) {
-                                                if (strlen($parameters) > 1) { $parameters = $parameters."&"; }
-                                                $parameters = $parameters."department=".$_GET["department"];
-                                            }
-                                            
-                                            if (strlen($parameters) > 1) { $parameters = $parameters."&"; }
-                                            $parameters = $parameters."sort=4";
-
-                                            if (strlen($parameters) > 1) { ?>
-                                                href="<?= "admins.php".$parameters ?>" <?php
-                                            } else { ?>
-                                                href="<?= "admins.php" ?>" <?php
-                                            } ?>>Newest Intern</a></li>
-                                    </ul>
-                                </div>
+                                        if (strlen($parameters) > 1) { ?>
+                                            href="<?= "admins.php".$parameters ?>" <?php
+                                        } else { ?>
+                                            href="<?= "admins.php" ?>" <?php
+                                        } ?>>Newest Intern</a></li>
+                                </ul>
                             </div>
                         </div>
                     </div>
                 </div>
-            </form>
+            </div>
         </div>
         
         <div class="row">
@@ -294,45 +294,45 @@
                         }
                     }
 
-                    if (!empty($_GET["department"]) && !empty($_GET["search"])) {
-                        $interns = array($_GET["department"], $_GET["search"]);
-                        
-                        $db->query("SELECT intern_personal_information.id AS intern_id, intern_personal_information.*, intern_wsap_information.*, departments.*, roles.*
-                        FROM intern_personal_information, intern_wsap_information, departments, roles, intern_roles
-                        WHERE intern_personal_information.id = intern_wsap_information.id AND
-                        intern_personal_information.id = intern_roles.intern_id AND
-                        intern_roles.role_id = roles.id AND roles.admin = 1 AND
-                        intern_wsap_information.department_id = departments.id AND departments.name=:dept_name AND
-                        (CONCAT(last_name, ' ', first_name) LIKE CONCAT( '%', :intern_name, '%') OR
-                        CONCAT(first_name, ' ', last_name) LIKE CONCAT( '%', :intern_name, '%'))".$sort);
-                        $db->selectInterns3($interns);
-                    } else if (!empty($_GET["department"])) {                        
-                        $db->query("SELECT intern_personal_information.id AS intern_id, intern_personal_information.*, intern_wsap_information.*, departments.*, roles.*
-                        FROM intern_personal_information, intern_wsap_information, departments, roles, intern_roles
-                        WHERE intern_personal_information.id = intern_wsap_information.id AND
-                        intern_personal_information.id = intern_roles.intern_id AND
-                        intern_roles.role_id = roles.id AND roles.admin = 1 AND
-                        intern_wsap_information.department_id = departments.id AND departments.name=:dept_name".$sort);
-                        $db->selectInterns2($_GET["department"]);
-                    } else if (!empty($_GET["search"])) {                        
-                        $db->query("SELECT intern_personal_information.id AS intern_id, intern_personal_information.*, intern_wsap_information.*, departments.*, roles.*
-                        FROM intern_personal_information, intern_wsap_information, departments, roles, intern_roles
-                        WHERE intern_personal_information.id = intern_wsap_information.id AND
-                        intern_personal_information.id = intern_roles.intern_id AND
-                        intern_roles.role_id = roles.id AND roles.admin = 1 AND
-                        intern_wsap_information.department_id = departments.id AND
-                        (CONCAT(last_name, ' ', first_name) LIKE CONCAT( '%', :intern_name, '%') OR
-                        CONCAT(first_name, ' ', last_name) LIKE CONCAT( '%', :intern_name, '%'))".$sort);
-                        $db->selectInterns($_GET["search"]);
-                    } else {
-                        $db->query("SELECT intern_personal_information.id AS intern_id, intern_personal_information.*, intern_wsap_information.*, departments.*, roles.*
-                        FROM intern_personal_information, intern_wsap_information, departments, roles, intern_roles
-                        WHERE intern_personal_information.id = intern_wsap_information.id AND
-                        intern_personal_information.id = intern_roles.intern_id AND
-                        intern_roles.role_id = roles.id AND roles.admin = 1 AND
-                        intern_wsap_information.department_id = departments.id".$sort);
+                    $conditions = " WHERE intern_personal_information.id = intern_wsap_information.id AND
+                    intern_personal_information.id = intern_roles.intern_id AND
+                    intern_wsap_information.department_id = departments.id AND
+                    (SELECT COUNT(*) FROM roles WHERE admin = 1 AND roles.id = intern_roles.role_id) > 0";
+    
+                    if (!empty($_GET["search"])) {
+                        if (strlen($conditions) > 6) {
+                            $conditions = $conditions." AND";
+                        }
+                        $conditions = $conditions." (CONCAT(last_name, ' ', first_name) LIKE CONCAT( '%', :intern_name, '%') OR
+                        CONCAT(first_name, ' ', last_name) LIKE CONCAT( '%', :intern_name, '%'))";
+                    }
+                    if (!empty($_GET["department"])) {
+                        if (strlen($conditions) > 6) {
+                            $conditions = $conditions." AND";
+                        }
+                        $conditions = $conditions." departments.name=:dept_name";
+                    }
+    
+                    $query = "SELECT DISTINCT intern_personal_information.id AS intern_id, intern_personal_information.*, intern_wsap_information.*, departments.*
+                    FROM intern_personal_information, intern_wsap_information, departments, intern_roles";
+    
+                    if (strlen($conditions) > 6) {
+                        $db->query($query.$conditions.$sort);
+    
+                        if (!empty($_GET["search"])) {
+                            $db->selectInternName($_GET["search"]);
+                        }
+                        if (!empty($_GET["department"])) {
+                            $db->selectDepartment($_GET["department"]);
+                        }
                     }
                     $db->execute();
+
+                    $roles_db = new Database();
+
+                    $roles_db->query("SELECT intern_roles.*, roles.*
+                    FROM intern_roles, roles
+                    WHERE intern_roles.role_id = roles.id AND roles.admin = 1");
 
                     while ($row = $db->fetch()) { ?>
                         <a class="clickable-card" href="profile.php?intern_id=<?= $row["intern_id"] ?>"
@@ -355,7 +355,14 @@
                                     <h5 class="mb-0 text-dark fs-regular">
                                         <?= $row["last_name"].", ".$row["first_name"] ?>
                                     </h5>
-                                    <h6 class="fs-f"><?= $row["name"] ?></h6>
+                                    <h6 class="fs-f"> <?php
+                                        $roles_db->execute();
+                                        while ($role = $roles_db->fetch()) {
+                                            if ($row["intern_id"] == $role["intern_id"]) {
+                                                echo $role["name"]; ?> <br> <?php
+                                            }
+                                        } ?>
+                                     </h6>
                                 </div>
                                 <div class="bottom w-100 mt-3"> <?php
                                     if ($row["status"] == 0 || $row["status"] == 5) { ?>

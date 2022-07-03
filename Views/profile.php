@@ -278,7 +278,12 @@
     }
 
     require_once "../Templates/header_view.php";
-    setTitle("WSAP IP Profile");
+
+    if (empty($_GET["intern_id"])) {
+        setTitle("My Profile");
+    } else {
+        setTitle("Intern's Profile");
+    }
 ?> 
 <div class="my-container"> 
     <?php
@@ -292,7 +297,13 @@
         
         <div class="d-flex align-items-center mb-2">
             <div>
-                <h3>My Profile</h3>
+                <h3> <?php
+                if (empty($_GET["intern_id"])) {
+                    echo "My Profile";
+                } else {
+                    echo "Intern's Profile";
+                } ?>
+                </h3>
             </div>
         </div>
 
@@ -339,7 +350,7 @@
                     if (!empty($_GET["intern_id"])) {
                         if ($admin_roles_count != 0) { ?>
                             <div class="w-fit my-2 mx-auto">
-                                <a class="btn btn-indigo" href="edit_profile.php?intern_id=<?= $_GET["intern_id"] ?>">
+                                <a class="btn btn-indigo" href="edit_interns_profile.php?intern_id=<?= $_GET["intern_id"] ?>">
                                     <i class="fa-solid fa-pen me-2"></i></i>Edit
                                 </a>
                             </div> <?php
@@ -445,20 +456,19 @@
                                         if (empty($_GET["intern_id"])) { ?>
                                             <span class="text-danger">*</span> <?php
                                         } ?>
-                                    </label>
-                                    <input type="date" name="birthday" class="form-control <?php
-                                        if (!empty($_GET["intern_id"])) { ?>
-                                            fw-bold <?php
-                                        } ?>"
-                                    value="<?php
+                                    </label> <?php
+                                    if (!empty($_GET["intern_id"])) { ?>
+                                         <input type="text" name="birthday" class="form-control fw-bold"
+                                         value="<?= date("F j, Y", strtotime($value["birthday"])) ?>" disabled> <?php
+                                    } else { ?>
+                                    <input type="date" name="birthday" class="form-control" 
+                                        value="<?php
                                         if (isset($_SESSION["birthday"])) {
                                             echo $_SESSION["birthday"];
                                         } else {
                                             echo date("Y-m-d", strtotime($value["birthday"]));
-                                        } ?>" <?php
-                                        if (!empty($_GET["intern_id"])) { ?>
-                                            disabled <?php
-                                        } ?>>
+                                        } ?>"> <?php
+                                    } ?>
                                 </div>
                                 <div class="col-lg-4 col-md-12 user_input my-1">
                                     <label class="mb-2" for="gender">Gender</label>
@@ -589,25 +599,27 @@
                                 <div class="col-lg-12">
                                     <div class="row">
                                         <div class="col-lg-3 col-md-6 col-sm-6 user_input my-1">
-                                            <label class="mb-2" for="onboardDate">Onboard Date <?php
-                                                if (empty($_GET["intern_id"])) { ?>
-                                                    <span class="text-danger">*</span> <?php
-                                                } ?>
-                                            </label>
-                                            <input type="date" name="onboardDate" class="form-control fw-bold"
-                                            value="<?= date("Y-m-d", strtotime($value["onboard_date"])) ?>" disabled>
+                                            <label class="mb-2" for="onboardDate">Onboard Date</label>
+                                            <input type="text" name="onboardDate" class="form-control fw-bold"
+                                            value="<?= date("F j, Y", strtotime($value["onboard_date"])) ?>" disabled>
                                         </div>
-                                        <div class="col-lg-3 col-md-6 col-sm-6 user_input my-1">
-                                            <label class="mb-2" for="offboardDate">Estimated Offboard Date
-                                            </label>
-                                            <input type="text" name="offboardDate" class="form-control fw-bold"
-                                            value="<?php
-                                            $rendering_days = round(($value["target_rendering_hours"]-$value["rendered_hours"])/8);
-                                            $estimated_weekends = ceil(($rendering_days/5) * 2);
-                                            $rendering_days += $estimated_weekends + 1;
+                                        <div class="col-lg-3 col-md-6 col-sm-6 user_input my-1"> <?php
+                                            if (empty($value["offboard_date"])) { ?>
+                                                <label class="mb-2" for="offboardDate">Estimated Offboard Date</label>
+                                                <input type="text" name="offboardDate" class="form-control fw-bold"
+                                                value="<?php
+                                                $rendering_days = round(($value["target_rendering_hours"]-$value["rendered_hours"])/8);
+                                                $estimated_weekends = ceil(($rendering_days/5) * 2);
+                                                $rendering_days += $estimated_weekends + 1;
 
-                                            echo date("m/d/Y", strtotime($date->getDate()." + ".$rendering_days." days")); ?>"
-                                            disabled>
+                                                echo date("F j, Y", strtotime($date->getDate()." + ".$rendering_days." days")); ?>"
+                                                disabled> <?php
+                                            } else { ?>
+                                                <label class="mb-2" for="offboardDate">Offboard Date</label>
+                                                <input type="text" name="offboardDate" class="form-control fw-bold"
+                                                value="<?= date("F j, Y", strtotime($value["offboard_date"])); ?>"
+                                                disabled> <?php
+                                            } ?>
                                         </div>
                                         <div class="col-lg-3 col-md-6 col-sm-6 user_input my-1">
                                             <label class="mb-2" for="renderedHours">Rendered Hours</label>
@@ -939,8 +951,8 @@
                                     <div class="row">
                                         <div class="col-lg-3 col-md-6 col-sm-6 user_input my-1">
                                             <label class="mb-2" for="date_activated">Date Activated</label>
-                                            <input type="date" name="date_activated" class="form-control fw-bold"
-                                                value="<?= $value["date_activated"]; ?>" disabled>
+                                            <input type="text" name="date_activated" class="form-control fw-bold"
+                                                value="<?= date("F j, Y", strtotime($value["date_activated"])) ?>" disabled>
                                         </div> <?php
                                         if (empty($_GET["intern_id"])) { ?>
                                             <div class="col-lg-3 col-md-6 col-sm-6 user_input my-1">

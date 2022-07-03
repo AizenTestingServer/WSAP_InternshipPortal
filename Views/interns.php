@@ -29,6 +29,7 @@
         $first_name = toProper(fullTrim($_POST["firstName"]));
         $middle_name = toProper(fullTrim($_POST["middleName"]));
         $gender = $_POST["gender"];
+        $department_id = $_POST["department"];
 
         if (!empty($last_name) && !empty($first_name)) {
             $intern_id = $date->getYear()."-".randomWord();
@@ -38,6 +39,12 @@
             $db->query("INSERT INTO intern_personal_information (id, last_name, first_name, middle_name, gender)
             VALUES(:intern_id, :last_name, :first_name, :middle_name, :gender)");
             $db->insertPersonalInfo($personal_info);
+            $db->execute();
+            $db->closeStmt();
+
+            $db->query("INSERT INTO intern_wsap_information (id, department_id) VALUES(:intern_id, :department_id)");
+            $db->setInternId($intern_id);
+            $db->setDeptId($department_id);
             $db->execute();
             $db->closeStmt();
                     
@@ -65,6 +72,11 @@
     if (isset($_POST["removeAccount"])) {
         if (!empty($_POST["intern_id"]) && !empty($_POST["fullName"])) {    
             $db->query("DELETE FROM intern_personal_information WHERE id=:intern_id");
+            $db->setInternId($_POST["intern_id"]);
+            $db->execute();
+            $db->closeStmt();
+            
+            $db->query("DELETE FROM intern_wsap_information WHERE id=:intern_id");
             $db->setInternId($_POST["intern_id"]);
             $db->execute();
             $db->closeStmt();
@@ -121,7 +133,7 @@
     }
 
     require_once "../Templates/header_view.php";
-    setTitle("WSAP IP Interns");
+    setTitle("Interns");
 ?>
 <div class="my-container"> 
     <?php
@@ -157,9 +169,9 @@
                     </div>
                 <form>
                 
-                <div class="col-12 d-lg-flex d-md-inline-block">
+                <div class="col-12">
                     <div class="w-100 d-md-flex">
-                        <div class="d-flex my-2">
+                        <div class="d-flex mb-2">
                             <!--DEPARTMENT DROPDOWN-->
                             <div class="dropdown align-center me-2">
                                 <button class="btn btn-light border-dark dropdown-toggle" type="button" id="dropdownMenuButton1"
@@ -380,6 +392,17 @@
                                                             <option value="1">Female</option>
                                                         </select>
                                                     </div>
+                                                    <div class="col-12 user_input my-1">
+                                                        <label class="mb-2" for="department">Department</label>
+                                                        <select name="department" class="form-select"> <?php
+                                                            $db->query("SELECT * FROM departments ORDER BY name");
+                                                            $db->execute();
+                                                            
+                                                            while ($row = $db->fetch()) { ?>
+                                                                <option value="<?= $row["id"] ?>"><?= $row["name"] ?> </option> <?php
+                                                            } ?>
+                                                        </select>
+                                                    </div>
                                                 </div>
                                             </div>
 
@@ -391,12 +414,12 @@
                                 </div>
                             </div>
                             
-                            <div class="w-fit my-2 ms-auto">
+                            <div class="w-fit ms-auto">
                                 <button type="button" class="btn btn-primary" data-bs-toggle="modal" 
                                     data-bs-target="#addInternModal">
                                     <i class="fa-solid fa-plus me-2"></i>Add Intern
                                 </button>
-                                <a class="btn btn-secondary" href="edit_profile.php">
+                                <a class="btn btn-secondary" href="edit_interns_profile.php">
                                     <i class="fa-solid fa-pen me-2"></i>Edit Profile
                                 </a>
                             </div> <?php
@@ -431,21 +454,39 @@
                 </div>
 
                 <div class="interns"> <?php
-                    $full_name_condition = "";
+                    $sort = " ORDER BY last_name LIMIT 5";
+
+                    $conditions = " WHERE intern_personal_information.id = intern_wsap_information.id AND
+                    intern_wsap_information.department_id = departments.id AND
+                    (SELECT COUNT(*) FROM intern_accounts WHERE intern_accounts.id=intern_personal_information.id) = 0";
+
                     if (!empty($_GET["search"])) {
-                        $full_name_condition = " AND (CONCAT(last_name, ' ', first_name) LIKE CONCAT( '%', :intern_name, '%') OR
+                        if (strlen($conditions) > 6) {
+                            $conditions = $conditions." AND";
+                        }
+                        $conditions = $conditions." (CONCAT(last_name, ' ', first_name) LIKE CONCAT( '%', :intern_name, '%') OR
                         CONCAT(first_name, ' ', last_name) LIKE CONCAT( '%', :intern_name, '%'))";
                     }
-
-                    $db->query("SELECT * FROM intern_personal_information
-                    WHERE (SELECT COUNT(*) FROM intern_accounts
-                    WHERE intern_accounts.id=intern_personal_information.id) = 0".$full_name_condition.
-                    " ORDER BY last_name LIMIT 5");
-                    
-                    if (strlen($full_name_condition) > 0) {
-                        $db->selectInterns($_GET["search"]);
+                    if (!empty($_GET["department"])) {
+                        if (strlen($conditions) > 6) {
+                            $conditions = $conditions." AND";
+                        }
+                        $conditions = $conditions." departments.name=:dept_name";
                     }
-                    
+
+                    $query = "SELECT intern_personal_information.id AS intern_id, intern_personal_information.*, intern_wsap_information.*, departments.*
+                    FROM intern_personal_information, intern_wsap_information, departments";
+
+                    if (strlen($conditions) > 6) {
+                        $db->query($query.$conditions.$sort);
+    
+                        if (!empty($_GET["search"])) {
+                            $db->selectInternName($_GET["search"]);
+                        }
+                        if (!empty($_GET["department"])) {
+                            $db->selectDepartment($_GET["department"]);
+                        }
+                    }
                     $db->execute();
 
                     $count = 0;
@@ -476,9 +517,9 @@
                                                     <h5 class="text-dark fs-regular mb-0">
                                                         <?= $row["last_name"].", ".$row["first_name"] ?>
                                                     </h5>
-                                                    <h6 class="fs-f"><?= $row["id"] ?></h6>
+                                                    <h6 class="fs-f"><?= $row["intern_id"] ?></h6>
                                                     <input type="text" name="intern_id" class="form-control text-center d-none mt-2"
-                                                        value="<?= $row["id"] ?>" readonly>
+                                                        value="<?= $row["intern_id"] ?>" readonly>
                                                     <input type="text" name="fullName" class="form-control text-center d-none mt-2"
                                                         value="<?= $row["last_name"].", ".$row["first_name"] ?>" readonly>
                                                 </div>
@@ -522,7 +563,8 @@
                                     <h5 class="mb-0 text-dark fs-regular">
                                         <?= $row["last_name"].", ".$row["first_name"] ?>
                                     </h5>
-                                    <h6 class="fs-f"><?= $row["id"] ?></h6>
+                                    <h6 class="fs-f mb-0"><?= $row["name"] ?></h6>
+                                    <h6 class="fs-d fw-bold"><?= $row["intern_id"] ?></h6>
                                 </div>
                             </div>
                             <button class="btn btn-danger btn-sm top-right" data-bs-toggle="modal" 
@@ -568,35 +610,37 @@
                     }
                 }
 
-                if (!empty($_GET["department"]) && !empty($_GET["search"])) {
-                    $interns = array($_GET["department"], $_GET["search"]);
-                    
-                    $db->query("SELECT intern_personal_information.id AS intern_id, intern_personal_information.*, intern_wsap_information.*, departments.*
-                    FROM intern_personal_information, intern_wsap_information, departments
-                    WHERE intern_personal_information.id = intern_wsap_information.id AND
-                    intern_wsap_information.department_id = departments.id AND name=:dept_name AND
-                    (CONCAT(last_name, ' ', first_name) LIKE CONCAT( '%', :intern_name, '%') OR
-                    CONCAT(first_name, ' ', last_name) LIKE CONCAT( '%', :intern_name, '%'))".$sort);
-                    $db->selectInterns3($interns);
-                } else if (!empty($_GET["department"])) {                        
-                    $db->query("SELECT intern_personal_information.id AS intern_id, intern_personal_information.*, intern_wsap_information.*, departments.*
-                    FROM intern_personal_information, intern_wsap_information, departments
-                    WHERE intern_personal_information.id = intern_wsap_information.id AND
-                    intern_wsap_information.department_id = departments.id AND name=:dept_name".$sort);
-                    $db->selectInterns2($_GET["department"]);
-                } else if (!empty($_GET["search"])) {                        
-                    $db->query("SELECT intern_personal_information.id AS intern_id, intern_personal_information.*, intern_wsap_information.*, departments.*
-                    FROM intern_personal_information, intern_wsap_information, departments
-                    WHERE intern_personal_information.id = intern_wsap_information.id AND
-                    intern_wsap_information.department_id = departments.id AND
-                    (CONCAT(last_name, ' ', first_name) LIKE CONCAT( '%', :intern_name, '%') OR
-                    CONCAT(first_name, ' ', last_name) LIKE CONCAT( '%', :intern_name, '%'))".$sort);
-                    $db->selectInterns($_GET["search"]);
-                } else {
-                    $db->query("SELECT intern_personal_information.id AS intern_id, intern_personal_information.*, intern_wsap_information.*, departments.*
-                    FROM intern_personal_information, intern_wsap_information, departments
-                    WHERE intern_personal_information.id = intern_wsap_information.id AND
-                    intern_wsap_information.department_id = departments.id".$sort);
+                $conditions = " WHERE intern_personal_information.id = intern_wsap_information.id AND
+                intern_personal_information.id = intern_accounts.id AND
+                intern_wsap_information.department_id = departments.id";
+
+                if (!empty($_GET["search"])) {
+                    if (strlen($conditions) > 6) {
+                        $conditions = $conditions." AND";
+                    }
+                    $conditions = $conditions." (CONCAT(last_name, ' ', first_name) LIKE CONCAT( '%', :intern_name, '%') OR
+                    CONCAT(first_name, ' ', last_name) LIKE CONCAT( '%', :intern_name, '%'))";
+                }
+                if (!empty($_GET["department"])) {
+                    if (strlen($conditions) > 6) {
+                        $conditions = $conditions." AND";
+                    }
+                    $conditions = $conditions." departments.name=:dept_name";
+                }
+
+                $query = "SELECT intern_personal_information.id AS intern_id, intern_personal_information.*, 
+                intern_wsap_information.*, intern_accounts.*,  departments.*
+                FROM intern_personal_information, intern_wsap_information, intern_accounts, departments";
+
+                if (strlen($conditions) > 6) {
+                    $db->query($query.$conditions.$sort);
+
+                    if (!empty($_GET["search"])) {
+                        $db->selectInternName($_GET["search"]);
+                    }
+                    if (!empty($_GET["department"])) {
+                        $db->selectDepartment($_GET["department"]);
+                    }
                 }
                 $db->execute();
 

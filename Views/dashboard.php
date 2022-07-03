@@ -60,7 +60,7 @@
     }
 
     require_once "../Templates/header_view.php";
-    setTitle("WSAP IP Dashboard");
+    setTitle("Dashboard");
 ?> 
 <div class="my-container"> 
     <?php
@@ -162,16 +162,24 @@
                     <div class="summary-boxes">
                         <div class="top">
                             <div class="left">
-                                <div class="subheader mt-2">
-                                    Est. Offboard Date
+                                <div class="subheader mt-2"> <?php
+                                    if (empty($intern_wsap_info["offboard_date"])) {
+                                        echo "Est. Offboard Date";
+                                    } else {
+                                        echo "Offboard Date";
+                                    } ?>
                                 </div>
                                 <div class="summary-total">
-                                    <h3><?php
-                                    $rendering_days = round(($intern_wsap_info["target_rendering_hours"]-$intern_wsap_info["rendered_hours"])/8);
-                                    $estimated_weekends = ceil(($rendering_days/5) * 2);
-                                    $rendering_days += $estimated_weekends + 1;
-                                    
-                                    echo date("M j", strtotime($date->getDate()." + ".$rendering_days." days")); ?></h3>
+                                    <h5> <?php
+                                    if (empty($intern_wsap_info["offboard_date"])) {
+                                        $rendering_days = round(($intern_wsap_info["target_rendering_hours"]-$intern_wsap_info["rendered_hours"])/8);
+                                        $estimated_weekends = ceil(($rendering_days/5) * 2);
+                                        $rendering_days += $estimated_weekends + 1;
+                                        
+                                        echo date("j M Y", strtotime($date->getDate()." + ".$rendering_days." days"));
+                                    } else {
+                                        echo date("j M Y", strtotime($intern_wsap_info["offboard_date"]));
+                                    } ?></h5>
                                 </div>
                             </div>
                             <div class="right">
@@ -262,7 +270,8 @@
 
                     <?php $record_count = 0; ?>
                     <div class="daily_task"> <?php
-                        if (isTimeInEnabled($lts_att["att_date"]) && $intern_wsap_info["status"] == 1) { $record_count++; ?>
+                        if (isTimeInEnabled($lts_att["att_date"]) && $intern_wsap_info["status"] == 1) {
+                            $record_count++; ?>
                             <div class="task-box">
                                 <div class="task-box-status">
                                     <div class="d-flex justify-content-between">
@@ -285,7 +294,8 @@
                             </div> <?php
                         }
                         
-                        if ($remind_time_out && $intern_wsap_info["status"] == 1) { $record_count++; ?>
+                        if ($remind_time_out &&$intern_wsap_info["status"] == 1) {
+                            $record_count++; ?>
                             <div class="task-box">
                                 <div class="task-box-status">
                                     <div class="d-flex justify-content-between">

@@ -16,7 +16,7 @@
     $db->execute();
 
     require_once "../Templates/header_view.php";
-    setTitle("WSAP IP Brands");
+    setTitle("Brands");
 ?> 
 <div class="my-container"> 
     <?php
@@ -37,12 +37,10 @@
         <div class="brand_grid fs-inter"> <?php
             while ($row = $db->fetch()) { ?>
                 <div class="boxes">
-                    <div class="content">
-                        <p class="fs-a mb-0">
-                            <?= $row["name"] ?>
-                        </p>
-                        <h5><?= $row["abbreviation"] ?></h5>
-                        <div>
+                    <div class="content position-relative p-1 pb-3">
+                        <h5 class="mb-0"><?= $row["abbreviation"] ?></h5>
+                        <p class="fs-a"><?= $row["name"] ?></p>
+                        <div class="position-absolute bottom-0">
                             <a href="<?= $row["fb_link"] ?>" target="window"><i class="fa-brands fa-facebook"></i></a>
                             <a href="<?= $row["insta_link"] ?>" target="window"><i class="fa-brands fa-instagram"></i></a>
                             <a href="<?= $row["twitter_link"] ?>" target="window"><i class="fa-brands fa-twitter"></i></a>

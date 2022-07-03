@@ -100,7 +100,7 @@
     }
 
     require_once "./Templates/header.php";
-    setTitle("WSAP IP Login");
+    setTitle("Login");
 ?>
 <div class="login-container">
     <div class="login-outside">

@@ -14,7 +14,9 @@
     $db = new Database();
     $date = new Date();
 
-    $db->query("SELECT * FROM intern_personal_information WHERE id=:intern_id");
+    $db->query("SELECT intern_personal_information.*, intern_wsap_information.*
+    FROM intern_personal_information, intern_wsap_information
+    WHERE intern_personal_information.id = intern_wsap_information.id AND intern_personal_information.id=:intern_id");
     $db->setInternId($_SESSION["intern_id"]);
     $db->execute();
     
@@ -27,7 +29,6 @@
         $gender = $_POST["gender"];
         $birthday = $_POST["birthday"];
         
-        $dept_id = $_POST["department"];
         $status = $_POST["status"];
         $onboard_date = $_POST["onboardDate"];
         $target_rendering_hours = $_POST["targetRenderingHours"];
@@ -47,7 +48,6 @@
         $_SESSION["gender"] = $gender;
         $_SESSION["birthday"] = $birthday;
 
-        $_SESSION["dept_id"] = $dept_id;
         $_SESSION["status"] = $status;
         $_SESSION["onboard_date"] = $onboard_date;
         $_SESSION["target_rendering_hours"] = $target_rendering_hours;
@@ -79,124 +79,126 @@
         !empty($_POST["confirm_password"]);
 
         if ($personal_completed && $wsap_completed && $educational_completed && $account_completed) {
-            if (isValidEmail($email_address)) {
-                if (isValidMobileNumber($mobile_number) &&
-                    (empty($mobile_number_2) || isValidMobileNumber($mobile_number_2))) {
-                    if (strlen($_POST["password"]) > 5) {
-                        if (isValidPassword($_POST["password"])) {
-                            if ($_POST["password"] == $_POST["confirm_password"]) {
-                                $image_name = $_FILES["image"]["name"];
-                                $image_size = $_FILES["image"]["size"];
-                                $tmp_name = $_FILES["image"]["tmp_name"];
-                                $error = $_FILES["image"]["error"];
-            
-                                if (!empty($image_name)) {
-                                    if ($error == 0) {
-                                        $img_ex = strtolower(pathinfo($image_name, PATHINFO_EXTENSION));
-                                        $allowed_exs = array("jpg", "jpeg", "png");
-                            
-                                        if (in_array($img_ex, $allowed_exs)) {
-                                            $personal_info = array($last_name,
-                                            $first_name,
-                                            $middle_name,
-                                            $gender,
-                                            $birthday,
-                                            $_SESSION["intern_id"]);
-                                    
-                                            $db->query("UPDATE intern_personal_information
-                                            SET last_name=:last_name, first_name=:first_name, middle_name=:middle_name,
-                                            gender=:gender, birthday=:birthday WHERE id=:intern_id");
-                                            $db->setPersonalInfo($personal_info);
-                                            $db->execute();
-                                            $db->closeStmt();
-                                            
-                                            $image_path = "../Assets/img/profile_imgs/".$image_name;
-                                            
-                                            $wsap_info = array($_SESSION["intern_id"],
-                                            $dept_id,
-                                            $status,
-                                            $onboard_date,
-                                            $target_rendering_hours,
-                                            0,
-                                            $email_address,
-                                            $mobile_number,
-                                            $mobile_number_2,
-                                            $image_path);
-                                            
-                                            $db->query("INSERT INTO intern_wsap_information
-                                            VALUES(:intern_id, :dept_id, :status, :onboard_date,
-                                            :target_rendering_hours, :rendered_hours,
-                                            :email_address, :mobile_number, :mobile_number_2, :image)");
-                                            $db->insertWSAPInfo($wsap_info);
-                                            $db->execute();
-                                            $db->closeStmt();
-            
-                                            $educational_info = array($_SESSION["intern_id"],
-                                            $university,
-                                            $university_abbreviation,
-                                            $course,
-                                            $course_abbreviation,
-                                            $year);
-                                    
-                                            $db->query("INSERT INTO intern_educational_information
-                                            VALUES(:intern_id, :university, :university_abbreviation,
-                                            :course, :course_abbreviation, :year)");
-                                            $db->insertEducationalInfo($educational_info);
-                                            $db->execute();
-                                            $db->closeStmt();
-            
-                                            $account_info = array($_SESSION["intern_id"],
-                                            md5($_POST["password"]),
-                                            date("Y-m-d", $date->getDateValue()));
-                            
-                                            $db->query("INSERT INTO intern_accounts
-                                            VALUES(:intern_id, :password, :date_activated)");
-                                            $db->insertAccount($account_info);
-                                            $db->execute();
-                                            $db->closeStmt();
-            
-                                            move_uploaded_file($tmp_name, $image_path);
-                    
-                                            $log_value = $last_name.", ".$first_name.
-                                                "'s (".$_SESSION["intern_id"].") account has been activated.";
-                                    
-                                            $log = array($date->getDateTime(),
-                                            strtoupper($_SESSION["intern_id"]),
-                                            $log_value);
-                                    
-                                            $db->query("INSERT INTO audit_logs
-                                            VALUES (null, :timestamp, :intern_id, :log)");
-                                            $db->log($log);
-                                            $db->execute();
-                                            $db->closeStmt();
-                                            
-                                            $_SESSION["setup_success"] = "Successfully setup the profile.";
-                                            $_SESSION["password"] = $_POST["password"];
-                                            redirect("dashboard.php");
-                                            exit();
+            if ($target_rendering_hours >= 200) {
+                if (isValidEmail($email_address)) {
+                    if (isValidMobileNumber($mobile_number) &&
+                        (empty($mobile_number_2) || isValidMobileNumber($mobile_number_2))) {
+                        if (strlen($_POST["password"]) > 5) {
+                            if (isValidPassword($_POST["password"])) {
+                                if ($_POST["password"] == $_POST["confirm_password"]) {
+                                    $image_name = $_FILES["image"]["name"];
+                                    $image_size = $_FILES["image"]["size"];
+                                    $tmp_name = $_FILES["image"]["tmp_name"];
+                                    $error = $_FILES["image"]["error"];
+                
+                                    if (!empty($image_name)) {
+                                        if ($error == 0) {
+                                            $img_ex = strtolower(pathinfo($image_name, PATHINFO_EXTENSION));
+                                            $allowed_exs = array("jpg", "jpeg", "png");
+                                
+                                            if (in_array($img_ex, $allowed_exs)) {
+                                                $personal_info = array($last_name,
+                                                $first_name,
+                                                $middle_name,
+                                                $gender,
+                                                $birthday,
+                                                $_SESSION["intern_id"]);
+                                        
+                                                $db->query("UPDATE intern_personal_information
+                                                SET last_name=:last_name, first_name=:first_name, middle_name=:middle_name,
+                                                gender=:gender, birthday=:birthday WHERE id=:intern_id");
+                                                $db->setPersonalInfo($personal_info);
+                                                $db->execute();
+                                                $db->closeStmt();
+                                                
+                                                $image_path = "../Assets/img/profile_imgs/".$image_name;
+                                                
+                                                $wsap_info = array($status,
+                                                $onboard_date,
+                                                $target_rendering_hours,
+                                                $email_address,
+                                                $mobile_number,
+                                                $mobile_number_2,
+                                                $image_path,
+                                                $_SESSION["intern_id"]);
+                                                
+                                                $db->query("UPDATE intern_wsap_information
+                                                SET status=:status, onboard_date=:onboard_date, target_rendering_hours=:target_rendering_hours,
+                                                email_address=:email_address, mobile_number=:mobile_number, mobile_number_2=:mobile_number_2,
+                                                image=:image WHERE id=:intern_id");
+                                                $db->setWSAPInfo($wsap_info);
+                                                $db->execute();
+                                                $db->closeStmt();
+                
+                                                $educational_info = array($_SESSION["intern_id"],
+                                                $university,
+                                                $university_abbreviation,
+                                                $course,
+                                                $course_abbreviation,
+                                                $year);
+                                        
+                                                $db->query("INSERT INTO intern_educational_information
+                                                VALUES(:intern_id, :university, :university_abbreviation,
+                                                :course, :course_abbreviation, :year)");
+                                                $db->insertEducationalInfo($educational_info);
+                                                $db->execute();
+                                                $db->closeStmt();
+                
+                                                $account_info = array($_SESSION["intern_id"],
+                                                md5($_POST["password"]),
+                                                date("Y-m-d", $date->getDateValue()));
+                                
+                                                $db->query("INSERT INTO intern_accounts
+                                                VALUES(:intern_id, :password, :date_activated)");
+                                                $db->insertAccount($account_info);
+                                                $db->execute();
+                                                $db->closeStmt();
+                
+                                                move_uploaded_file($tmp_name, $image_path);
+                        
+                                                $log_value = $last_name.", ".$first_name.
+                                                    "'s (".$_SESSION["intern_id"].") account has been activated.";
+                                        
+                                                $log = array($date->getDateTime(),
+                                                strtoupper($_SESSION["intern_id"]),
+                                                $log_value);
+                                        
+                                                $db->query("INSERT INTO audit_logs
+                                                VALUES (null, :timestamp, :intern_id, :log)");
+                                                $db->log($log);
+                                                $db->execute();
+                                                $db->closeStmt();
+                                                
+                                                $_SESSION["setup_success"] = "Successfully setup the profile.";
+                                                $_SESSION["password"] = $_POST["password"];
+                                                redirect("dashboard.php");
+                                                exit();
+                                            } else {
+                                                $_SESSION["setup_failed"] = "The file must be an image!";
+                                            }
                                         } else {
-                                            $_SESSION["setup_failed"] = "The file must be an image!";
+                                            $_SESSION["setup_failed"] = "There is an error occurred!";
                                         }
                                     } else {
-                                        $_SESSION["setup_failed"] = "There is an error occurred!";
+                                        $_SESSION["setup_failed"] = "You must select an image file first!";
                                     }
                                 } else {
-                                    $_SESSION["setup_failed"] = "You must select an image file first!";
+                                    $_SESSION["setup_failed"] = "The password does not match!";
                                 }
                             } else {
-                                $_SESSION["setup_failed"] = "The password does not match!";
+                                $_SESSION["setup_failed"] = "The password must only contain letters or numbers!";
                             }
                         } else {
-                            $_SESSION["setup_failed"] = "The password must only contain letters or numbers!";
+                            $_SESSION["setup_failed"] = "The new password must be between 6 and 16 characters!";
                         }
                     } else {
-                        $_SESSION["setup_failed"] = "The new password must be between 6 and 16 characters!";
+                        $_SESSION["setup_failed"] = "The mobile number is not a valid number!";
                     }
                 } else {
-                    $_SESSION["setup_failed"] = "The mobile number is not a valid number!";
+                    $_SESSION["setup_failed"] = "The email address is not a valid email!";
                 }
             } else {
-                $_SESSION["setup_failed"] = "The email address is not a valid email!";
+                $_SESSION["setup_failed"] = "The target rendering hours must be at least 200!";
             }
         } else {
             $_SESSION["setup_failed"] = "Please fill-out the required fields!";
@@ -206,7 +208,7 @@
     }
 
     require_once "../Templates/header_view.php";
-    setTitle("WSAP IP Profile Setup");
+    setTitle("Profile Setup");
 ?> 
 <div class="my-container">
     <div class="main-section p-4 ms-0">
@@ -311,8 +313,6 @@
                                         value="<?php
                                         if (isset($_SESSION["birthday"])) {
                                             echo $_SESSION["birthday"];
-                                        } else {
-                                            echo date("Y-m-d", $date->getDateValue());
                                         } ?>">
                                 </div>
                                 <div class="col-lg-4 col-md-12 user_input my-1">
@@ -361,18 +361,13 @@
                                         </div>
                                         <div class="col-lg-4 col-md-6 col-sm-6 user_input my-1">
                                             <label class="mb-2" for="department">Department</label>
-                                            <select name="department" class="form-select"> <?php
-                                                $db->query("SELECT * FROM departments ORDER BY name");
+                                            <select name="department" class="form-select fw-bold" disabled> <?php
+                                                $db->query("SELECT * FROM departments WHERE id=:id ORDER BY name");
+                                                $db->setId($value["department_id"]);
                                                 $db->execute();
 
-                                                $index = 0;
                                                 while ($row = $db->fetch()) { ?>
-                                                <option <?php
-                                                    if (isset($_SESSION["dept_id"])) {
-                                                        if ($_SESSION["dept_id"] == $row["id"]) { ?> selected <?php }
-                                                    } else {
-                                                        if ($index == 0) { ?> selected <?php }
-                                                    } $index++; ?> value="<?= $row["id"] ?>"><?= $row["name"] ?> </option> <?php
+                                                    <option value="<?= $row["id"] ?>" selected><?= $row["name"] ?> </option> <?php
                                                 } ?>
                                             </select>
                                         </div>
@@ -438,8 +433,6 @@
                                                 value="<?php
                                                 if (isset($_SESSION["onboard_date"])) {
                                                     echo $_SESSION["onboard_date"];
-                                                } else {
-                                                    echo date("Y-m-d", $date->getDateValue());
                                                 } ?>">
                                         </div>
                                         <div class="col-lg-6 col-md-6 col-sm-6 user_input my-1">

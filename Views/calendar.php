@@ -22,16 +22,13 @@
     $db->execute();
     $admin_roles_count = $db->rowCount();
 
-    $db->query("SELECT COUNT(*) AS active_interns FROM intern_wsap_information WHERE status = 1");
-    $db->execute();
-
-    $active_interns = 0;
-    if ($value = $db->fetch()) {
-        $active_interns = $value["active_interns"];
-    }
+    $db_interns = new Database();
+    $db_interns->query("SELECT intern_wsap_information.*, intern_accounts.*
+    FROM intern_wsap_information, intern_accounts
+    WHERE intern_wsap_information.id = intern_accounts.id");
 
     require_once "../Templates/header_view.php";
-    setTitle("WSAP IP Calendar");
+    setTitle("Calendar");
 ?>
 
 <div class="my-container">
@@ -138,10 +135,21 @@
                                 <h6><?= date("D", strtotime($row["att_date"])); ?></h6>
                             </div>
                             <div class="bottom d-flex justify-content-evenly border py-1"> <?php
+                                $db_interns->execute();
+
+                                $active_interns = 0;
+                                while ($row_interns = $db_interns->fetch()) {
+                                    if (strtotime($row_interns["onboard_date"]) <= strtotime($row["att_date"]) &&
+                                        (empty($row_interns["offboard_date"]) ||
+                                        strtotime($row_interns["offboard_date"]) >= strtotime($row["att_date"]))) {
+                                        $active_interns++;
+                                    }
+                                }
+
                                 $db->query("SELECT COUNT(*) AS present FROM attendance WHERE att_date=:att_date");
                                 $db->setAttDate($row["att_date"]);
                                 $db->execute();
-                                $value = $db->fetch(); 
+                                $value = $db->fetch();
 
                                 $db->query("SELECT * FROM attendance WHERE att_date=:att_date");
                                 $db->setAttDate($row["att_date"]);

@@ -147,9 +147,9 @@
     require_once "../Templates/header_view.php";
     
     if (empty($_GET["role_id"])) {
-        setTitle("WSAP IP Add Role");
+        setTitle("Add Role");
     } else {
-        setTitle("WSAP IP Edit Role");
+        setTitle("Edit Role");
     }
 ?> 
 <div class="my-container"> 

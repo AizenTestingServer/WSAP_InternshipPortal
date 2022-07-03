@@ -75,6 +75,10 @@ class Database {
         $this->stmt->bindValue(":intern_id", $intern_id);
     }
 
+    function setDeptId($department_id) {
+        $this->stmt->bindValue(":department_id", $department_id);
+    }
+
     function setAttDate($date) {
         $this->stmt->bindValue(":att_date", $date);
     }
@@ -126,6 +130,11 @@ class Database {
         $this->stmt->bindValue(":intern_id", $computed_rendered_hours[1]);
     }
 
+    function setOffboardDate($offboard_date_value) {
+        $this->stmt->bindValue(":offboard_date", $offboard_date_value[0]);
+        $this->stmt->bindValue(":intern_id", $offboard_date_value[1]);
+    }
+
     function uploadImage($upload_image) {
         $this->stmt->bindValue(":intern_id", $upload_image[0]);
         $this->stmt->bindValue(":image_path", $upload_image[1]);
@@ -155,25 +164,24 @@ class Database {
 
     function insertWSAPInfo($wsap_info) {
         $this->stmt->bindValue(":intern_id", $wsap_info[0]);
-        $this->stmt->bindValue(":dept_id", $wsap_info[1]);
-        $this->stmt->bindValue(":status", $wsap_info[2]);
-        $this->stmt->bindValue(":onboard_date", $wsap_info[3]);
-        $this->stmt->bindValue(":target_rendering_hours", $wsap_info[4]);
-        $this->stmt->bindValue(":rendered_hours", $wsap_info[5]);
-        $this->stmt->bindValue(":email_address", $wsap_info[6]);
-        $this->stmt->bindValue(":mobile_number", $wsap_info[7]);
-        $this->stmt->bindValue(":mobile_number_2", $wsap_info[8]);
-        $this->stmt->bindValue(":image", $wsap_info[9]);
+        $this->stmt->bindValue(":status", $wsap_info[1]);
+        $this->stmt->bindValue(":onboard_date", $wsap_info[2]);
+        $this->stmt->bindValue(":target_rendering_hours", $wsap_info[3]);
+        $this->stmt->bindValue(":email_address", $wsap_info[4]);
+        $this->stmt->bindValue(":mobile_number", $wsap_info[5]);
+        $this->stmt->bindValue(":mobile_number_2", $wsap_info[6]);
+        $this->stmt->bindValue(":image", $wsap_info[7]);
     }
 
     function setWSAPInfo($wsap_info) {
-        $this->stmt->bindValue(":dept_id", $wsap_info[0]);
-        $this->stmt->bindValue(":status", $wsap_info[1]);
-        $this->stmt->bindValue(":onboard_date", $wsap_info[2]);
+        $this->stmt->bindValue(":status", $wsap_info[0]);
+        $this->stmt->bindValue(":onboard_date", $wsap_info[1]);
+        $this->stmt->bindValue(":target_rendering_hours", $wsap_info[2]);
         $this->stmt->bindValue(":email_address", $wsap_info[3]);
         $this->stmt->bindValue(":mobile_number", $wsap_info[4]);
         $this->stmt->bindValue(":mobile_number_2", $wsap_info[5]);
-        $this->stmt->bindValue(":intern_id", $wsap_info[6]);
+        $this->stmt->bindValue(":image", $wsap_info[6]);
+        $this->stmt->bindValue(":intern_id", $wsap_info[7]);
     }
 
     function setWSAPInfo2($wsap_info) {
@@ -186,10 +194,10 @@ class Database {
     }
 
     function setWSAPInfo3($wsap_info) {
-        $this->stmt->bindValue(":email_address", $wsap_info[1]);
-        $this->stmt->bindValue(":mobile_number", $wsap_info[2]);
-        $this->stmt->bindValue(":mobile_number_2", $wsap_info[3]);
-        $this->stmt->bindValue(":intern_id", $wsap_info[4]);
+        $this->stmt->bindValue(":email_address", $wsap_info[0]);
+        $this->stmt->bindValue(":mobile_number", $wsap_info[1]);
+        $this->stmt->bindValue(":mobile_number_2", $wsap_info[2]);
+        $this->stmt->bindValue(":intern_id", $wsap_info[3]);
     }
 
     function insertEducationalInfo($educational_info) {
@@ -237,50 +245,20 @@ class Database {
         $this->stmt->bindValue(":intern_name", $interns_attendance[2]);
     }
 
-    function selectInterns($interns) {
-        $this->stmt->bindValue(":intern_name", $interns);
+    function selectInternName($intern_name) {
+        $this->stmt->bindValue(":intern_name", $intern_name);
     }
 
-    function selectInterns2($interns) {
-        $this->stmt->bindValue(":dept_name", $interns);
+    function selectDepartment($dept_name) {
+        $this->stmt->bindValue(":dept_name", $dept_name);
     }
 
-    function selectInterns3($interns) {
-        $this->stmt->bindValue(":dept_name", $interns[0]);
-        $this->stmt->bindValue(":intern_name", $interns[1]);
+    function selectRoleName($role_name) {
+        $this->stmt->bindValue(":role_name", $role_name);
     }
 
-    function selectRoles($roles) {
-        $this->stmt->bindValue(":role_name", $roles[0]);
-    }
-
-    function selectRoles2($roles) {
-        $this->stmt->bindValue(":dept_name", $roles[0]);
-    }
-
-    function selectRoles3($roles) {
-        $this->stmt->bindValue(":brand_name", $roles[0]);
-    }
-
-    function selectRoles4($roles) {
-        $this->stmt->bindValue(":role_name", $roles[0]);
-        $this->stmt->bindValue(":dept_name", $roles[1]);
-    }
-
-    function selectRoles5($roles) {
-        $this->stmt->bindValue(":role_name", $roles[0]);
-        $this->stmt->bindValue(":brand_name", $roles[1]);
-    }
-
-    function selectRoles6($roles) {
-        $this->stmt->bindValue(":dept_name", $roles[0]);
-        $this->stmt->bindValue(":brand_name", $roles[1]);
-    }
-
-    function selectRoles7($roles) {
-        $this->stmt->bindValue(":role_name", $roles[0]);
-        $this->stmt->bindValue(":dept_name", $roles[1]);
-        $this->stmt->bindValue(":brand_name", $roles[2]);
+    function selectBrand($brand_name) {
+        $this->stmt->bindValue(":brand_name", $brand_name);
     }
 
     function setRoleId($role_id) {
@@ -318,10 +296,6 @@ class Database {
 
     function selectLog($log) {
         $this->stmt->bindValue(":log", $log);
-    }
-
-    function selectDepartment($dept_name) {
-        $this->stmt->bindValue(":dept_name", $dept_name);
     }
 }
 

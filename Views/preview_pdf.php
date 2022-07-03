@@ -71,7 +71,7 @@
     }
 
     require_once "../Templates/header_view.php";
-    setTitle("WSAP IP Preview DTR as PDF");
+    setTitle("Preview DTR as PDF");
 ?>
 
 <div class="my-container"> <?php
@@ -181,14 +181,19 @@
                 }
                 $db->setInternId($_GET["intern_id"]);
                 $db->execute();
+                
+                $att_db = new Database();
+
+                $att_db->query("SELECT * FROM attendance WHERE intern_id=:intern_id");
+                $att_db->setInternId($_GET["intern_id"]);
 
                 $total_rendered_hours = 0;
                 
-                while ($month = $db->fetch()) { ?>
+                while ($row = $db->fetch()) { ?>
                     <div class="indicator-head-container my-3">
                         <ul class="list-group list-group-horizontal list-unstyled fw-bold">
                             <li class="text-center" style="width: 100%;">
-                                <?= strtoupper($month["month"])." ".$month["year"] ?>
+                                <?= strtoupper($row["month"])." ".$row["year"] ?>
                             </li>
                         </ul>
                         <p class="list-group-item text-center mb-0" style="width: 100%;">Official hours for arrival and departure</p>
@@ -215,14 +220,10 @@
                         </thead>
 
                         <tbody> <?php
-                            $selected_month = date("m", strtotime($month["month"]));
-                            $selected_year = date("Y", strtotime($month["year"]));
+                            $selected_month = date("m", strtotime($row["month"]));
+                            $selected_year = date("Y", strtotime($row["year"]));
                             $number_of_days = cal_days_in_month(CAL_GREGORIAN, $selected_month, $selected_year);
 
-                            $att_db = new Database();
-
-                            $att_db->query("SELECT * FROM attendance WHERE intern_id=:intern_id");
-                            $att_db->setInternId($_GET["intern_id"]);
                             $att_db->execute();
 
                             $rendered_hours_in_month = 0;
@@ -231,7 +232,7 @@
                             for ($i = 1; $i <= $number_of_days + 1; $i++) { 
                                 if ($i == $number_of_days + 1) { ?>
                                     <tr>
-                                        <th scope="row" colspan="5"><?= "Total in ".$month["month"] ?></th>
+                                        <th scope="row" colspan="5"><?= "Total in ".$row["month"] ?></th>
                                         <td><?= $rendered_hours_in_month ?></td>
                                         <td><?= $ot_hours_in_month ?></td>
                                     </tr> <?php

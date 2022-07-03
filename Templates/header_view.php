@@ -31,7 +31,7 @@
 
     <?php
         function setTitle($title) {
-            echo "<title>".$title."</title>";
+            echo "<title> WSAP IP | ".$title."</title>";
         }
     ?>
 

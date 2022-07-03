@@ -68,7 +68,7 @@
     }
 
     require_once "../Templates/header_view.php";
-    setTitle("WSAP IP Interns' Attendance");
+    setTitle("Interns' Attendance");
 ?>
 <div class="my-container"> 
     <?php
@@ -87,9 +87,9 @@
         </div> <?php
         if ($admin_roles_count != 0) { ?>
             <div>
-                <form method="post">
-                    <div class="row">
-                        <!--SEARCH BUTTON/TEXT-->
+                <div class="row">
+                    <!--SEARCH BUTTON/TEXT-->
+                    <form method="post">
                         <div class="col-lg-8 col-md-10 col-sm-12">
                             <div class="input-group mb-3">
                                 <input type="text" class="form-control" placeholder="Search Intern" name="search_intern" value="<?php
@@ -102,33 +102,66 @@
                                 </div>
                             </div>
                         </div>
-                        <!--DEPARTMENT DROPDOWN-->
-                        <div class="col-12 d-lg-flex d-md-inline-block">
-                            <div class="w-lg-fit w-md-100 d-flex align-items-center my-2 me-lg-2 me-md-0">
-                                <div class="input-group">
-                                    <input type="text" class="form-control" value="<?= $selected_date ?>" disabled>
-                                    <div class="input-group-append">
-                                        <a class="btn btn-smoke border-dark" href="calendar.php">Select Date</a>
-                                    </div>
-                                </div>                        
-                            </div>
+                    </form>
+                        
+                    <!--DEPARTMENT DROPDOWN-->
+                    <div class="col-12 d-lg-flex d-md-inline-block">
+                        <div class="w-lg-fit w-md-100 d-flex align-items-center my-2 me-lg-2 me-md-0">
+                            <div class="input-group">
+                                <input type="text" class="form-control" value="<?= $selected_date ?>" disabled>
+                                <div class="input-group-append">
+                                    <a class="btn btn-smoke border-dark" href="calendar.php">Select Date</a>
+                                </div>
+                            </div>                        
+                        </div>
 
-                            <div class="w-100 d-md-flex d-sm-inline-block">
-                                <div class="w-fit d-flex my-2">
-                                    <div class="dropdown align-center me-2">
-                                        <button class="btn btn-light border-dark dropdown-toggle" type="button" id="dropdownMenuButton1"
-                                        data-bs-toggle="dropdown" aria-expanded="false" name="department"> <?php
-                                            if (empty($_GET["department"])) {
-                                                echo "All Departments";
-                                            } else {
-                                                echo $_GET["department"];
-                                            }?>
-                                        </button>
-                                        <ul class="dropdown-menu" aria-labelledby="dropdownMenuButton1">
+                        <div class="w-100 d-md-flex d-sm-inline-block">
+                            <div class="w-fit d-flex my-2">
+                                <div class="dropdown align-center me-2">
+                                    <button class="btn btn-light border-dark dropdown-toggle" type="button" id="dropdownMenuButton1"
+                                    data-bs-toggle="dropdown" aria-expanded="false" name="department"> <?php
+                                        if (empty($_GET["department"])) {
+                                            echo "All Departments";
+                                        } else {
+                                            echo $_GET["department"];
+                                        }?>
+                                    </button>
+                                    <ul class="dropdown-menu" aria-labelledby="dropdownMenuButton1">
+                                        <li><a class="dropdown-item btn-smoke" <?php
+                                            $parameters = "?";
+                                            if (!empty($_GET["search"])) {
+                                                $parameters = $parameters."search=".$_GET["search"];
+                                            }
+                                            
+                                            if (!empty($_GET["sort"])) {
+                                                if (strlen($parameters) > 1) { $parameters = $parameters."&"; }
+                                                $parameters = $parameters."sort=".$_GET["sort"];
+                                            }
+
+                                            if (!empty($selected_date)) {
+                                                if (strlen($parameters) > 1) { $parameters = $parameters."&"; }
+                                                $parameters = $parameters."date=".$selected_date;
+                                            }
+
+                                            if (strlen($parameters) > 1) { ?>
+                                                href="<?= "interns_attendance.php".$parameters ?>" <?php
+                                            } else { ?>
+                                                href="<?= "interns_attendance.php" ?>" <?php
+                                            } ?>> All Departments </a></li> <?php
+                                        
+                                        $db->query("SELECT * FROM departments ORDER BY name");
+                                        $db->execute();
+                                        
+                                        while ($row = $db->fetch()) { ?>
                                             <li><a class="dropdown-item btn-smoke" <?php
                                                 $parameters = "?";
                                                 if (!empty($_GET["search"])) {
                                                     $parameters = $parameters."search=".$_GET["search"];
+                                                }
+
+                                                if (!empty($row["name"])) {
+                                                    if (strlen($parameters) > 1) { $parameters = $parameters."&"; }
+                                                    $parameters = $parameters."department=".$row["name"];
                                                 }
                                                 
                                                 if (!empty($_GET["sort"])) {
@@ -145,198 +178,165 @@
                                                     href="<?= "interns_attendance.php".$parameters ?>" <?php
                                                 } else { ?>
                                                     href="<?= "interns_attendance.php" ?>" <?php
-                                                } ?>> All Departments </a></li> <?php
-                                            
-                                            $db->query("SELECT * FROM departments ORDER BY name");
-                                            $db->execute();
-                                            
-                                            while ($row = $db->fetch()) { ?>
-                                                <li><a class="dropdown-item btn-smoke" <?php
-                                                    $parameters = "?";
-                                                    if (!empty($_GET["search"])) {
-                                                        $parameters = $parameters."search=".$_GET["search"];
-                                                    }
-
-                                                    if (!empty($row["name"])) {
-                                                        if (strlen($parameters) > 1) { $parameters = $parameters."&"; }
-                                                        $parameters = $parameters."department=".$row["name"];
-                                                    }
-                                                    
-                                                    if (!empty($_GET["sort"])) {
-                                                        if (strlen($parameters) > 1) { $parameters = $parameters."&"; }
-                                                        $parameters = $parameters."sort=".$_GET["sort"];
-                                                    }
-
-                                                    if (!empty($selected_date)) {
-                                                        if (strlen($parameters) > 1) { $parameters = $parameters."&"; }
-                                                        $parameters = $parameters."date=".$selected_date;
-                                                    }
-
-                                                    if (strlen($parameters) > 1) { ?>
-                                                        href="<?= "interns_attendance.php".$parameters ?>" <?php
-                                                    } else { ?>
-                                                        href="<?= "interns_attendance.php" ?>" <?php
-                                                    } ?>> <?= $row["name"] ?>
-                                                </a></li> <?php
-                                            } ?>
-                                        </ul>
-                                    </div>
-                                    <!--SORTING DROPDOWN-->
-                                    <div class="dropdown me-2">
-                                        <button class="btn btn-light border-dark dropdown-toggle" type="button" id="dropdownMenuButton1"
-                                        data-bs-toggle="dropdown" aria-expanded="false"> <?php
-                                            if (empty($_GET["sort"])) {
-                                                echo "Default";
-                                            } else {
-                                                switch ($_GET["sort"]) {
-                                                    case "1":
-                                                        echo "A-Z";
-                                                        break;
-                                                    case "2":
-                                                        echo "Z-A";
-                                                        break;
-                                                    case "3":
-                                                        echo "Latest";
-                                                        break;
-                                                    case "4":
-                                                        echo "Earliest";
-                                                        break;
-                                                }
-                                            }?>
-                                        </button>
-                                        <ul class="dropdown-menu" aria-labelledby="dropdownMenuButton1" name="sort">
-                                            <li><a class="dropdown-item btn-smoke" <?php
-                                                $parameters = "?";
-                                                if (!empty($_GET["search"])) {
-                                                    $parameters = $parameters."search=".$_GET["search"];
-                                                }
-
-                                                if (!empty($_GET["department"])) {
-                                                    if (strlen($parameters) > 1) { $parameters = $parameters."&"; }
-                                                    $parameters = $parameters."department=".$_GET["department"];
-                                                }
-
-                                                if (!empty($selected_date)) {
-                                                    if (strlen($parameters) > 1) { $parameters = $parameters."&"; }
-                                                    $parameters = $parameters."date=".$selected_date;
-                                                }
-
-                                                if (strlen($parameters) > 1) { ?>
-                                                    href="<?= "interns_attendance.php".$parameters ?>" <?php
-                                                } else { ?>
-                                                    href="<?= "interns_attendance.php" ?>" <?php
-                                                } ?>>Default</a></li>
-                                            <li><a class="dropdown-item btn-smoke" <?php
-                                                $parameters = "?";
-                                                if (!empty($_GET["search"])) {
-                                                    $parameters = $parameters."search=".$_GET["search"];
-                                                }
-
-                                                if (!empty($_GET["department"])) {
-                                                    if (strlen($parameters) > 1) { $parameters = $parameters."&"; }
-                                                    $parameters = $parameters."department=".$_GET["department"];
-                                                }
-
-                                                if (strlen($parameters) > 1) { $parameters = $parameters."&"; }
-                                                $parameters = $parameters."sort=1";
-
-                                                if (!empty($selected_date)) {
-                                                    if (strlen($parameters) > 1) { $parameters = $parameters."&"; }
-                                                    $parameters = $parameters."date=".$selected_date;
-                                                }
-
-                                                if (strlen($parameters) > 1) { ?>
-                                                    href="<?= "interns_attendance.php".$parameters ?>" <?php
-                                                } else { ?>
-                                                    href="<?= "interns_attendance.php" ?>" <?php
-                                                } ?>>A-Z</a></li>
-                                            <li><a class="dropdown-item btn-smoke" <?php
-                                                $parameters = "?";
-                                                if (!empty($_GET["search"])) {
-                                                    $parameters = $parameters."search=".$_GET["search"];
-                                                }
-
-                                                if (!empty($_GET["department"])) {
-                                                    if (strlen($parameters) > 1) { $parameters = $parameters."&"; }
-                                                    $parameters = $parameters."department=".$_GET["department"];
-                                                }
-                                                
-                                                if (strlen($parameters) > 1) { $parameters = $parameters."&"; }
-                                                $parameters = $parameters."sort=2";
-
-                                                if (!empty($selected_date)) {
-                                                    if (strlen($parameters) > 1) { $parameters = $parameters."&"; }
-                                                    $parameters = $parameters."date=".$selected_date;
-                                                }
-
-                                                if (strlen($parameters) > 1) { ?>
-                                                    href="<?= "interns_attendance.php".$parameters ?>" <?php
-                                                } else { ?>
-                                                    href="<?= "interns_attendance.php" ?>" <?php
-                                                } ?>>Z-A</a></li>
-                                            <li><a class="dropdown-item btn-smoke" <?php
-                                                $parameters = "?";
-                                                if (!empty($_GET["search"])) {
-                                                    $parameters = $parameters."search=".$_GET["search"];
-                                                }
-
-                                                if (!empty($_GET["department"])) {
-                                                    if (strlen($parameters) > 1) { $parameters = $parameters."&"; }
-                                                    $parameters = $parameters."department=".$_GET["department"];
-                                                }
-                                                
-                                                if (strlen($parameters) > 1) { $parameters = $parameters."&"; }
-                                                $parameters = $parameters."sort=3";
-
-                                                if (!empty($selected_date)) {
-                                                    if (strlen($parameters) > 1) { $parameters = $parameters."&"; }
-                                                    $parameters = $parameters."date=".$selected_date;
-                                                }
-
-                                                if (strlen($parameters) > 1) { ?>
-                                                    href="<?= "interns_attendance.php".$parameters ?>" <?php
-                                                } else { ?>
-                                                    href="<?= "interns_attendance.php" ?>" <?php
-                                                } ?>>Latest</a></li>
-                                            <li><a class="dropdown-item btn-smoke" <?php
-                                                $parameters = "?";
-                                                if (!empty($_GET["search"])) {
-                                                    $parameters = $parameters."search=".$_GET["search"];
-                                                }
-
-                                                if (!empty($_GET["department"])) {
-                                                    if (strlen($parameters) > 1) { $parameters = $parameters."&"; }
-                                                    $parameters = $parameters."department=".$_GET["department"];
-                                                }
-                                                
-                                                if (strlen($parameters) > 1) { $parameters = $parameters."&"; }
-                                                $parameters = $parameters."sort=4";
-
-                                                if (!empty($selected_date)) {
-                                                    if (strlen($parameters) > 1) { $parameters = $parameters."&"; }
-                                                    $parameters = $parameters."date=".$selected_date;
-                                                }
-
-                                                if (strlen($parameters) > 1) { ?>
-                                                    href="<?= "interns_attendance.php".$parameters ?>" <?php
-                                                } else { ?>
-                                                    href="<?= "interns_attendance.php" ?>" <?php
-                                                } ?>>Earliest</a></li>
-                                        </ul>
-                                    </div>
+                                                } ?>> <?= $row["name"] ?>
+                                            </a></li> <?php
+                                        } ?>
+                                    </ul>
                                 </div>
-                                
-                                <div class="w-fit ms-auto my-2">
-                                    <a type="button" class="btn btn-secondary"
-                                    href="absent_interns.php?date=<?= $selected_date ?>">
-                                        View Absent<i class="fa-solid fa-arrow-right ms-2"></i>
-                                    </a>
+                                <!--SORTING DROPDOWN-->
+                                <div class="dropdown me-2">
+                                    <button class="btn btn-light border-dark dropdown-toggle" type="button" id="dropdownMenuButton1"
+                                    data-bs-toggle="dropdown" aria-expanded="false"> <?php
+                                        if (empty($_GET["sort"])) {
+                                            echo "Default";
+                                        } else {
+                                            switch ($_GET["sort"]) {
+                                                case "1":
+                                                    echo "A-Z";
+                                                    break;
+                                                case "2":
+                                                    echo "Z-A";
+                                                    break;
+                                                case "3":
+                                                    echo "Latest";
+                                                    break;
+                                                case "4":
+                                                    echo "Earliest";
+                                                    break;
+                                            }
+                                        }?>
+                                    </button>
+                                    <ul class="dropdown-menu" aria-labelledby="dropdownMenuButton1" name="sort">
+                                        <li><a class="dropdown-item btn-smoke" <?php
+                                            $parameters = "?";
+                                            if (!empty($_GET["search"])) {
+                                                $parameters = $parameters."search=".$_GET["search"];
+                                            }
+
+                                            if (!empty($_GET["department"])) {
+                                                if (strlen($parameters) > 1) { $parameters = $parameters."&"; }
+                                                $parameters = $parameters."department=".$_GET["department"];
+                                            }
+
+                                            if (!empty($selected_date)) {
+                                                if (strlen($parameters) > 1) { $parameters = $parameters."&"; }
+                                                $parameters = $parameters."date=".$selected_date;
+                                            }
+
+                                            if (strlen($parameters) > 1) { ?>
+                                                href="<?= "interns_attendance.php".$parameters ?>" <?php
+                                            } else { ?>
+                                                href="<?= "interns_attendance.php" ?>" <?php
+                                            } ?>>Default</a></li>
+                                        <li><a class="dropdown-item btn-smoke" <?php
+                                            $parameters = "?";
+                                            if (!empty($_GET["search"])) {
+                                                $parameters = $parameters."search=".$_GET["search"];
+                                            }
+
+                                            if (!empty($_GET["department"])) {
+                                                if (strlen($parameters) > 1) { $parameters = $parameters."&"; }
+                                                $parameters = $parameters."department=".$_GET["department"];
+                                            }
+
+                                            if (strlen($parameters) > 1) { $parameters = $parameters."&"; }
+                                            $parameters = $parameters."sort=1";
+
+                                            if (!empty($selected_date)) {
+                                                if (strlen($parameters) > 1) { $parameters = $parameters."&"; }
+                                                $parameters = $parameters."date=".$selected_date;
+                                            }
+
+                                            if (strlen($parameters) > 1) { ?>
+                                                href="<?= "interns_attendance.php".$parameters ?>" <?php
+                                            } else { ?>
+                                                href="<?= "interns_attendance.php" ?>" <?php
+                                            } ?>>A-Z</a></li>
+                                        <li><a class="dropdown-item btn-smoke" <?php
+                                            $parameters = "?";
+                                            if (!empty($_GET["search"])) {
+                                                $parameters = $parameters."search=".$_GET["search"];
+                                            }
+
+                                            if (!empty($_GET["department"])) {
+                                                if (strlen($parameters) > 1) { $parameters = $parameters."&"; }
+                                                $parameters = $parameters."department=".$_GET["department"];
+                                            }
+                                            
+                                            if (strlen($parameters) > 1) { $parameters = $parameters."&"; }
+                                            $parameters = $parameters."sort=2";
+
+                                            if (!empty($selected_date)) {
+                                                if (strlen($parameters) > 1) { $parameters = $parameters."&"; }
+                                                $parameters = $parameters."date=".$selected_date;
+                                            }
+
+                                            if (strlen($parameters) > 1) { ?>
+                                                href="<?= "interns_attendance.php".$parameters ?>" <?php
+                                            } else { ?>
+                                                href="<?= "interns_attendance.php" ?>" <?php
+                                            } ?>>Z-A</a></li>
+                                        <li><a class="dropdown-item btn-smoke" <?php
+                                            $parameters = "?";
+                                            if (!empty($_GET["search"])) {
+                                                $parameters = $parameters."search=".$_GET["search"];
+                                            }
+
+                                            if (!empty($_GET["department"])) {
+                                                if (strlen($parameters) > 1) { $parameters = $parameters."&"; }
+                                                $parameters = $parameters."department=".$_GET["department"];
+                                            }
+                                            
+                                            if (strlen($parameters) > 1) { $parameters = $parameters."&"; }
+                                            $parameters = $parameters."sort=3";
+
+                                            if (!empty($selected_date)) {
+                                                if (strlen($parameters) > 1) { $parameters = $parameters."&"; }
+                                                $parameters = $parameters."date=".$selected_date;
+                                            }
+
+                                            if (strlen($parameters) > 1) { ?>
+                                                href="<?= "interns_attendance.php".$parameters ?>" <?php
+                                            } else { ?>
+                                                href="<?= "interns_attendance.php" ?>" <?php
+                                            } ?>>Latest</a></li>
+                                        <li><a class="dropdown-item btn-smoke" <?php
+                                            $parameters = "?";
+                                            if (!empty($_GET["search"])) {
+                                                $parameters = $parameters."search=".$_GET["search"];
+                                            }
+
+                                            if (!empty($_GET["department"])) {
+                                                if (strlen($parameters) > 1) { $parameters = $parameters."&"; }
+                                                $parameters = $parameters."department=".$_GET["department"];
+                                            }
+                                            
+                                            if (strlen($parameters) > 1) { $parameters = $parameters."&"; }
+                                            $parameters = $parameters."sort=4";
+
+                                            if (!empty($selected_date)) {
+                                                if (strlen($parameters) > 1) { $parameters = $parameters."&"; }
+                                                $parameters = $parameters."date=".$selected_date;
+                                            }
+
+                                            if (strlen($parameters) > 1) { ?>
+                                                href="<?= "interns_attendance.php".$parameters ?>" <?php
+                                            } else { ?>
+                                                href="<?= "interns_attendance.php" ?>" <?php
+                                            } ?>>Earliest</a></li>
+                                    </ul>
                                 </div>
+                            </div>
+                            
+                            <div class="w-fit ms-auto my-2">
+                                <a type="button" class="btn btn-secondary"
+                                href="absent_interns.php?date=<?= $selected_date ?>">
+                                    View Absent<i class="fa-solid fa-arrow-right ms-2"></i>
+                                </a>
                             </div>
                         </div>
                     </div>
-                </form>
-
+                </div>
             </div>
             <div class="row mb-3">
                 <div class="interns-attendance"> <?php

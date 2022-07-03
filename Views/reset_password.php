@@ -55,7 +55,7 @@
     }
 
     require_once "../Templates/header_view.php";
-    setTitle("WSAP IP Reset Password");
+    setTitle("Reset Password");
 ?> 
 <div class="my-container">
     <div class="main-section p-4 ms-0">

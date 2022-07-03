@@ -73,7 +73,7 @@
         exit();
     } else {
         require_once "../Templates/header_view.php";
-        setTitle("WSAP IP Role Assigned"); ?>
+        setTitle("Role Assigned"); ?>
 
         <div class="my-container"> <?php
             include_once "access_denied.php"; ?>

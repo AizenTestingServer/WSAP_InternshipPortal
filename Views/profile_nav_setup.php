@@ -45,7 +45,7 @@
             <i class="fa-solid fa-caret-down ms-2 mt-1"></i>
         </a>
         <ul class="profile_list">
-            <li><a href="sign_out.php"><i class="fa-solid fa-arrow-right-from-bracket me-2"></i>Sign out</a></li>
+            <li><a class="text-danger" href="sign_out.php"><i class="fa-solid fa-arrow-right-from-bracket me-2"></i>Sign out</a></li>
         </ul>
     </li>
 </ul>
