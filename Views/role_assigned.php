@@ -30,14 +30,22 @@
     $admin_roles_count = $db->rowCount();
 
     if ($admin_roles_count != 0) {
-        $db->query("SELECT intern_personal_information.id AS intern_id, intern_personal_information.*, intern_wsap_information.*, departments.*
-        FROM intern_personal_information, intern_wsap_information, departments
+        $db->query("SELECT intern_personal_information.id AS intern_id, intern_personal_information.*,
+        intern_wsap_information.*, intern_accounts.*, departments.*
+        FROM intern_personal_information, intern_wsap_information, intern_accounts, departments
         WHERE intern_personal_information.id = intern_wsap_information.id AND
+        intern_personal_information.id = intern_accounts.id AND
         intern_wsap_information.department_id = departments.id AND
         intern_personal_information.id=:intern_id");
         $db->setInternId($_GET["intern_id"]);
         $db->execute();
         $value = $db->fetch();
+        $intern_count = $db->rowCount();
+
+        if ($intern_count == 0) {
+            redirect("assign_roles.php");
+            exit();
+        }
 
         $db->query("SELECT * FROM roles WHERE id=:id");
         $db->setId($_GET["role_id"]);

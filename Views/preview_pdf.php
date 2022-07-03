@@ -61,8 +61,13 @@
     intern_accounts.id=:intern_id");
     $db->setInternId($_GET["intern_id"]);
     $db->execute();
-
     $intern_info = $db->fetch();
+    $intern_count = $db->rowCount();
+
+    if ($intern_count == 0) {
+        redirect("attendance.php");
+        exit();
+    }
 
     if (isset($_POST["generatePDF"])) {
         $_SESSION["print"] = true;

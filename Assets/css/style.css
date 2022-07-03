@@ -76,7 +76,7 @@ body {
     width: 45px;
     height: 45px;
     padding: 2px;
-    object-fit: contain;
+    object-fit: cover;
     border-radius: 50%;
 }
 
@@ -84,7 +84,7 @@ body {
     width: 45px;
     height: 45px;
     padding: 4px;
-    object-fit: contain;
+    object-fit: cover;
     border-radius: 50%;
 }
 
@@ -333,13 +333,13 @@ body {
 #output {
     width: 150px;
     height: 150px;
-    object-fit: contain;
+    object-fit: cover;
 }
 
 .img-intern {
     width: 100px;
     height: 100px;
-    object-fit: contain;
+    object-fit: cover;
 }
 
 .img-nav {
@@ -762,6 +762,17 @@ a.dt-button {
     display: none;
 }
 
+.images-grid {
+    display: grid;
+    gap: 1rem;
+}
+
+.images-grid .image {
+    width: 200px;
+    height: 200px;
+    object-fit: cover;
+}
+
 @media (min-width: 0px) {
     .intern.info {
         margin-top: 230px;
@@ -802,6 +813,10 @@ a.dt-button {
         width: calc(100% - 310px);
     }
 
+    .images-grid {
+        grid-template-columns: repeat(2, 1fr);
+    }
+
     .w-md-fit {
         width: fit-content;
     }
@@ -818,6 +833,10 @@ a.dt-button {
 
     .limited-card.d-lg-initial {
         display: initial;
+    }
+
+    .images-grid {
+        grid-template-columns: repeat(3, 1fr);
     }
 
     .w-lg-fit {

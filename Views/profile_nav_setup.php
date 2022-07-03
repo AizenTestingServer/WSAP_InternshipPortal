@@ -43,7 +43,7 @@
                         echo $profileValue["image"];
                     }   
                 }
-            } ?>" alt="">
+            } ?>" alt="" onerror="this.src='../Assets/img/profile_imgs/no_image_found.jpeg';">
             <span class="me-1">
                 <?php 
                     if (isset($_SESSION["intern_id"]) || isset($_SESSION["intern_id_2"])) {

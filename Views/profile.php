@@ -35,6 +35,12 @@
         $db->setInternId($_SESSION["intern_id"]);
     }
     $db->execute();
+    $intern_count = $db->rowCount();
+
+    if ($intern_count == 0) {
+        redirect("profile.php");
+        exit();
+    }
     
     $value = $db->fetch();
 
@@ -53,16 +59,6 @@
                     $image_path = "../Assets/img/profile_imgs/".$image_name;
                     move_uploaded_file($tmp_name, $image_path);
       
-                    // $upload_image = array(
-                    //     strtoupper($_SESSION["intern_id"]),
-                    //     $image_path,
-                    // );
-    
-                    // $db->query("INSERT INTO images VALUES (null, :intern_id, :image_path)");
-                    // $db->uploadImage($upload_image);
-                    // $db->execute();
-                    // $db->closeStmt();
-      
                     $profile_image = array(
                         $image_path,
                         strtoupper($_SESSION["intern_id"]),
@@ -73,6 +69,31 @@
                     $db->setProfileImage($profile_image);
                     $db->execute();
                     $db->closeStmt();
+
+                    $image = array(
+                        strtoupper($_SESSION["intern_id"]),
+                        $image_name
+                    );
+
+                    $db->query("SELECT * FROM images
+                    WHERE intern_id=:intern_id AND image_name=:image_name");
+                    $db->selectImage($image);
+                    $db->execute();
+                    $image_count = $db->rowCount();
+
+                    if ($image_count == 0) {
+                        $upload_image = array(
+                            strtoupper($_SESSION["intern_id"]),
+                            $image_path,
+                            $image_name
+                        );
+        
+                        $db->query("INSERT INTO images VALUES
+                        (null, :intern_id, :image_path, :image_name)");
+                        $db->uploadImage($upload_image);
+                        $db->execute();
+                        $db->closeStmt();
+                    }
                     
                     $_SESSION["upload_success"] = "The file has been uploaded successfully.";
                 } else {
@@ -327,7 +348,7 @@
                             } else {
                                 echo $value["image"];
                             }
-                        } ?>" /> <?php
+                        } ?>" onerror="this.src='../Assets/img/profile_imgs/no_image_found.jpeg';"> <?php
 
                     if (isset($_SESSION["upload_success"])) { ?>
                         <div class="alert alert-success text-success">
@@ -363,6 +384,55 @@
                             type="submit" name="uploadImage">Upload</button> <?php
                     } ?>
                 </form>
+
+                <div class="modal fade" id="myPhotosModal" tabindex="-1" aria-labelledby="myPhotosModalLabel" aria-hidden="true">
+                    <div class="modal-dialog modal-lg modal-dialog-centered">
+                        <div class="modal-content">
+                            <div class="modal-header">
+                                <h5 class="modal-title" id="myPhotosModalLabel">My Photos</h5>
+                                <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Close"></button>
+                            </div>
+
+                            <form action="<?= htmlspecialchars($_SERVER["PHP_SELF"]);?>" method="post">
+                                <div class="modal-body">
+                                    <div class="images-grid p-2"> <?php
+                                        $images_db = new Database();
+
+                                        $images_db->query("SELECT intern_personal_information.*, images.*
+                                        FROM intern_personal_information, images
+                                        WHERE intern_personal_information.id = images.intern_id AND
+                                        intern_personal_information.id=:intern_id");
+                                        $images_db->setInternId($_SESSION["intern_id"]);
+                                        $images_db->execute();
+
+                                        while ($images = $images_db->fetch()) { ?>
+                                            <div class="p-2">
+                                                <img src="<?= $images["image_path"] ?>" class="image"
+                                                    onerror="this.src='../Assets/img/profile_imgs/no_image_found.jpeg';">
+                                                <p class="my-2" style="height: 20px; overflow: hidden;"><?= $images["image_name"] ?></p> <?php
+                                                if ($value["image"] == $images["image_path"]) { ?>
+                                                    <a class="btn btn-sm btn-secondary w-75 disabled">Current Profile Photo</a> <?php
+                                                } else { ?>
+                                                    <a href="set_profile_photo.php?intern_id=<?= strtoupper($_SESSION["intern_id"]) ?>&image_id=<?= $images["id"] ?>"
+                                                    class="btn btn-sm btn-indigo w-75">Set as Profile Photo</a> <?php
+                                                } ?>
+                                            </div> <?php
+                                        } ?>                                   
+                                    </div>
+                                </div>
+
+                                <div class="modal-footer">
+                                </div>
+                            </form>
+                        </div>
+                    </div>
+                </div> <?php
+
+                if (empty($_GET["intern_id"])) { ?>
+                    <button class="btn btn-sm btn-primary mt-2 w-100" style="max-width: 150px;"
+                        data-bs-toggle="modal" data-bs-target="#myPhotosModal">My Photos</button> <?php
+                } ?>
+                
             </div>
 
             <div class="col-lg-8 col-md-7 p-4"> <?php

@@ -363,7 +363,7 @@
                                             } else {
                                                 echo $row["image"];
                                             }
-                                        } ?>">
+                                        } ?>" onerror="this.src='../Assets/img/profile_imgs/no_image_found.jpeg';">
                                     </div>
                                     <div class="summary-total mt-2 w-fit mx-auto">
                                         <h5 class="mb-0 text-dark fs-regular">

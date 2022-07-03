@@ -49,7 +49,8 @@
                     </div>
                     <div class="logo">
                         <a href="<?= $row["web_link"] ?>" target="window">
-                            <img class="img-fluid" src="<?= $row["image"] ?>" alt="">
+                            <img class="img-fluid" src="<?= $row["image"] ?>" alt=""
+                                onerror="this.src='../Assets/img/profile_imgs/no_image_found.jpeg';">
                         </a>
                     </div>
                 </div> <?php

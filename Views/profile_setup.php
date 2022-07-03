@@ -155,6 +155,18 @@
                                                 $db->closeStmt();
                 
                                                 move_uploaded_file($tmp_name, $image_path);
+
+                                                $upload_image = array(
+                                                    strtoupper($_SESSION["intern_id"]),
+                                                    $image_path,
+                                                    $image_name
+                                                );
+                                
+                                                $db->query("INSERT INTO images VALUES
+                                                (null, :intern_id, :image_path, :image_name)");
+                                                $db->uploadImage($upload_image);
+                                                $db->execute();
+                                                $db->closeStmt();
                         
                                                 $log_value = $last_name.", ".$first_name.
                                                     "'s (".$_SESSION["intern_id"].") account has been activated.";
@@ -265,7 +277,7 @@
                             } else {
                                 echo $value["image"];
                             }
-                        } ?>" />
+                        } ?>" onerror="this.src='../Assets/img/profile_imgs/no_image_found.jpeg';">
                     <input class="form-control form-control-sm mx-auto" id="formFileSm" type="file" accept="image/*"
                         onchange="loadFile(event)" name="image" style="max-width: 350px;">
                 </div>

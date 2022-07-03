@@ -138,11 +138,17 @@ class Database {
     function uploadImage($upload_image) {
         $this->stmt->bindValue(":intern_id", $upload_image[0]);
         $this->stmt->bindValue(":image_path", $upload_image[1]);
+        $this->stmt->bindValue(":image_name", $upload_image[2]);
     }
 
     function setProfileImage($profile_image) {
         $this->stmt->bindValue(":image", $profile_image[0]);
         $this->stmt->bindValue(":intern_id", $profile_image[1]);
+    }
+
+    function selectImage($image) {
+        $this->stmt->bindValue(":intern_id", $image[0]);
+        $this->stmt->bindValue(":image_name", $image[1]);
     }
 
     function insertPersonalInfo($personal_info) {
