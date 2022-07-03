@@ -30,14 +30,14 @@
                     echo $profileValue["image"];
                 }
             } ?>" alt="">
-            <span>
+            <span class="me-1">
                 <?php 
                     if (isset($_SESSION["intern_id"])) {
                         echo $profileValue["last_name"].", ".$profileValue["first_name"]." ".$profileValue["middle_name"];
                     }
                 ?>
             </span>
-            <i class="fa-solid fa-caret-down ms-2 mt-1"></i>
+            <i class="fa-solid fa-caret-down mb-1"></i>
         </a>
         <ul class="profile_list">
             <li><a href="profile.php"><i class="fa-solid fa-user me-2"></i>My Profile</a></li>

@@ -256,7 +256,15 @@
                                 echo "../Assets/img/profile_imgs/default_female.png";
                             }
                         } else {
-                            echo "../Assets/img/profile_imgs/default_male.png";
+                            if ($value["image"] == null || strlen($value["image"]) == 0) {
+                                if ($value["gender"] == 0) {
+                                    echo "../Assets/img/profile_imgs/default_male.png";
+                                } else {
+                                    echo "../Assets/img/profile_imgs/default_female.png";
+                                }
+                            } else {
+                                echo $value["image"];
+                            }
                         } ?>" />
                     <input class="form-control form-control-sm mx-auto" id="formFileSm" type="file" accept="image/*"
                         onchange="loadFile(event)" name="image" style="max-width: 350px;">
@@ -323,12 +331,18 @@
                                                 if ($_SESSION["gender"] == 0) { ?>
                                                     selected <?php
                                                 }
-                                            } else { ?>
-                                                selected <?php
+                                            } else {
+                                                if ($value["gender"] == 0) { ?>
+                                                    selected <?php
+                                                }
                                             } ?>>Male</option>
                                         <option value="1" <?php
                                             if (isset($_SESSION["gender"])) {
                                                 if ($_SESSION["gender"] == 1) { ?>
+                                                    selected <?php
+                                                }
+                                            } else {
+                                                if ($value["gender"] == 1) { ?>
                                                     selected <?php
                                                 }
                                             } ?>>Female</option>

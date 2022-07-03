@@ -61,9 +61,7 @@
             } else {
                 $_SESSION["sign_in_failed"] = "Unregistered account!";
             }
-        } else if (empty($_POST["intern_id"]) && empty($_POST["password"])) {
-            $_SESSION["sign_in_failed"] = "Please enter your credentials.";
-        } else {
+        } else if (!empty($_POST["intern_id"]) && empty($_POST["password"])) {
             $_SESSION["intern_id_temp"] = $_POST["intern_id"];
 
             $db->query("SELECT * FROM intern_personal_information WHERE id=:intern_id AND
@@ -80,20 +78,22 @@
                 $db->query("SELECT intern_personal_information.*, intern_accounts.*
                 FROM intern_personal_information, intern_accounts
                 WHERE intern_personal_information.id=intern_accounts.id AND
-                intern_personal_information.id=:intern_id");
+                intern_accounts.password = '' AND intern_personal_information.id=:intern_id");
                 $db->setInternId($_POST["intern_id"]);
                 $db->execute();
                 $value = $db->fetch();
                 
-                if (empty($value["password"])) {
+                if ($db->rowCount() != 0) {
                     $_SESSION["intern_id_2"] = $_POST["intern_id"];
                     unset($_SESSION["intern_id_temp"]);
                     redirect("./Views/reset_password.php");
                     exit();
-                } else {                
+                } else {
                     $_SESSION["sign_in_failed"] = "Please enter your credentials.";
                 }
             }
+        } else {
+            $_SESSION["sign_in_failed"] = "Please enter your credentials.";
         }
         redirect("index.php");
         exit();

@@ -9,16 +9,8 @@
     }
     
     require_once "../Controllers/Database.php";
-    require_once "../Controllers/Date.php";
 
     $db = new Database();
-    $date = new Date();
-
-    $db->query("SELECT * FROM intern_personal_information WHERE id=:intern_id");
-    $db->setInternId($_SESSION["intern_id_2"]);
-    $db->execute();
-    
-    $value = $db->fetch();
 
     if (isset($_POST["setPassword"])) {
         if (!empty($_POST["password"]) && !empty($_POST["confirm_password"])) {
@@ -30,7 +22,7 @@
                         $db->query("UPDATE intern_accounts SET password=:password WHERE id=:intern_id");
                         $db->updatePassword($password);
                         $db->execute();
-                        $db->closeStmt(); 
+                        $db->closeStmt();
                     
                         $_SESSION["setup_success"] = "Successfully setup the password.";
                         $_SESSION["intern_id"] = $_SESSION["intern_id_2"];
