@@ -106,6 +106,10 @@ class Database {
         $this->stmt->bindValue(":start_week_date", $overtime_data[2]);
     }
 
+    function setOvertimeHoursLeft($new_overtime_hours_left) {
+        $this->stmt->bindValue(":overtime_hours_left", $new_overtime_hours_left);
+    }
+
     function timeIn($attendance) {
         $this->stmt->bindValue(":intern_id", $attendance[0]);
         $this->stmt->bindValue(":att_date", $attendance[1]);

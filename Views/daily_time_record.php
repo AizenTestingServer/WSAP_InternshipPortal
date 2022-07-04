@@ -286,6 +286,33 @@
     
     if (isset($_POST["removeTimeOut"])) {
         if (!empty($_POST["att_id"]) && !empty($_POST["rendered_hours"]) && !empty($_POST["att_date"])) {
+            $db->query("SELECT * FROM attendance WHERE id=:id");
+            $db->setId($_POST["att_id"]);
+            $db->execute();
+            $att = $db->fetch();
+
+            $time_out = $att["time_out"];
+
+            if (strlen($time_out) > 8) {
+                $time_out = substr($time_out, 0, 8);
+            }
+
+            if (isOvertime($time_out)) {
+                $dt_time_out_start = new DateTime(date("G:i", $date->time_out_start()));
+                $dt_time_out = new DateTime(date("G:i", strtotime($time_out)));
+                $ot_hours = $dt_time_out_start->diff($dt_time_out)->format("%h");
+                $rendered_minutes = $dt_time_out_start->diff($dt_time_out)->format("%i");
+                $ot_hours += round($rendered_minutes/60, 1);
+
+                $new_overtime_hours_left = $overtime_hours["overtime_hours_left"] + $ot_hours;
+        
+                $db->query("UPDATE overtime_hours SET overtime_hours_left=:overtime_hours_left WHERE id=:id");
+                $db->setId($overtime_hours["id"]);
+                $db->setOvertimeHoursLeft($new_overtime_hours_left);
+                $db->execute();
+                $db->closeStmt();
+            }
+
             $attendance = array(
                 "NTO",
                 $_POST["att_id"]
@@ -293,6 +320,16 @@
 
             $db->query("UPDATE attendance SET time_out=:time_out WHERE id=:id");
             $db->timeOut($attendance);
+            $db->execute();
+            $db->closeStmt();
+                
+            $attendance = array(
+                0,
+                $_POST["att_id"]
+            );
+
+            $db->query("UPDATE attendance SET rendered_hours=:rendered_hours WHERE id=:id");
+            $db->setAttRenderedHours($attendance);
             $db->execute();
             $db->closeStmt();
 
@@ -647,7 +684,7 @@
                                                                 <input type="text" name="att_id" class="form-control text-center d-none mt-2"
                                                                             value="<?= $row["id"] ?>" readonly>
                                                                 <input type="text" name="rendered_hours" class="form-control text-center d-none mt-2"
-                                                                            value="<?= $rendered_hours ?>" readonly>
+                                                                            value="<?= $row["rendered_hours"] ?>" readonly>
                                                                 <input type="text" name="att_date" class="form-control text-center d-none mt-2"
                                                                             value="<?= $row["att_date"] ?>" readonly>
                                                             </div>
@@ -742,7 +779,7 @@
                                             href="daily_time_record.php?intern_id=<?= $_GET["intern_id"] ?>&id=<?= $row["id"] ?>">
                                                 <i class="fa-solid fa-pen fs-a"></i>
                                             </a> <?php
-                                        } else if (!empty($time_out)) { ?>
+                                        } else if (!empty($row["time_out"])) { ?>
                                             <button class="btn btn-danger btn-sm" data-bs-toggle="modal" 
                                                 data-bs-target="#removeTimeOutModal<?= $row["id"] ?>">
                                                 <i class="fa-solid fa-xmark fs-a"></i>
