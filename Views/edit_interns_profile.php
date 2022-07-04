@@ -211,40 +211,44 @@
         $_SESSION["target_rendering_hours"] = $target_rendering_hours;
         
         if (!empty($onboard_date)) {
-            $wsap_info = array($dept_id,
-            $status,
-            $onboard_date,
-            $rendered_hours,
-            $target_rendering_hours,
-            $_GET["intern_id"]);
+            if ($target_rendering_hours >= 200) {
+                $wsap_info = array($dept_id,
+                $status,
+                $onboard_date,
+                $rendered_hours,
+                $target_rendering_hours,
+                $_GET["intern_id"]);
+        
+                $db->query("UPDATE intern_wsap_information
+                SET department_id=:dept_id, status=:status, onboard_date=:onboard_date,
+                target_rendering_hours=:target_rendering_hours, rendered_hours=:rendered_hours
+                WHERE id=:intern_id");
+                $db->setWSAPInfo2($wsap_info);
+                $db->execute();
+                $db->closeStmt();
+                        
+                $log_value = $admin_info["last_name"].", ".$admin_info["first_name"].
+                    " (".$admin_info["name"].") updated the WSAP information of ".$value["last_name"].", ".$value["first_name"].".";
     
-            $db->query("UPDATE intern_wsap_information
-            SET department_id=:dept_id, status=:status, onboard_date=:onboard_date,
-            target_rendering_hours=:target_rendering_hours, rendered_hours=:rendered_hours
-            WHERE id=:intern_id");
-            $db->setWSAPInfo2($wsap_info);
-            $db->execute();
-            $db->closeStmt();
-                    
-            $log_value = $admin_info["last_name"].", ".$admin_info["first_name"].
-                " (".$admin_info["name"].") updated the WSAP information of ".$value["last_name"].", ".$value["first_name"].".";
-
-            $log = array($date->getDateTime(),
-            strtoupper($_SESSION["intern_id"]),
-            $log_value);
-
-            $db->query("INSERT INTO audit_logs
-            VALUES (null, :timestamp, :intern_id, :log)");
-            $db->log($log);
-            $db->execute();
-            $db->closeStmt();
-            
-            $_SESSION["wsap_success"] = "Successfully saved the changes.";
-            unset($_SESSION["dept_id"]);
-            unset($_SESSION["status"]);
-            unset($_SESSION["onboard_date"]);
-            unset($_SESSION["rendered_hours"]);
-            unset($_SESSION["target_rendering_hours"]);
+                $log = array($date->getDateTime(),
+                strtoupper($_SESSION["intern_id"]),
+                $log_value);
+    
+                $db->query("INSERT INTO audit_logs
+                VALUES (null, :timestamp, :intern_id, :log)");
+                $db->log($log);
+                $db->execute();
+                $db->closeStmt();
+                
+                $_SESSION["wsap_success"] = "Successfully saved the changes.";
+                unset($_SESSION["dept_id"]);
+                unset($_SESSION["status"]);
+                unset($_SESSION["onboard_date"]);
+                unset($_SESSION["rendered_hours"]);
+                unset($_SESSION["target_rendering_hours"]);
+            } else {
+                $_SESSION["wsap_failed"] = "The target rendering hours must be at least 200!";
+            }
         } else {
             $_SESSION["wsap_failed"] = "Please fill-out the required fields!";
         }
@@ -747,7 +751,12 @@
                                                         <label class="mb-2" for="renderedHours">Rendered Hours
                                                             <span class="text-danger">*</span></label>
                                                         <input type="number" name="renderedHours" class="form-control"
-                                                            value="<?= $value["rendered_hours"]; ?>"> <?php
+                                                            value="<?php
+                                                            if (isset($_SESSION["rendered_hours"])) {
+                                                                echo $_SESSION["rendered_hours"];
+                                                            } else {
+                                                                echo $value["rendered_hours"];;
+                                                            } ?>"> <?php
                                                     } else { ?>
                                                         <label class="mb-2" for="renderedHours">Rendered Hours</label>
                                                         <input type="number" name="renderedHours" class="form-control fw-bold"
@@ -759,7 +768,12 @@
                                                         <label class="mb-2" for="targetRenderingHours">Target Rendering Hours
                                                             <span class="text-danger">*</span></label>
                                                         <input type="number" name="targetRenderingHours" class="form-control"
-                                                            value="<?= $value["target_rendering_hours"]; ?>"> <?php
+                                                            value="<?php
+                                                            if (isset($_SESSION["target_rendering_hours"])) {
+                                                                echo $_SESSION["target_rendering_hours"];
+                                                            } else {
+                                                                echo $value["target_rendering_hours"];
+                                                            } ?>"> <?php
                                                     } else { ?>
                                                         <label class="mb-2" for="targetRenderingHours">Target Rendering Hours</label>
                                                         <input type="number" name="targetRenderingHours" class="form-control fw-bold"
@@ -776,7 +790,7 @@
                                         <div class="col-lg-4 col-md-6 col-sm-6 user_input my-1">
                                             <label class="mb-2" for="emailAddress">Email Address</label>
                                             <input name="emailAddress" class="form-control fw-bold"
-                                                value="<?php if(isset($_SESSION["email_address"])) {
+                                                value="<?php if (isset($_SESSION["email_address"])) {
                                                         echo $_SESSION["email_address"];
                                                     } else {
                                                         echo $value["email_address"];
@@ -792,7 +806,7 @@
                                                     <span class="input-group-text">+63</span>
                                                 </div>
                                                 <input type="phone" name="mobileNumber" class="form-control fw-bold"
-                                                value="<?php if(isset($_SESSION["mobile_number"])) {
+                                                value="<?php if (isset($_SESSION["mobile_number"])) {
                                                         echo $_SESSION["mobile_number"];
                                                     } else {
                                                         echo $value["mobile_number"];
@@ -809,7 +823,7 @@
                                                     <span class="input-group-text">+63</span>
                                                 </div>
                                                 <input type="phone" name="mobileNumber2" class="form-control fw-bold"
-                                                value="<?php if(isset($_SESSION["mobile_number_2"])) {
+                                                value="<?php if (isset($_SESSION["mobile_number_2"])) {
                                                         echo $_SESSION["mobile_number_2"];
                                                     } else {
                                                         echo $value["mobile_number_2"];
@@ -852,7 +866,7 @@
                                             <div class="col-lg-6 col-md-12 user_input my-1">
                                                 <label class="mb-2" for="university">University</label>
                                                 <input type="text" name="university" class="form-control fw-bold"
-                                                    value="<?php if(isset($_SESSION["university"])) {
+                                                    value="<?php if (isset($_SESSION["university"])) {
                                                     echo $_SESSION["university"];
                                                     } else {
                                                         echo $value["university"];
@@ -864,7 +878,7 @@
                                             <div class="col-lg-6 col-md-12 user_input my-1">
                                                 <label class="mb-2" for="course">Course</label>
                                                 <input type="text" name="course" class="form-control fw-bold"
-                                                    value="<?php if(isset($_SESSION["course"])) {
+                                                    value="<?php if (isset($_SESSION["course"])) {
                                                     echo $_SESSION["course"];
                                                     } else {
                                                         echo $value["course"];
@@ -876,7 +890,7 @@
                                             <div class="col-lg-4 col-md-6 col-sm-6 user_input my-1">
                                                 <label class="mb-2" for="university_abbreviation">University Abbreviation</label>
                                                 <input type="text" name="university_abbreviation" class="form-control fw-bold"
-                                                    value="<?php if(isset($_SESSION["university_abbreviation"])) {
+                                                    value="<?php if (isset($_SESSION["university_abbreviation"])) {
                                                     echo $_SESSION["university_abbreviation"];
                                                     } else {
                                                         echo $value["university_abbreviation"];
@@ -888,7 +902,7 @@
                                             <div class="col-lg-4 col-md-6 col-sm-6 user_input my-1">
                                                 <label class="mb-2" for="course_abbreviation">Course Abbreviation</label>
                                                 <input type="text" name="course_abbreviation" class="form-control fw-bold"
-                                                    value="<?php if(isset($_SESSION["course_abbreviation"])) {
+                                                    value="<?php if (isset($_SESSION["course_abbreviation"])) {
                                                     echo $_SESSION["course_abbreviation"];
                                                     } else {
                                                         echo $value["course_abbreviation"];
@@ -1402,7 +1416,7 @@
                 <div class="row">
                     <div class="interns"> <?php
                         $sort = " ORDER BY intern_personal_information.last_name";
-                        if(!empty($_GET["sort"])) {
+                        if (!empty($_GET["sort"])) {
                             switch ($_GET["sort"]) {
                                 case "1":
                                     $sort = " ORDER BY intern_personal_information.last_name";

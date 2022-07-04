@@ -721,7 +721,7 @@
                                             if (!empty($_GET["intern_id"])) { ?>
                                                 fw-bold <?php
                                             } ?>"
-                                        value="<?php if(isset($_SESSION["email_address"])) {
+                                        value="<?php if (isset($_SESSION["email_address"])) {
                                                 echo $_SESSION["email_address"];
                                             } else {
                                                 echo $value["email_address"];
@@ -744,7 +744,7 @@
                                             if (!empty($_GET["intern_id"])) { ?>
                                                 fw-bold <?php
                                             } ?>"
-                                        value="<?php if(isset($_SESSION["mobile_number"])) {
+                                        value="<?php if (isset($_SESSION["mobile_number"])) {
                                                 echo $_SESSION["mobile_number"];
                                             } else {
                                                 echo $value["mobile_number"];
@@ -764,7 +764,7 @@
                                             if (!empty($_GET["intern_id"])) { ?>
                                                 fw-bold <?php
                                             } ?>"
-                                        value="<?php if(isset($_SESSION["mobile_number_2"])) {
+                                        value="<?php if (isset($_SESSION["mobile_number_2"])) {
                                                 echo $_SESSION["mobile_number_2"];
                                             } else {
                                                 echo $value["mobile_number_2"];
@@ -838,7 +838,7 @@
                                                 if (!empty($_GET["intern_id"])) { ?>
                                                     fw-bold <?php
                                                 } ?>"
-                                                value="<?php if(isset($_SESSION["university"])) {
+                                                value="<?php if (isset($_SESSION["university"])) {
                                                 echo $_SESSION["university"];
                                                 } else {
                                                     echo $value["university"];
@@ -857,7 +857,7 @@
                                                 if (!empty($_GET["intern_id"])) { ?>
                                                     fw-bold <?php
                                                 } ?>"
-                                                value="<?php if(isset($_SESSION["course"])) {
+                                                value="<?php if (isset($_SESSION["course"])) {
                                                 echo $_SESSION["course"];
                                                 } else {
                                                     echo $value["course"];
@@ -876,7 +876,7 @@
                                                 if (!empty($_GET["intern_id"])) { ?>
                                                     fw-bold <?php
                                                 } ?>"
-                                                value="<?php if(isset($_SESSION["university_abbreviation"])) {
+                                                value="<?php if (isset($_SESSION["university_abbreviation"])) {
                                                 echo $_SESSION["university_abbreviation"];
                                                 } else {
                                                     echo $value["university_abbreviation"];
@@ -895,7 +895,7 @@
                                                 if (!empty($_GET["intern_id"])) { ?>
                                                     fw-bold <?php
                                                 } ?>"
-                                                value="<?php if(isset($_SESSION["course_abbreviation"])) {
+                                                value="<?php if (isset($_SESSION["course_abbreviation"])) {
                                                 echo $_SESSION["course_abbreviation"];
                                                 } else {
                                                     echo $value["course_abbreviation"];

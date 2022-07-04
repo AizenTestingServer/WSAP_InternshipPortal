@@ -467,7 +467,7 @@
                                                 <span class="text-danger">*</span>
                                             </label>
                                             <input type="number" name="targetRenderingHours" class="form-control"
-                                                value="<?php if(isset($_SESSION["target_rendering_hours"])) {
+                                                value="<?php if (isset($_SESSION["target_rendering_hours"])) {
                                                     echo $_SESSION["target_rendering_hours"]; } ?>">
                                         </div>
                                     </div>
@@ -481,7 +481,7 @@
                                     <label class="mb-2" for="emailAddress">Email Address
                                         <span class="text-danger">*</span></label>
                                     <input name="emailAddress" class="form-control"
-                                        value="<?php if(isset($_SESSION["email_address"])) {
+                                        value="<?php if (isset($_SESSION["email_address"])) {
                                             echo $_SESSION["email_address"]; } ?>" maxLength="64">
                                 </div>
                                 <div class="col-lg-4 col-md-6 col-sm-6 user_input my-1">
@@ -492,7 +492,7 @@
                                             <span class="input-group-text">+63</span>
                                         </div>
                                         <input type="phone" name="mobileNumber" class="form-control"
-                                            value="<?php if(isset($_SESSION["mobile_number"])) {
+                                            value="<?php if (isset($_SESSION["mobile_number"])) {
                                                 echo $_SESSION["mobile_number"]; } ?>" maxLength="10">
                                     </div>
                                 </div>
@@ -503,7 +503,7 @@
                                             <span class="input-group-text">+63</span>
                                         </div>
                                         <input type="phone" name="mobileNumber2" class="form-control"
-                                            value="<?php if(isset($_SESSION["mobile_number_2"])) {
+                                            value="<?php if (isset($_SESSION["mobile_number_2"])) {
                                                 echo $_SESSION["mobile_number_2"]; } ?>" maxLength="10">
                                     </div>
                                 </div>
@@ -531,28 +531,28 @@
                                             <label class="mb-2" for="university">University
                                                 <span class="text-danger">*</span></label>
                                             <input type="text" name="university" class="form-control"
-                                                value="<?php if(isset($_SESSION["university"])) {
+                                                value="<?php if (isset($_SESSION["university"])) {
                                                     echo $_SESSION["university"]; } ?>" maxLength="64">
                                         </div>
                                         <div class="col-lg-6 col-md-12 user_input my-1">
                                             <label class="mb-2" for="course">Course
                                                 <span class="text-danger">*</span></label>
                                             <input type="text" name="course" class="form-control"
-                                                value="<?php if(isset($_SESSION["course"])) {
+                                                value="<?php if (isset($_SESSION["course"])) {
                                                     echo $_SESSION["course"]; } ?>" maxLength="64">
                                         </div>
                                         <div class="col-lg-4 col-md-6 col-sm-6 user_input my-1">
                                             <label class="mb-2" for="university_abbreviation">University Abbreviation
                                                 <span class="text-danger">*</span></label>
                                             <input type="text" name="university_abbreviation" class="form-control"
-                                                value="<?php if(isset($_SESSION["university_abbreviation"])) {
+                                                value="<?php if (isset($_SESSION["university_abbreviation"])) {
                                                     echo $_SESSION["university_abbreviation"]; } ?>" maxLength="16">
                                         </div>
                                         <div class="col-lg-4 col-md-6 col-sm-6 user_input my-1">
                                             <label class="mb-2" for="course_abbreviation">Course Abbreviation
                                                 <span class="text-danger">*</span></label>
                                             <input type="text" name="course_abbreviation" class="form-control"
-                                                value="<?php if(isset($_SESSION["course_abbreviation"])) {
+                                                value="<?php if (isset($_SESSION["course_abbreviation"])) {
                                                     echo $_SESSION["course_abbreviation"]; } ?>" maxLength="12">
                                         </div>
                                         <div class="col-lg-4 col-md-6 col-sm-6 user_input my-1">

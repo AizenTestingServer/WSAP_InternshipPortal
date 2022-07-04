@@ -341,7 +341,7 @@
             <div class="row mb-3">
                 <div class="interns-attendance"> <?php
                         $sort = " ORDER BY intern_personal_information.last_name";
-                        if(!empty($_GET["sort"])) {
+                        if (!empty($_GET["sort"])) {
                             switch ($_GET["sort"]) {
                                 case "1":
                                     $sort = " ORDER BY intern_personal_information.last_name";
