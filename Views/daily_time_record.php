@@ -490,7 +490,10 @@
                                             </div>
                                             <div class="col-4">
                                                 <select class="form-select" name="time_out_min"> <?php
-                                                    for ($i = 1; $i <= 60; $i++) { ?>
+                                                    for ($i = 1; $i <= 60; $i++) {
+                                                        if (strlen($i) == 1) {
+                                                            $i = "0".$i;
+                                                        } ?>
                                                         <option value="<?= $i ?>" <?php
                                                         if ($time_out_min == $i) { ?>
                                                             selected <?php
