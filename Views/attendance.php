@@ -336,10 +336,9 @@
                             ?> text-primary <?php
                         }
                     ?>">
-                        <span class="fw-bold">
-                            <?= $overtime_hours["overtime_hours_left"] ?> Overtime Hours Left
-                        </span>
+                        <b><?= $overtime_hours["overtime_hours_left"] ?> Overtime Hours Left</b>
                         since <?= $overtime_hours["start_week_date"] ?>
+                        <i>(Resets every Friday)</i>.
                     </h6>
                 </div> <?php
             }
