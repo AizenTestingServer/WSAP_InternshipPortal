@@ -41,6 +41,45 @@
             redirect("daily_time_record.php");
             exit();
         }
+
+        $db->query("SELECT * FROM overtime_hours WHERE intern_id=:intern_id ORDER BY id DESC LIMIT 1");
+        $db->setInternId($_GET["intern_id"]);
+        $db->execute();
+    
+        $overtime_hours = $db->fetch();
+    
+        $day = "friday";
+        
+        if (strtotime("today") < strtotime($day)) {
+          $start_week_date = date("F j, Y", strtotime("last ".$day));
+        } else {
+          $start_week_date = date("F j, Y", strtotime($day));
+        }
+    
+        if ($admin_roles_count != 0) {
+            $overtime_hours_left = 15;
+        } else {
+            $overtime_hours_left = 10;
+        }
+    
+        if ($db->rowCount() == 0 || $overtime_hours["start_week_date"] != $start_week_date) {
+            $overtime_data = array(
+                strtoupper($_GET["intern_id"]),
+                $start_week_date,
+                $overtime_hours_left
+            );
+    
+            $db->query("INSERT INTO overtime_hours VALUES (null, :intern_id, :start_week_date, :overtime_hours_left)");
+            $db->setOvertimeData($overtime_data);
+            $db->execute();
+            $db->closeStmt();
+    
+            $db->query("SELECT * FROM overtime_hours WHERE intern_id=:intern_id ORDER BY id DESC LIMIT 1");
+            $db->setInternId($_GET["intern_id"]);
+            $db->execute();
+        
+            $overtime_hours = $db->fetch();
+        }
     }
 
     if (!empty($_GET["id"])) {    
@@ -144,13 +183,31 @@
                 $rendered_hours = 8;
             }
 
+            $rendered_overtime_hours = 0;
             if (isOvertime($time_out)) {
                 $dt_time_out_start = new DateTime(date("G:i", $date->time_out_start()));
                 $dt_time_out = new DateTime(date("G:i", strtotime($time_out)));
-                $rendered_hours += $dt_time_out_start->diff($dt_time_out)->format("%h");
+                $rendered_overtime_hours += $dt_time_out_start->diff($dt_time_out)->format("%h");
                 $rendered_minutes = $dt_time_out_start->diff($dt_time_out)->format("%i");
-                $rendered_hours += round($rendered_minutes/60, 1);
+                $rendered_overtime_hours += round($rendered_minutes/60, 1);
+
+                if ($rendered_overtime_hours > $overtime_hours["overtime_hours_left"]) {
+                    $rendered_overtime_hours = $overtime_hours["overtime_hours_left"];
+                }
+
+                $computed_overtime_hours_left = $overtime_hours["overtime_hours_left"] - $rendered_overtime_hours;
+                $rendered_hours += $rendered_overtime_hours;
             }
+                
+            $attendance = array(
+                $rendered_hours,
+                $selected_att["id"]
+            );
+
+            $db->query("UPDATE attendance SET rendered_hours=:rendered_hours WHERE id=:id");
+            $db->setAttRenderedHours($attendance);
+            $db->execute();
+            $db->closeStmt();
 
             $db->query("SELECT * FROM intern_wsap_information WHERE id=:intern_id;");
             $db->setInternId($_GET["intern_id"]);
@@ -184,12 +241,24 @@
                 $db->execute();
                 $db->closeStmt();
             }
-                        
+
+            $computed_overtime_hours = array(
+                $computed_overtime_hours_left,
+                $_GET["intern_id"],
+                $start_week_date
+            );
+
+            $db->query("UPDATE overtime_hours SET overtime_hours_left=:overtime_hours_left 
+            WHERE intern_id=:intern_id AND start_week_date=:start_week_date");
+            $db->updateOvertimeData($computed_overtime_hours);
+            $db->execute();
+            $db->closeStmt();
+
             $log_value = $admin_info["last_name"].", ".$admin_info["first_name"].
                 " (".$admin_info["name"].") set the ".$_POST["att_date"]." time out of ".$value["last_name"].", ".$value["first_name"].".";
 
             $log = array($date->getDateTime(),
-            strtoupper($_SESSION["intern_id"]),
+            strtoupper($_GET["intern_id"]),
             $log_value);
 
             $db->query("INSERT INTO audit_logs
@@ -553,36 +622,9 @@
                             $count = 0;
                             $conditions = array("AU", "AE", "MS", "AS", "OT", "OD", "L", "NTO");
                             while ($row = $db->fetch()) {
-                                $count++;
-
-                                $time_in = $row["time_in"];
-                                $time_out = $row["time_out"];
-
-                                $rendered_hours = 0;
-                                if (!empty($time_in) && !empty($time_out) && $time_out != "NTO") {
-                                    if (strlen($time_in) > 8) {
-                                        $time_in = substr($time_in, 0, 8);
-                                    }                                    
-                                    if (strlen($time_out) > 8) {
-                                        $time_out = substr($time_out, 0, 8);
-                                    }
-
-                                    if (isMorningShift($time_in, $time_out) || isAfternoonShift($time_in, $time_out)) {
-                                        $rendered_hours = 4;
-                                    } else {
-                                        $rendered_hours = 8;
-                                    }
-
-                                    if (isOvertime($time_out)) {
-                                        $dt_time_out_start = new DateTime(date("G:i", $date->time_out_start()));
-                                        $dt_time_out = new DateTime(date("G:i", strtotime($time_out)));
-                                        $rendered_hours += $dt_time_out_start->diff($dt_time_out)->format("%h");
-                                        $rendered_minutes = $dt_time_out_start->diff($dt_time_out)->format("%i");
-                                        $rendered_hours += round($rendered_minutes/60, 1);
-                                    }
-                                } ?>
+                                $count++; ?>
                                 <tr> <?php
-                                    if ($time_out != "NTO") { ?>
+                                    if ($row["time_out"] != "NTO") { ?>
                                         <div class="modal fade" id="removeTimeOutModal<?= $row["id"] ?>" tabindex="-1"
                                             aria-labelledby="removeTimeOutModalLabel" aria-hidden="true">
                                             <div class="modal-dialog modal-dialog-centered">
@@ -693,9 +735,9 @@
                                             }
                                         } ?>
                                     </td>
-                                    <td><?= $rendered_hours ?></td>
+                                    <td><?= $row["rendered_hours"] ?></td>
                                     <td> <?php
-                                        if ($time_out == "NTO") { ?>
+                                        if ($row["time_out"] == "NTO") { ?>
                                             <a class="btn btn-secondary btn-sm"
                                             href="daily_time_record.php?intern_id=<?= $_GET["intern_id"] ?>&id=<?= $row["id"] ?>">
                                                 <i class="fa-solid fa-pen fs-a"></i>

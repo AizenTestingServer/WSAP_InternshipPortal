@@ -538,7 +538,7 @@ a.dt-button {
     font-family: "Inter", sans-serif;
     color: var(--text-2);
     background: var(--white);
-
+    height: 100%
 }
 
 .summary .summary-boxes .top {
@@ -550,7 +550,7 @@ a.dt-button {
 }
 
 .summary .summary-boxes .top .left {
-    line-height: 1.75em;
+    line-height: 1em;
 }
 
 .summary .summary-boxes .top .left .subheader {

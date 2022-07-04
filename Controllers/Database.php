@@ -94,6 +94,18 @@ class Database {
         $this->stmt->bindValue(":year", $date_value[2]);
     }
 
+    function setOvertimeData($overtime_data) {
+        $this->stmt->bindValue(":intern_id", $overtime_data[0]);
+        $this->stmt->bindValue(":start_week_date", $overtime_data[1]);
+        $this->stmt->bindValue(":overtime_hours_left", $overtime_data[2]);
+    }
+
+    function updateOvertimeData($overtime_data) {
+        $this->stmt->bindValue(":overtime_hours_left", $overtime_data[0]);
+        $this->stmt->bindValue(":intern_id", $overtime_data[1]);
+        $this->stmt->bindValue(":start_week_date", $overtime_data[2]);
+    }
+
     function timeIn($attendance) {
         $this->stmt->bindValue(":intern_id", $attendance[0]);
         $this->stmt->bindValue(":att_date", $attendance[1]);
@@ -103,6 +115,11 @@ class Database {
 
     function timeOut($attendance) {
         $this->stmt->bindValue(":time_out", $attendance[0]);
+        $this->stmt->bindValue(":id", $attendance[1]);
+    }
+
+    function setAttRenderedHours($attendance) {
+        $this->stmt->bindValue(":rendered_hours", $attendance[0]);
         $this->stmt->bindValue(":id", $attendance[1]);
     }
 

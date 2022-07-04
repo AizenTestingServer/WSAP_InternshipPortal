@@ -12,9 +12,17 @@
 
     $db = new Database();
     $date = new Date();
+    
+    $db->query("SELECT intern_personal_information.*, intern_roles.*, roles.*
+    FROM intern_personal_information, intern_roles, roles
+    WHERE intern_personal_information.id=intern_roles.intern_id AND
+    intern_roles.role_id=roles.id AND roles.admin=1 AND
+    intern_personal_information.id=:intern_id");
+    $db->setInternId($_SESSION["intern_id"]);
+    $db->execute();
+    $admin_roles_count = $db->rowCount();
 
-    $db->query("SELECT * FROM intern_wsap_information
-    WHERE id=:intern_id");
+    $db->query("SELECT * FROM intern_wsap_information WHERE id=:intern_id");
     $db->setInternId($_SESSION["intern_id"]);
     $db->execute();
 
@@ -42,6 +50,45 @@
     $brand_count = 0;
     if ($value = $db->fetch()) {
         $brand_count = $value["brand_count"];
+    }
+
+    $db->query("SELECT * FROM overtime_hours WHERE intern_id=:intern_id ORDER BY id DESC LIMIT 1");
+    $db->setInternId($_SESSION["intern_id"]);
+    $db->execute();
+
+    $overtime_hours = $db->fetch();
+
+    $day = "friday";
+	
+	if (strtotime("today") < strtotime($day)) {
+	  $start_week_date = date("F j, Y", strtotime("last ".$day));
+	} else {
+	  $start_week_date = date("F j, Y", strtotime($day));
+	}
+    
+    if ($admin_roles_count != 0) {
+        $overtime_hours_left = 15;
+    } else {
+        $overtime_hours_left = 10;
+    }
+
+    if ($db->rowCount() == 0 || $overtime_hours["start_week_date"] != $start_week_date) {
+        $overtime_data = array(
+            strtoupper($_SESSION["intern_id"]),
+            $start_week_date,
+            $overtime_hours_left
+        );
+
+        $db->query("INSERT INTO overtime_hours VALUES (null, :intern_id, :start_week_date, :overtime_hours_left)");
+        $db->setOvertimeData($overtime_data);
+        $db->execute();
+        $db->closeStmt();
+
+        $db->query("SELECT * FROM overtime_hours WHERE intern_id=:intern_id ORDER BY id DESC LIMIT 1");
+        $db->setInternId($_SESSION["intern_id"]);
+        $db->execute();
+    
+        $overtime_hours = $db->fetch();
     }
 
     $db->query("SELECT * FROM attendance WHERE intern_id=:intern_id ORDER BY id DESC LIMIT 1;");
@@ -91,7 +138,7 @@
                     <div class="summary-boxes">
                         <div class="top">
                             <div class="left">
-                                <div class="subheader mt-2">
+                                <div class="subheader my-2">
                                     Rendered Hours
                                 </div>
                                 <div class="summary-total">
@@ -108,12 +155,33 @@
                         </div>
                     </div>
                 </a>
+
+                <a class="clickable-card" href="attendance.php" draggable="false">
+                    <div class="summary-boxes">
+                        <div class="top">
+                            <div class="left">
+                                <div class="subheader my-2">
+                                    Overtime Hours Left since <?= $overtime_hours["start_week_date"] ?>
+                                </div>
+                                <div class="summary-total">
+                                    <h3><?= $overtime_hours["overtime_hours_left"] ?></h3>
+                                </div>
+                            </div>
+                            <div class="right">
+                                <i class="fa-solid fa-clock bg-secondary text-light circle"></i>
+                            </div>
+                        </div>
+                        <div class="bottom">
+
+                        </div>
+                    </div>
+                </a>
                 
                 <a class="clickable-card" href="profile.php" draggable="false">
                     <div class="summary-boxes">
                         <div class="top">
                             <div class="left">
-                                <div class="subheader mt-2">
+                                <div class="subheader my-2">
                                     Days in WSAP
                                 </div>
                                 <div class="summary-total">
@@ -127,7 +195,7 @@
                                 </div>
                             </div>
                             <div class="right">
-                                <i class="fa-solid fa-calendar bg-secondary text-light circle"></i>
+                                <i class="fa-solid fa-calendar bg-success text-light circle"></i>
                             </div>
                         </div>
                         <div class="bottom">
@@ -140,7 +208,7 @@
                     <div class="summary-boxes">
                         <div class="top">
                             <div class="left">
-                                <div class="subheader mt-2">
+                                <div class="subheader my-2">
                                     Weeks in WSAP
                                 </div>
                                 <div class="summary-total">
@@ -149,7 +217,7 @@
                                 </div>
                             </div>
                             <div class="right">
-                                <i class="fa-solid fa-calendar bg-success text-light circle"></i>
+                                <i class="fa-solid fa-calendar bg-red-palette text-light circle"></i>
                             </div>
                         </div>
                         <div class="bottom">
@@ -162,7 +230,7 @@
                     <div class="summary-boxes">
                         <div class="top">
                             <div class="left">
-                                <div class="subheader mt-2"> <?php
+                                <div class="subheader my-2"> <?php
                                     if (empty($intern_wsap_info["offboard_date"])) {
                                         echo "Est. Offboard Date";
                                     } else {
@@ -183,7 +251,7 @@
                                 </div>
                             </div>
                             <div class="right">
-                                <i class="fa-solid fa-graduation-cap bg-red-palette text-light circle"></i>
+                                <i class="fa-solid fa-graduation-cap bg-primary text-light circle"></i>
                             </div>
                         </div>
                         <div class="bottom">
@@ -196,7 +264,7 @@
                     <div class="summary-boxes">
                         <div class="top">
                             <div class="left">
-                                <div class="subheader mt-2">
+                                <div class="subheader my-2">
                                     Total Websites
                                 </div>
                                 <div class="summary-total">
@@ -217,7 +285,7 @@
                     <div class="summary-boxes">
                         <div class="top">
                             <div class="left">
-                                <div class="subheader mt-2">
+                                <div class="subheader my-2">
                                     Total Interns
                                 </div>
                                 <div class="summary-total">
@@ -225,7 +293,7 @@
                                 </div>
                             </div>
                             <div class="right">
-                                <i class="fa-solid fa-user-group bg-red-palette text-light circle"></i>
+                                <i class="fa-solid fa-user-group bg-success text-light circle"></i>
                             </div>
                         </div>
                         <div class="bottom">
@@ -238,7 +306,7 @@
                     <div class="summary-boxes">
                         <div class="top">
                             <div class="left">
-                                <div class="subheader mt-2">
+                                <div class="subheader my-2">
                                     Active Interns
                                 </div>
                                 <div class="summary-total">
@@ -246,7 +314,7 @@
                                 </div>
                             </div>
                             <div class="right">
-                                <i class="fa-solid fa-user-tie bg-primary text-light circle"></i>
+                                <i class="fa-solid fa-user-tie bg-red-palette text-light circle"></i>
                             </div>
                         </div>
                         <div class="bottom">

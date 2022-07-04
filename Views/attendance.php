@@ -13,6 +13,15 @@
 
     $db = new Database();
     $date = new Date();
+    
+    $db->query("SELECT intern_personal_information.*, intern_roles.*, roles.*
+    FROM intern_personal_information, intern_roles, roles
+    WHERE intern_personal_information.id=intern_roles.intern_id AND
+    intern_roles.role_id=roles.id AND roles.admin=1 AND
+    intern_personal_information.id=:intern_id");
+    $db->setInternId($_SESSION["intern_id"]);
+    $db->execute();
+    $admin_roles_count = $db->rowCount();
 
     $db->query("SELECT * FROM intern_wsap_information
     WHERE id=:intern_id");
@@ -20,6 +29,45 @@
     $db->execute();
 
     $intern_wsap_info = $db->fetch();
+
+    $db->query("SELECT * FROM overtime_hours WHERE intern_id=:intern_id ORDER BY id DESC LIMIT 1");
+    $db->setInternId($_SESSION["intern_id"]);
+    $db->execute();
+
+    $overtime_hours = $db->fetch();
+
+    $day = "friday";
+	
+	if (strtotime("today") < strtotime($day)) {
+	  $start_week_date = date("F j, Y", strtotime("last ".$day));
+	} else {
+	  $start_week_date = date("F j, Y", strtotime($day));
+	}
+
+    if ($admin_roles_count != 0) {
+        $overtime_hours_left = 15;
+    } else {
+        $overtime_hours_left = 10;
+    }
+
+    if ($db->rowCount() == 0 || $overtime_hours["start_week_date"] != $start_week_date) {
+        $overtime_data = array(
+            strtoupper($_SESSION["intern_id"]),
+            $start_week_date,
+            $overtime_hours_left
+        );
+
+        $db->query("INSERT INTO overtime_hours VALUES (null, :intern_id, :start_week_date, :overtime_hours_left)");
+        $db->setOvertimeData($overtime_data);
+        $db->execute();
+        $db->closeStmt();
+
+        $db->query("SELECT * FROM overtime_hours WHERE intern_id=:intern_id ORDER BY id DESC LIMIT 1");
+        $db->setInternId($_SESSION["intern_id"]);
+        $db->execute();
+    
+        $overtime_hours = $db->fetch();
+    }
 
     if (isset($_SESSION["intern_id"])) {
         $db->query("SELECT * FROM attendance WHERE intern_id=:intern_id ORDER BY id DESC LIMIT 1;");
@@ -117,13 +165,31 @@
                     $rendered_hours = 8;
                 }
 
+                $rendered_overtime_hours = 0;
                 if (isOvertime($time_out)) {
                     $dt_time_out_start = new DateTime(date("G:i", $date->time_out_start()));
                     $dt_time_out = new DateTime(date("G:i", strtotime($time_out)));
-                    $rendered_hours += $dt_time_out_start->diff($dt_time_out)->format("%h");
+                    $rendered_overtime_hours += $dt_time_out_start->diff($dt_time_out)->format("%h");
                     $rendered_minutes = $dt_time_out_start->diff($dt_time_out)->format("%i");
-                    $rendered_hours += round($rendered_minutes/60, 1);
+                    $rendered_overtime_hours += round($rendered_minutes/60, 1);
+
+                    if ($rendered_overtime_hours > $overtime_hours["overtime_hours_left"]) {
+                        $rendered_overtime_hours = $overtime_hours["overtime_hours_left"];
+                    }
+
+                    $computed_overtime_hours_left = $overtime_hours["overtime_hours_left"] - $rendered_overtime_hours;
+                    $rendered_hours += $rendered_overtime_hours;
                 }
+                
+                $attendance = array(
+                    $rendered_hours,
+                    $lts_att["id"]
+                );
+
+                $db->query("UPDATE attendance SET rendered_hours=:rendered_hours WHERE id=:id");
+                $db->setAttRenderedHours($attendance);
+                $db->execute();
+                $db->closeStmt();
 
                 $db->query("SELECT * FROM intern_wsap_information WHERE id=:intern_id;");
                 $db->setInternId($_SESSION["intern_id"]);
@@ -157,6 +223,18 @@
                     $db->execute();
                     $db->closeStmt();
                 }
+
+                $computed_overtime_hours = array(
+                    $computed_overtime_hours_left,
+                    $_SESSION["intern_id"],
+                    $start_week_date
+                );
+    
+                $db->query("UPDATE overtime_hours SET overtime_hours_left=:overtime_hours_left 
+                WHERE intern_id=:intern_id AND start_week_date=:start_week_date");
+                $db->updateOvertimeData($computed_overtime_hours);
+                $db->execute();
+                $db->closeStmt();
 
                 redirect("attendance.php");
                 exit();
@@ -224,7 +302,7 @@
 
         <div>
             <div id="time-in-time-out-layout" class="d-md-flex d-sm-inline-block">
-                <div class="my-2">
+                <div class="mt-2">
                     <?php
                         if (isset($_SESSION["intern_id"])) {
                             if (isTimeInEnabled($lts_att["att_date"]) && $intern_wsap_info["status"] == 1) {
@@ -246,6 +324,23 @@
             if ($intern_wsap_info["status"] != 1) { ?>
                 <div class="w-fit my-2 ms-2">
                     <p class="text-danger fw-bold">Only an active intern can time in and time out.</p>
+                </div> <?php
+            } else { ?>
+                <div class="w-fit my-2 ms-2">
+                    <h6 class="<?php
+                        if ($overtime_hours["overtime_hours_left"] == $overtime_hours_left) {
+                            ?> text-success <?php
+                        } else if ($overtime_hours["overtime_hours_left"] == 0) {
+                            ?> text-danger <?php
+                        } else {
+                            ?> text-primary <?php
+                        }
+                    ?>">
+                        <span class="fw-bold">
+                            <?= $overtime_hours["overtime_hours_left"] ?> Overtime Hours Left
+                        </span>
+                        since <?= $overtime_hours["start_week_date"] ?>
+                    </h6>
                 </div> <?php
             }
             if (isset($_SESSION["error"])) { ?>
@@ -505,36 +600,7 @@
                                     }
                                 } ?>
                             </td>
-                            <td> <?php
-                                $time_in = $row["time_in"];
-                                $time_out = $row["time_out"];
-
-                                $rendered_hours = 0;
-                                if (!empty($time_in) && !empty($time_out) && $time_out != "NTO") {
-                                    if (strlen($time_in) > 8) {
-                                        $time_in = substr($time_in, 0, 8);
-                                    }                                    
-                                    if (strlen($time_out) > 8) {
-                                        $time_out = substr($time_out, 0, 8);
-                                    }
-
-                                    if (isMorningShift($time_in, $time_out) || isAfternoonShift($time_in, $time_out)) {
-                                        $rendered_hours = 4;
-                                    } else {
-                                        $rendered_hours = 8;
-                                    }
-
-                                    if (isOvertime($time_out)) {
-                                        $dt_time_out_start = new DateTime(date("G:i", $date->time_out_start()));
-                                        $dt_time_out = new DateTime(date("G:i", strtotime($time_out)));
-                                        $rendered_hours += $dt_time_out_start->diff($dt_time_out)->format("%h");
-                                        $rendered_minutes = $dt_time_out_start->diff($dt_time_out)->format("%i");
-                                        $rendered_hours += round($rendered_minutes/60, 1);
-                                    }
-                                }
-                                
-                                echo $rendered_hours; ?>
-                            </td>
+                            <td><?= $row["rendered_hours"] ?></td>
                         </tr> <?php
                     }
                 } ?>
