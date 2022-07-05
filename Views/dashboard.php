@@ -80,7 +80,12 @@
     $db->execute();
 
     $max_overtime_hours = $db->fetch();
-    $overtime_hours_left = $max_overtime_hours["max_overtime_hours"];
+
+    if (!empty($max_overtime_hours["max_overtime_hours"])) {
+        $overtime_hours_left = $max_overtime_hours["max_overtime_hours"];
+    } else {
+        $overtime_hours_left = 10;   
+    }
 
     if ($db->rowCount() == 0 || $overtime_hours["start_week_date"] != $start_week_date) {
         $overtime_data = array(
