@@ -65,12 +65,22 @@
 	} else {
 	  $start_week_date = date("F j, Y", strtotime($day));
 	}
-    
-    if ($admin_roles_count != 0) {
-        $overtime_hours_left = 15;
-    } else {
-        $overtime_hours_left = 10;
-    }
+
+    $db->query("SELECT roles.*
+    FROM roles
+    WHERE max_overtime_hours=(SELECT MAX(roles.max_overtime_hours)
+    FROM roles, intern_roles
+    WHERE roles.id = intern_roles.role_id AND
+    intern_roles.intern_id=:intern_id) AND
+    EXISTS (SELECT * FROM intern_roles
+    WHERE roles.id = intern_roles.role_id AND
+    intern_roles.intern_id=:intern_id)
+    ORDER BY admin_level DESC LIMIT 1");
+    $db->setInternId($_SESSION["intern_id"]);
+    $db->execute();
+
+    $max_overtime_hours = $db->fetch();
+    $overtime_hours_left = $max_overtime_hours["max_overtime_hours"];
 
     if ($db->rowCount() == 0 || $overtime_hours["start_week_date"] != $start_week_date) {
         $overtime_data = array(

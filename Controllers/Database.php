@@ -297,17 +297,19 @@ class Database {
         $this->stmt->bindValue(":role_name", $roles[0]);
         $this->stmt->bindValue(":brand_id", $roles[1]);
         $this->stmt->bindValue(":dept_id", $roles[2]);
-        $this->stmt->bindValue(":admin", $roles[3]);
-        $this->stmt->bindValue(":level", $roles[4]);
+        $this->stmt->bindValue(":max_overtime_hours", $roles[3]);
+        $this->stmt->bindValue(":admin", $roles[4]);
+        $this->stmt->bindValue(":level", $roles[5]);
     }
 
     function updateRole($roles) {
         $this->stmt->bindValue(":role_name", $roles[0]);
         $this->stmt->bindValue(":brand_id", $roles[1]);
         $this->stmt->bindValue(":dept_id", $roles[2]);
-        $this->stmt->bindValue(":admin", $roles[3]);
-        $this->stmt->bindValue(":level", $roles[4]);
-        $this->stmt->bindValue(":role_id", $roles[5]);
+        $this->stmt->bindValue(":max_overtime_hours", $roles[3]);
+        $this->stmt->bindValue(":admin", $roles[4]);
+        $this->stmt->bindValue(":level", $roles[5]);
+        $this->stmt->bindValue(":role_id", $roles[6]);
     }
 
     function assignRole($intern_roles) {

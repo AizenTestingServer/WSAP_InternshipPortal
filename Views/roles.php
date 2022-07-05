@@ -414,6 +414,7 @@
                         <th scope="col">Name</th>
                         <th scope="col">Brand</th>
                         <th scope="col">Department</th>
+                        <th scope="col">Max OT Hours</th>
                         <th scope="col">Admin</th>
                         <th scope="col">Level</th>
                     </tr>
@@ -495,6 +496,7 @@
                              } else {
                                 echo "No Department";
                              } ?></td>
+                            <td><?= $row["max_overtime_hours"] ?></td>
                             <td><?php
                                 if ($row["admin"] == 1) {
                                     echo "Yes";;

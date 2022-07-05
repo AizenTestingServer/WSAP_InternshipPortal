@@ -723,27 +723,23 @@
                         (SELECT intern_roles.* FROM intern_roles
                         WHERE intern_roles.role_id=roles.id AND
                         intern_roles.intern_id=:intern_id)";
-                        $roles = array();
-                        
+                    
                         if (!empty($_GET["search"])) {
                             if (strlen($conditions) > 6) {
                                 $conditions = $conditions." AND";
                             }
-                            array_push($roles, $_GET["search"]);
                             $conditions = $conditions." roles.name LIKE CONCAT('%', :role_name, '%')";
                         }
                         if (!empty($_GET["department"])) {
                             if (strlen($conditions) > 6) {
                                 $conditions = $conditions." AND";
                             }
-                            array_push($roles, $_GET["department"]);
                             $conditions = $conditions." departments.name=:dept_name";
                         }
                         if (!empty($_GET["brand"])) {
                             if (strlen($conditions) > 6) {
                                 $conditions = $conditions." AND";
                             }
-                            array_push($roles, $_GET["brand"]);
                             $conditions = $conditions." brands.name=:brand_name";
                         }
 
@@ -755,21 +751,15 @@
                         if (strlen($conditions) > 6) {
                             $db->query($query.$conditions.$sort);
                             $db->setInternId($_GET["intern_id"]);
-
-                            if (!empty($_GET["search"]) && !empty($_GET["department"]) && !empty($_GET["brand"])) {
-                                $db->selectRoles7($roles);
-                            } else if (!empty($_GET["department"]) && !empty($_GET["brand"])) {
-                                $db->selectRoles6($roles);
-                            } else if (!empty($_GET["search"]) && !empty($_GET["brand"])) {
-                                $db->selectRoles5($roles);
-                            } else if (!empty($_GET["search"]) && !empty($_GET["department"])) {
-                                $db->selectRoles4($roles);
-                            } else if (!empty($_GET["brand"])) {
-                                $db->selectRoles3($roles);
-                            } else if (!empty($_GET["department"])) {
-                                $db->selectRoles2($roles);
-                            } else if (!empty($_GET["search"])) {
-                                $db->selectRoles($roles);
+                        
+                            if (!empty($_GET["brand"])) {
+                                $db->selectBrand($_GET["brand"]);
+                            }
+                            if (!empty($_GET["department"])) {
+                                $db->selectDepartment($_GET["department"]);
+                            }
+                             if (!empty($_GET["search"])) {
+                                $db->selectRoleName($_GET["search"]);
                             }
                         } else {
                             $db->query($query.$sort);
