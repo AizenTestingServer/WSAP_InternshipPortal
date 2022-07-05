@@ -95,22 +95,19 @@
         }
 
         if (isset($_POST["timeIn"])) { 
-            if ($date->getDateTimeValue() > $date->morning_briefing() &&
-            $date->getDateTimeValue() < $date->morning_shift_end()) {
-                $attendance = array(
-                    strtoupper($_SESSION["intern_id"]),
-                    $date->getDate(),
-                    $date->getTime()." L",
-                    null,
-                );
+            if ($date->getDateTimeValue() > $date->morning_briefing() && $date->getDateTimeValue() < $date->morning_shift_end()) {
+                $time_in = $date->getTime()." L";
             } else {
-                $attendance = array(
-                    strtoupper($_SESSION["intern_id"]),
-                    $date->getDate(),
-                    $date->getTime(),
-                    null,
-                );
+                $time_in = $date->getTime();
             }
+
+            $attendance = array(
+                strtoupper($_SESSION["intern_id"]),
+                $date->getDate(),
+                $time_in,
+                null,
+                0
+            );
 
             if ($db->rowCount() != 0 && $date->getDateValue() == strtotime($lts_att["att_date"])) {
                 $_SESSION["error"] = "You are already timed in!";
@@ -119,7 +116,7 @@
             }
             
             $db->query("INSERT INTO attendance
-            VALUES (NULL, :intern_id, :att_date, :time_in, :time_out);");
+            VALUES (NULL, :intern_id, :att_date, :time_in, :time_out, :rendered_hours);");
             $db->timeIn($attendance);
             $db->execute();
             $db->closeStmt();

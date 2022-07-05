@@ -115,6 +115,7 @@ class Database {
         $this->stmt->bindValue(":att_date", $attendance[1]);
         $this->stmt->bindValue(":time_in", $attendance[2]);
         $this->stmt->bindValue(":time_out", $attendance[3]);
+        $this->stmt->bindValue(":rendered_hours", $attendance[4]);
     }
 
     function timeOut($attendance) {
