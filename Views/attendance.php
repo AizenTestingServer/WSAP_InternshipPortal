@@ -81,7 +81,7 @@
         $db->execute();
         $lts_att = $db->fetch();
 
-        if ($date->getDate() != $lts_att["att_date"]) {
+        if (!empty($lts_att) && $date->getDate() != $lts_att["att_date"]) {
             if (empty($lts_att["time_out"])) {
                 $attendance = array(
                     "NTO",
@@ -308,7 +308,13 @@
                 <div class="mt-2">
                     <?php
                         if (isset($_SESSION["intern_id"])) {
-                            if (isTimeInEnabled($lts_att["att_date"]) && $intern_wsap_info["status"] == 1) {
+                            if (!empty($lts_att)) {
+                                $att_date = $lts_att["att_date"];
+                            } else {
+                                $att_date = "";
+                            }
+
+                            if (isTimeInEnabled($att_date) && $intern_wsap_info["status"] == 1) {
                                 $date->time_in_enabled();
                             } else {
                                 $date->time_in_disabled();

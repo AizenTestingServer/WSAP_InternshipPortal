@@ -353,7 +353,13 @@
 
                     <?php $record_count = 0; ?>
                     <div class="daily_task"> <?php
-                        if (isTimeInEnabled($lts_att["att_date"]) && $intern_wsap_info["status"] == 1) {
+                        if (!empty($lts_att)) {
+                            $att_date = $lts_att["att_date"];
+                        } else {
+                            $att_date = "";
+                        }
+
+                        if (isTimeInEnabled($att_date) && $intern_wsap_info["status"] == 1) {
                             $record_count++; ?>
                             <div class="task-box">
                                 <div class="task-box-status">
