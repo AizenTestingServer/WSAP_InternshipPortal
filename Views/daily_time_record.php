@@ -195,9 +195,9 @@
                     $rendered_overtime_hours = $overtime_hours["overtime_hours_left"];
                 }
 
-                $computed_overtime_hours_left = $overtime_hours["overtime_hours_left"] - $rendered_overtime_hours;
                 $rendered_hours += $rendered_overtime_hours;
             }
+            $computed_overtime_hours_left = $overtime_hours["overtime_hours_left"] - $rendered_overtime_hours;
                 
             $attendance = array(
                 $rendered_hours,
@@ -432,7 +432,7 @@
                         </div>
                         <div class="bottom w-md-fit w-sm-100"> <?php
                             if ($value["status"] == 0 || $value["status"] == 5) { ?>
-                                <p class="bg-warning text-dark rounded w-fit m-auto px-2 pt-1 pb-1 fs-d"> <?php
+                                <p class="bg-warning text-dark rounded w-fit m-auto px-2 py-1 fs-d"> <?php
                                     if ($value["status"] == 0) {
                                         echo "Inactive";
                                     } else {
@@ -440,7 +440,7 @@
                                     } ?>
                                 </p> <?php
                             }  else if ($value["status"] == 1 || $value["status"] == 4) { ?>
-                                <p class="bg-success text-light rounded w-fit m-auto px-2 pt-1 pb-1 fs-d"> <?php
+                                <p class="bg-success text-light rounded w-fit m-auto px-2 py-1 fs-d"> <?php
                                     if ($value["status"] == 1) {
                                         echo "Active";
                                     } else {
@@ -448,15 +448,15 @@
                                     } ?>
                                 </p> <?php
                             }   else if ($value["status"] == 2) { ?>
-                                <p class="bg-secondary text-light rounded w-fit m-auto px-2 pt-1 pb-1 fs-d">
+                                <p class="bg-secondary text-light rounded w-fit m-auto px-2 py-1 fs-d">
                                     Offboarded
                                 </p> <?php
                             }   else if ($value["status"] == 4) { ?>
-                                <p class="bg-dark text-light rounded w-fit m-auto px-2 pt-1 pb-1 fs-d">
+                                <p class="bg-dark text-light rounded w-fit m-auto px-2 py-1 fs-d">
                                     Withdrawn
                                 </p> <?php
                             }   else if ($value["status"] == 6) { ?>
-                                <p class="bg-danger text-light rounded w-fit m-auto px-2 pt-1 pb-1 fs-d">
+                                <p class="bg-danger text-light rounded w-fit m-auto px-2 py-1 fs-d">
                                     Terminated
                                 </p> <?php
                             } ?>
@@ -613,15 +613,18 @@
                     $db->execute();
                     $nto_value = $db->fetch(); ?>
                                         
-                    <div class="w-fit ms-auto my-2"> <?php
+                    <div class="w-fit ms-auto my-2">
+                        <button id="exportToExcel" class="btn btn-excel">
+                            Export as Excel
+                        </button> <?php
                         if ($nto_value["count"] == 0) { ?>
-                            <a class="btn btn-primary"
+                            <a class="btn btn-pdf"
                                 href="preview_pdf.php?intern_id=<?= strtoupper($_SESSION["intern_id"]) ?>"
                                 target="window">
                                 Preview DTR as PDF
                             </a> <?php
                         } else { ?>
-                            <a class="btn btn-primary disabled">
+                            <a class="btn btn-pdf disabled">
                                 Preview DTR as PDF
                             </a> <?php
                         } ?>
@@ -634,7 +637,7 @@
                     </div> <?php
                 } ?>
 
-                <table class="table caption-top fs-d text-center">
+                <table id="dtr" class="table caption-top fs-d text-center">
                     <thead>
                         <tr>
                             <th scope="col">#</th>
@@ -708,31 +711,31 @@
                                     <td> <?php
                                         if (strlen($row["time_in"]) > 0) {
                                             if ($row["time_in"] == $conditions[0]) { ?>
-                                                <p class="bg-danger text-light rounded w-fit m-auto px-2 pt-1 pb-1">
+                                                <p class="bg-danger text-light rounded w-fit m-auto px-2 py-1">
                                                     <?= $row["time_in"] ?>
                                                 </p> <?php
                                             }  else if ($row["time_in"] == $conditions[1]) { ?>
-                                                <p class="bg-primary text-light rounded w-fit m-auto px-2 pt-1 pb-1">
+                                                <p class="bg-primary text-light rounded w-fit m-auto px-2 py-1">
                                                     <?= $row["time_in"] ?>
                                                 </p> <?php
                                             }  else if (strlen($row["time_out"]) > 0 && str_contains($row["time_out"], $conditions[2])) { ?>
-                                                <p class="bg-morning text-light rounded w-fit m-auto px-2 pt-1 pb-1">
+                                                <p class="bg-morning text-light rounded w-fit m-auto px-2 py-1">
                                                     <?= $row["time_in"] ?>
                                                 </p> <?php
                                             }  else if (strlen($row["time_out"]) > 0 && str_contains($row["time_out"], $conditions[3])) { ?>
-                                                <p class="bg-afternoon text-light rounded w-fit m-auto px-2 pt-1 pb-1">
+                                                <p class="bg-afternoon text-light rounded w-fit m-auto px-2 py-1">
                                                     <?= $row["time_in"] ?>
                                                 </p> <?php
                                             }  else if (str_contains($row["time_in"], $conditions[4])) { ?>
-                                                <p class="bg-dark text-light rounded w-fit m-auto px-2 pt-1 pb-1">
+                                                <p class="bg-dark text-light rounded w-fit m-auto px-2 py-1">
                                                     <?= $row["time_in"] ?>
                                                 </p> <?php
                                             }  else if (str_contains($row["time_in"], $conditions[6])) { ?>
-                                                <p class="bg-warning text-dark rounded w-fit m-auto px-2 pt-1 pb-1">
+                                                <p class="bg-warning text-dark rounded w-fit m-auto px-2 py-1">
                                                     <?= $row["time_in"] ?>
                                                 </p> <?php
                                             }  else { ?>
-                                                <p class="bg-success text-light rounded w-fit m-auto px-2 pt-1 pb-1">
+                                                <p class="bg-success text-light rounded w-fit m-auto px-2 py-1">
                                                     <?= $row["time_in"] ?>
                                                 </p> <?php
                                             }
@@ -741,35 +744,35 @@
                                     <td> <?php
                                         if (strlen($row["time_out"]) > 0) {
                                             if ($row["time_out"] == $conditions[0]) { ?>
-                                                <p class="bg-danger text-light rounded w-fit m-auto px-2 pt-1 pb-1">
+                                                <p class="bg-danger text-light rounded w-fit m-auto px-2 py-1">
                                                     <?= $row["time_out"] ?>
                                                 </p> <?php
                                             }  else if ($row["time_out"] == $conditions[1]) { ?>
-                                                <p class="bg-primary text-light rounded w-fit m-auto px-2 pt-1 pb-1">
+                                                <p class="bg-primary text-light rounded w-fit m-auto px-2 py-1">
                                                     <?= $row["time_out"] ?>
                                                 </p> <?php
                                             }  else if (str_contains($row["time_out"], $conditions[4])) { ?>
-                                                <p class="bg-indigo text-light rounded w-fit m-auto px-2 pt-1 pb-1">
+                                                <p class="bg-indigo text-light rounded w-fit m-auto px-2 py-1">
                                                     <?= $row["time_out"] ?>
                                                 </p> <?php
                                             }  else if (str_contains($row["time_out"], $conditions[2])) { ?>
-                                                <p class="bg-morning text-light rounded w-fit m-auto px-2 pt-1 pb-1">
+                                                <p class="bg-morning text-light rounded w-fit m-auto px-2 py-1">
                                                     <?= $row["time_out"] ?>
                                                 </p> <?php
                                             }  else if (str_contains($row["time_out"], $conditions[3])) { ?>
-                                                <p class="bg-afternoon text-light rounded w-fit m-auto px-2 pt-1 pb-1">
+                                                <p class="bg-afternoon text-light rounded w-fit m-auto px-2 py-1">
                                                     <?= $row["time_out"] ?>
                                                 </p> <?php
                                             }  else if (str_contains($row["time_out"], $conditions[5])) { ?>
-                                                <p class="bg-dark text-light rounded w-fit m-auto px-2 pt-1 pb-1">
+                                                <p class="bg-dark text-light rounded w-fit m-auto px-2 py-1">
                                                     <?= $row["time_out"] ?>
                                                 </p> <?php
                                             }  else if ($row["time_out"] == $conditions[7]) { ?>
-                                                <p class="bg-warning text-dark rounded w-fit m-auto px-2 pt-1 pb-1">
+                                                <p class="bg-warning text-dark rounded w-fit m-auto px-2 py-1">
                                                     <?= $row["time_out"] ?>
                                                 </p> <?php
                                             }  else { ?>
-                                                <p class="bg-success text-light rounded w-fit m-auto px-2 pt-1 pb-1">
+                                                <p class="bg-success text-light rounded w-fit m-auto px-2 py-1">
                                                     <?= $row["time_out"] ?>
                                                 </p> <?php
                                             }
@@ -1081,7 +1084,7 @@
                                     </div>
                                     <div class="bottom w-100 mt-3"> <?php
                                         if ($row["status"] == 0 || $row["status"] == 5) { ?>
-                                            <p class="bg-warning text-dark rounded w-fit m-auto px-2 pt-1 pb-1 fs-d"> <?php
+                                            <p class="bg-warning text-dark rounded w-fit m-auto px-2 py-1 fs-d"> <?php
                                                 if ($row["status"] == 0) {
                                                     echo "Inactive";
                                                 } else {
@@ -1089,7 +1092,7 @@
                                                 } ?>
                                             </p> <?php
                                         }  else if ($row["status"] == 1 || $row["status"] == 4) { ?>
-                                            <p class="bg-success text-light rounded w-fit m-auto px-2 pt-1 pb-1 fs-d"> <?php
+                                            <p class="bg-success text-light rounded w-fit m-auto px-2 py-1 fs-d"> <?php
                                                 if ($row["status"] == 1) {
                                                     echo "Active";
                                                 } else {
@@ -1097,15 +1100,15 @@
                                                 } ?>
                                             </p> <?php
                                         }   else if ($row["status"] == 2) { ?>
-                                            <p class="bg-secondary text-light rounded w-fit m-auto px-2 pt-1 pb-1 fs-d">
+                                            <p class="bg-secondary text-light rounded w-fit m-auto px-2 py-1 fs-d">
                                             Offboarded
                                             </p> <?php
                                         }   else if ($row["status"] == 4) { ?>
-                                            <p class="bg-dark text-light rounded w-fit m-auto px-2 pt-1 pb-1 fs-d">
+                                            <p class="bg-dark text-light rounded w-fit m-auto px-2 py-1 fs-d">
                                             Withdrawn
                                             </p> <?php
                                         }   else if ($row["status"] == 6) { ?>
-                                            <p class="bg-danger text-light rounded w-fit m-auto px-2 pt-1 pb-1">
+                                            <p class="bg-danger text-light rounded w-fit m-auto px-2 py-1">
                                                 Terminated
                                             </p> <?php
                                         } ?>
@@ -1127,6 +1130,13 @@
         } ?>
     </div>
 </div>
+<script>
+  document.getElementById("exportToExcel").addEventListener("click", function() {
+    var table2excel = new Table2Excel();
+    table2excel.export(document.getElementById("dtr"),
+        "<?= $value["last_name"].", ".$value["first_name"]."'s Daily Time Record" ?>");
+  });
+</script>
 <?php
     require_once "../Templates/footer.php";
 ?>

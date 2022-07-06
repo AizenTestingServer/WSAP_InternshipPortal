@@ -366,7 +366,7 @@
                                 </div>
                                 <div class="bottom w-100 mt-3"> <?php
                                     if ($row["status"] == 0 || $row["status"] == 5) { ?>
-                                        <p class="bg-warning text-dark rounded w-fit m-auto px-2 pt-1 pb-1 fs-d"> <?php
+                                        <p class="bg-warning text-dark rounded w-fit m-auto px-2 py-1 fs-d"> <?php
                                             if ($row["status"] == 0) {
                                                 echo "Inactive";
                                             } else {
@@ -374,7 +374,7 @@
                                             } ?>
                                         </p> <?php
                                     }  else if ($row["status"] == 1 || $row["status"] == 4) { ?>
-                                        <p class="bg-success text-light rounded w-fit m-auto px-2 pt-1 pb-1 fs-d"> <?php
+                                        <p class="bg-success text-light rounded w-fit m-auto px-2 py-1 fs-d"> <?php
                                             if ($row["status"] == 1) {
                                                 echo "Active";
                                             } else {
@@ -382,15 +382,15 @@
                                             } ?>
                                         </p> <?php
                                     }   else if ($row["status"] == 2) { ?>
-                                        <p class="bg-secondary text-light rounded w-fit m-auto px-2 pt-1 pb-1 fs-d">
+                                        <p class="bg-secondary text-light rounded w-fit m-auto px-2 py-1 fs-d">
                                            Offboarded
                                         </p> <?php
                                     }   else if ($row["status"] == 4) { ?>
-                                        <p class="bg-dark text-light rounded w-fit m-auto px-2 pt-1 pb-1 fs-d">
+                                        <p class="bg-dark text-light rounded w-fit m-auto px-2 py-1 fs-d">
                                            Withdrawn
                                         </p> <?php
                                     }   else if ($row["status"] == 6) { ?>
-                                        <p class="bg-danger text-light rounded w-fit m-auto px-2 pt-1 pb-1 fs-d">
+                                        <p class="bg-danger text-light rounded w-fit m-auto px-2 py-1 fs-d">
                                             Terminated
                                         </p> <?php
                                     } ?>

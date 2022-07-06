@@ -98,7 +98,8 @@
 
     function isOvertime($time_out) {
         $date = new Date();
-        return strtotime($time_out) >= $date->time_out_overtime_start() && strtotime($time_out) < $date->time_out_overtime_end();
+        return strtotime($time_out) >= $date->time_out_overtime_start() &&
+            strtotime($time_out) < $date->time_out_overtime_end();
     }
 
     function getMonths() {
@@ -140,5 +141,11 @@
         $date = new Date();
         return date("g:i a", $date->time_out_overtime_start())." to ".
             date("g:i a", strtotime(date("g:i a", $date->time_out_overtime_end())." - 1 minutes"));
+    }
+
+    function isDATEnabled() {
+        $date = new Date();
+        return $date->getDateTimeValue() >= $date->dat_start() &&
+            $date->getDateTimeValue() < $date->dat_end();
     }
 ?>

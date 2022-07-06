@@ -24,7 +24,7 @@
     $admin_info = $db->fetch();
     $admin_roles_count = $db->rowCount();
     
-    if (isset($_POST["btnAddIntern"])) {
+    if (isset($_POST["addIntern"])) {
         $last_name = toProper(fullTrim($_POST["lastName"]));
         $first_name = toProper(fullTrim($_POST["firstName"]));
         $middle_name = toProper(fullTrim($_POST["middleName"]));
@@ -209,7 +209,7 @@
                             </div>
 
                             <div class="modal-footer">
-                                <button type="submit" name="btnAddIntern" class="btn btn-success">Submit</button>
+                                <button type="submit" name="addIntern" class="btn btn-success">Submit</button>
                             </div>
                         </form>
                     </div>
@@ -496,7 +496,8 @@
                                                         <h5 class="text-dark fs-regular mb-0">
                                                             <?= $row["last_name"].", ".$row["first_name"] ?>
                                                         </h5>
-                                                        <h6 class="fs-f"><?= $row["intern_id"] ?></h6>
+                                                        <h6 class="fs-f mb-0"><?= $row["name"] ?></h6>
+                                                        <h6 class="fs-d fw-bold"><?= $row["intern_id"] ?></h6>
                                                         <input type="text" name="intern_id" class="form-control text-center d-none mt-2"
                                                             value="<?= $row["intern_id"] ?>" readonly>
                                                         <input type="text" name="fullName" class="form-control text-center d-none mt-2"

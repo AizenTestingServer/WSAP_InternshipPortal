@@ -13,7 +13,7 @@
     <script src="https://code.jquery.com/jquery-3.6.0.js"></script>
 
     <!-- data tables -->
-    <link href="//cdn.datatables.net/1.10.20/css/jquery.dataTables.min.css" rel="stylesheet" />
+    <!-- <link href="//cdn.datatables.net/1.10.20/css/jquery.dataTables.min.css" rel="stylesheet" />
     <link href="//cdn.datatables.net/buttons/1.6.2/css/buttons.dataTables.min.css" rel="stylesheet" />
     <script src="//cdn.datatables.net/1.10.21/js/jquery.dataTables.min.js"></script>
 
@@ -23,12 +23,13 @@
     <script src="//cdnjs.cloudflare.com/ajax/libs/pdfmake/0.1.53/pdfmake.min.js"></script>
     <script src="//cdnjs.cloudflare.com/ajax/libs/pdfmake/0.1.53/vfs_fonts.js"></script>
     <script src="//cdn.datatables.net/buttons/1.6.2/js/buttons.html5.min.js"></script>      
-    <script src="//cdn.datatables.net/buttons/1.6.2/js/buttons.print.min.js"></script>
+    <script src="//cdn.datatables.net/buttons/1.6.2/js/buttons.print.min.js"></script> -->
 
     <link rel="stylesheet" href="../Assets/css/style.css">
     <link rel="icon" href="../Assets/img/brand_logo/WSAP.png">
 
     <script src="https://raw.githack.com/eKoopmans/html2pdf/master/dist/html2pdf.bundle.js"></script>
+    <script src="../Assets/js/table2excel.js"></script>
 
     <?php
         function setTitle($title) {

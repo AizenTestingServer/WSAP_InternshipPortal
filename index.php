@@ -53,7 +53,7 @@
                 $db->execute();
                 $db->closeStmt();
 
-                $_SESSION["intern_id"] = $_POST["intern_id"];
+                $_SESSION["intern_id"] = strtoupper($_POST["intern_id"]);
                 $_SESSION["password"] = $_POST["password"];
                 unset($_SESSION["intern_id_temp"]);
                 redirect("./Views/dashboard.php");
@@ -70,7 +70,7 @@
             $db->execute();
 
             if ($db->rowCount() != 0) {
-                $_SESSION["intern_id"] = $_POST["intern_id"];
+                $_SESSION["intern_id"] = strtoupper($_POST["intern_id"]);
                 unset($_SESSION["intern_id_temp"]);
                 redirect("./Views/profile_setup.php");
                 exit();
@@ -84,7 +84,7 @@
                 $value = $db->fetch();
                 
                 if ($db->rowCount() != 0) {
-                    $_SESSION["intern_id_2"] = $_POST["intern_id"];
+                    $_SESSION["intern_id_2"] = strtoupper($_POST["intern_id"]);
                     unset($_SESSION["intern_id_temp"]);
                     redirect("./Views/reset_password.php");
                     exit();

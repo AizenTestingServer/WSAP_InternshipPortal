@@ -1088,52 +1088,6 @@
                     while ($row = $db->fetch()) {
                         $count++;  ?>
                         <tr>
-                            <div class="modal fade" id="removeRole<?= $row["id"] ?>" tabindex="-1"
-                                aria-labelledby="removeRoleModalLabel" aria-hidden="true">
-                                <div class="modal-dialog modal-dialog-centered">
-                                    <div class="modal-content">
-                                        <div class="modal-header">
-                                            <div>
-                                                <h5 class="modal-title" id="removeRoleModalLabel">
-                                                    Remove Role from Intern
-                                                </h5>
-                                                <h6 class="modal-title fs-f ms-2" id="removeRoleModalLabel">
-                                                    <?= $value["last_name"].", ".$value["first_name"] ?>
-                                                </h6>
-                                            </div>
-                                            <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Close"></button>
-                                        </div>
-                                        
-                                        <form action="<?= htmlspecialchars($_SERVER["PHP_SELF"]);?>" method="post">
-                                            <div class="modal-body">
-                                                <div class="text-center">
-                                                    <div class="summary-total mt-2 w-fit mx-auto">
-                                                        <h5 class="text-dark fs-regularmb-0"><?= $row["role_name"] ?></h5>
-                                                        <h6><?php
-                                                            if (!empty($row["dept_name"])) {
-                                                                echo $row["dept_name"];
-                                                            } else {
-                                                                echo "No Department";
-                                                            } ?></h6>
-                                                        <h6 class="fs-f mb-0"><?php
-                                                            if (!empty($row["brand_name"])) {
-                                                                echo $row["brand_name"];
-                                                            } else {
-                                                                echo "No Brand";
-                                                            } ?></h6>
-                                                        <input type="text" name="intern_role_id" class="form-control text-center d-none mt-2"
-                                                            value="<?= $row["id"] ?>" readonly>
-                                                    </div>
-                                                </div>
-                                            </div>
-
-                                            <div class="modal-footer">
-                                                <button type="submit" name="btnRemoveRole" class="btn btn-danger">Remove</button>
-                                            </div>
-                                        </form>
-                                    </div>
-                                </div>
-                            </div>
                             <th scope="row"><?= $count ?></th>
                             <td><?= $row["role_name"] ?></td>
                             <td><?php

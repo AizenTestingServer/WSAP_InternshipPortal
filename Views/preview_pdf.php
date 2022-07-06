@@ -154,7 +154,7 @@
                 } ?>
                 <div class="ms-auto">
                     <form method="post">
-                        <button class="btn btn-primary" name="generatePDF">Generate PDF</button>
+                        <button class="btn btn-pdf" name="generatePDF">Generate PDF</button>
                     </form>
                 </div>
             </div>

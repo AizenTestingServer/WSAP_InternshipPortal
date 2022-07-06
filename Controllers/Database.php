@@ -289,6 +289,10 @@ class Database {
         $this->stmt->bindValue(":brand_name", $brand_name);
     }
 
+    function search($search) {
+        $this->stmt->bindValue(":search", $intern_name);
+    }
+
     function setRoleId($role_id) {
         $this->stmt->bindValue(":role_id", $role_id);
     }
@@ -326,6 +330,22 @@ class Database {
 
     function selectLog($log) {
         $this->stmt->bindValue(":log", $log);
+    }
+
+    function insertTask($task) {
+        $this->stmt->bindValue(":intern_id", $task[0]);
+        $this->stmt->bindValue(":title", $task[1]);
+        $this->stmt->bindValue(":description", $task[2]);
+        $this->stmt->bindValue(":start_date", $task[3]);
+        $this->stmt->bindValue(":progress", $task[4]);
+    }
+
+    function updateTask($task) {
+        $this->stmt->bindValue(":title", $task[0]);
+        $this->stmt->bindValue(":description", $task[1]);
+        $this->stmt->bindValue(":start_date", $task[2]);
+        $this->stmt->bindValue(":progress", $task[3]);
+        $this->stmt->bindValue(":id", $task[4]);
     }
 }
 

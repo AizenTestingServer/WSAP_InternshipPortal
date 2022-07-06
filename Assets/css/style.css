@@ -8,7 +8,8 @@
     --orange: #CC9933;
     --white-smoke: #e7e7e7;
     --white: #fff;
-    --text-indigo: #0D0048;
+    --indigo: #0D0048;
+    --indigo-hover: #462b9f;
     --text-2: #5c5b61;
     --text-3: #cbcbd7;
     --red-palette: #f04770;
@@ -17,6 +18,10 @@
     --text-custom-dark: #040015;
     --text-color: rgb(52, 68, 109);
     --text-custom-dark: #040015;
+    --pdf: #AA0A00;
+    --pdf-hover: #710600;
+    --excel: #016D35;
+    --excel-hover: #004823;
 }
 
 body {
@@ -29,7 +34,7 @@ body {
 }
 
 .text-indigo {
-    color: var(--text-indigo);
+    color: var(--indigo);
 }
 
 .text-custom-dark {
@@ -90,25 +95,28 @@ body {
 
 /* scrollbar */
 ::-webkit-scrollbar {
-    width: 6px;
     display: none;
 }
 
-/* Track */
-::-webkit-scrollbar-track {
-    background: #f1f1f1;
+/* absolute-posiitons */
+
+.bottom-right {
+    position: absolute;
+    right: 1rem;
+    bottom: 1rem;
 }
 
-/* Handle */
-::-webkit-scrollbar-thumb {
-    background: var(--text-2);
+.top-right {
+    position: absolute;
+    right: 1rem;
+    top: 1rem;
 }
 
 /* Handle on hover */
 
 /* background-color */
 .bg-indigo {
-    background: var(--text-indigo);
+    background: var(--indigo);
 }
 
 .bg-red-palette {
@@ -124,39 +132,75 @@ body {
 }
 
 .bg-white {
-    background: #fff;
-}
-
-.bottom-right {
-    position: absolute;
-    right: 1rem;
-    bottom: 1rem;
-}
-
-.top-right {
-    position: absolute;
-    right: 1rem;
-    top: 1rem;
+    background: var(--white);
 }
 
 .btn-indigo {
-    background: var(--text-indigo);
-    color: #fff;
-}
-
-.btn-indigo:hover {
-    background: #462b9f;
-    color: #fff;
+    --bs-btn-color: var(--white);
+    --bs-btn-bg: var(--indigo);
+    --bs-btn-border-color: var(--indigo);
+    --bs-btn-hover-color: var(--white);
+    --bs-btn-hover-bg: var(--indigo-hover);
+    --bs-btn-hover-border-color: var(--indigo-hover);
+    --bs-btn-focus-shadow-rgb: 62, 56, 88;
+    --bs-btn-active-color: var(--white);
+    --bs-btn-active-bg: var(--indigo-hover);
+    --bs-btn-active-border-color: var(--indigo-hover);
+    --bs-btn-active-shadow: inset 0 3px 5px rgba(0, 0, 0, 0.125);
+    --bs-btn-disabled-color: var(--white);
+    --bs-btn-disabled-bg: var(--indigo);
+    --bs-btn-disabled-border-color: var(--indigo);
 }
 
 .btn-smoke {
-    background: #fff;
-    color: var(--text-custom-dark);
+    --bs-btn-color: var(--text-custom-dark);
+    --bs-btn-bg: var(--white);
+    --bs-btn-border-color: var(--text-custom-dark);
+    --bs-btn-hover-color: var(--text-custom-dark);
+    --bs-btn-hover-bg: var(--white-smoke);
+    --bs-btn-hover-border-color: var(--white-smoke);
+    --bs-btn-focus-shadow-rgb: 177, 177, 177;
+    --bs-btn-active-color: var(--text-custom-dark);
+    --bs-btn-active-bg: var(--white-smoke);
+    --bs-btn-active-border-color: var(--text-custom-dark);
+    --bs-btn-active-shadow: inset 0 3px 5px rgba(0, 0, 0, 0.125);
+    --bs-btn-disabled-color: var(--text-custom-dark);
+    --bs-btn-disabled-bg: var(--white);
+    --bs-btn-disabled-border-color: var(--text-custom-dark);
 }
 
-.btn-smoke:hover {
-    background: var(--white-smoke);
-    color: var(--text-custom-dark);
+.btn-pdf {
+    --bs-btn-color: var(--white);
+    --bs-btn-bg: var(--pdf);
+    --bs-btn-border-color: var(--pdf);
+    --bs-btn-hover-color: var(--white);
+    --bs-btn-hover-bg: var(--pdf-hover);
+    --bs-btn-hover-border-color: var(--pdf-hover);
+    --bs-btn-focus-shadow-rgb: 198, 91, 85;
+    --bs-btn-active-color: var(--white);
+    --bs-btn-active-bg: var(--pdf-hover);
+    --bs-btn-active-border-color: var(--pdf-hover);
+    --bs-btn-active-shadow: inset 0 3px 5px rgba(0, 0, 0, 0.125);
+    --bs-btn-disabled-color: var(--white);
+    --bs-btn-disabled-bg: var(--pdf);
+    --bs-btn-disabled-border-color: var(--pdf);
+}
+
+.btn-excel {
+    --bs-btn-color: var(--white);
+    --bs-btn-bg: var(--excel);
+    --bs-btn-border-color: var(--excel);
+    --bs-btn-hover-color: var(--white);
+    --bs-btn-hover-bg: var(--excel-hover);
+    --bs-btn-hover-border-color: var(--excel-hover);
+    --bs-btn-focus-shadow-rgb: 85, 157, 120;
+    --bs-btn-active-color: var(--white);
+    --bs-btn-active-bg: var(--excel-hover);
+    --bs-btn-active-border-color: var(--excel-hover);
+    --bs-btn-active-shadow: inset 0 3px 5px rgba(0, 0, 0, 0.125);
+    --bs-btn-disabled-color: var(--white);
+    --bs-btn-disabled-bg: var(--excel);
+    --bs-btn-disabled-border-color: var(--excel);
 }
 
 /* login-container */
@@ -203,7 +247,7 @@ body {
     max-height: max-content;
     position: relative;
     background: var(--white-smoke);
-    background: #fff;
+    background: var(--white);
     z-index: 1;
 }
 
@@ -224,7 +268,7 @@ body {
 }
 
 #tasks {
-    background: #fff;
+    background: var(--white);
     font-family: "Inter", sans-serif;
     border-radius: 8px;
     box-shadow: 0 3px 3px -1px rgb(10 22 70 / 10%), 0 0 1px 0 rgb(10 22 70 / 6%);
@@ -298,7 +342,7 @@ body {
     min-width: max-content;
     top: 0px;
     left: 70px;
-    background: #fff;
+    background: var(--white);
     padding: 0;
     display: none;
     border-radius: 6px;
@@ -347,12 +391,6 @@ body {
     height: 32px;
 }
 
-.tasks {
-    display: flex;
-    width: 100%;
-    align-items: center;
-}
-
 .task_number {
     width: 16.66%;
 }
@@ -368,7 +406,6 @@ body {
 /* daily accomplishment task */
 .daily_task {
     display: grid;
-    grid-template-columns: repeat(3, 1fr);
     gap: 8px;
 }
 
@@ -377,16 +414,23 @@ body {
     border-radius: 8px;
     padding: 1rem;
     box-shadow: 0 .5rem 1rem rgba(0, 0, 0, .15) !important;
+    min-height: 230px;
 }
 
 .task-box-status {
     width: 100%;
-
     font-size: 15px;
 }
 
 .task-box-action {
     width: 100%;
+}
+
+.task-box-action-2 {
+    position: absolute;
+    left: 1rem;
+    right: 1rem;
+    bottom: 1rem;
 }
 
 .event_info {
@@ -398,7 +442,7 @@ body {
 }
 
 .task-box {
-    background: #fff;
+    background: var(--white);
 }
 
 .line-separator {
@@ -457,17 +501,17 @@ a.dt-button {
 }
 
 .buttons-csv {
-    background: #fff !important;
+    background: var(--white) !important;
 }
 
 .buttons-excel {
     background: green !important;
-    color: #fff !important;
+    color: var(--white) !important;
 }
 
 .buttons-pdf {
     background: red !important;
-    color: #fff !important;
+    color: var(--white) !important;
 }
 
 .dataTables_wrapper {
@@ -495,7 +539,7 @@ a.dt-button {
     box-shadow: 0 .3rem 0.5rem rgba(0, 0, 0, .15) !important;
     display: flex;
     border-radius: 6px;
-    background: #fff;
+    background: var(--white);
 }
 
 .brand_grid .boxes .content {
@@ -594,7 +638,7 @@ a.dt-button {
     top: 30px;
     min-width: 175px;
     padding: 0.75rem;
-    background: #fff;
+    background: var(--white);
     box-shadow: 0 3px 3px -1px rgb(10 22 70 / 10%), 0 0 1px 0 rgb(10 22 70 / 6%);
     border-radius: 0.75rem;
     line-height: 1.75em;
@@ -773,6 +817,57 @@ a.dt-button {
     object-fit: cover;
 }
 
+.circular-progress {
+    position: relative;
+    height: 120px;
+    width: 120px;
+    border-radius: 50%;
+    background: conic-gradient(var(--bs-primary) 3.6deg, var(--white) 0deg);
+    display: flex;
+    align-items: center;
+    justify-content: center;
+}
+
+.circular-progress::before {
+    content: "";
+    position: absolute;
+    height: 100px;
+    width: 100px;
+    border-radius: 50%;
+    background-color: var(--white);
+}
+
+.progress-value {
+    position: relative;
+    font-size: 24px;
+    font-weight: 600;
+    color: var(--bs-primary);
+}
+
+.scrollbar {
+    float: left;
+    height: 80px;
+    width: calc(100% - 128px);
+    overflow-y: scroll;
+}
+
+.scrollbar-primary::-webkit-scrollbar {
+    width: 12px;
+    background-color: #F5F5F5;
+    display: initial;;
+}
+
+.scrollbar-primary::-webkit-scrollbar-thumb {
+    border-radius: 10px;
+    -webkit-box-shadow: inset 0 0 6px rgba(0, 0, 0, 0.1);
+    box-shadow: inset 0 0 6px rgba(0, 0, 0, 0.1);
+    background-color: #4285F4;
+}
+
+.scrollbar-primary {
+    scrollbar-color: #4285F4 #F5F5F5;
+}
+
 @media (min-width: 0px) {
     .intern.info {
         margin-top: 230px;
@@ -780,11 +875,7 @@ a.dt-button {
     }
 }
 
-@media (min-width: 576px) {
-    .interns-attendance, .interns {
-        grid-template-columns: repeat(1, 1fr);
-    }
-    
+@media (min-width: 576px) {    
     .intern.info {
         margin-top: 230px;
         width: 100%;
@@ -814,6 +905,10 @@ a.dt-button {
     }
 
     .images-grid {
+        grid-template-columns: repeat(2, 1fr);
+    }
+
+    .daily_task {
         grid-template-columns: repeat(2, 1fr);
     }
 
@@ -856,6 +951,10 @@ a.dt-button {
     .limited-card.d-xl-initial {
         display: initial;
     }
+
+    .daily_task {
+        grid-template-columns: repeat(3, 1fr);
+    }
 }
 
 @media (min-width: 1400px) {
@@ -865,6 +964,10 @@ a.dt-button {
 
     .limited-card.d-xxl-initial {
         display: initial;
+    }
+
+    .daily_task {
+        grid-template-columns: repeat(4, 1fr);
     }
 }
 

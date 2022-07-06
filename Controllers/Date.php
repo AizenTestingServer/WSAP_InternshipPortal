@@ -108,6 +108,14 @@
             <button type="button" class="btn btn-danger" data-bs-toggle="modal" 
             data-bs-target="#timeOutModal" disabled>Time out</button> <?php
         }
+
+        function dat_start() {
+            return strtotime(date("F j, Y")."4:00 pm"); //  4:00 pm
+        }
+
+        function dat_end() {
+            return strtotime(date("F j, Y")."8:00 pm"); //  8:00 pm
+        }
     }
 
 

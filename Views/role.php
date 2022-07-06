@@ -266,7 +266,8 @@
                             <label class="mb-2" for="max_overtime_hours">Max Overtime Hours
                                 <span class="text-danger me-1">*</span>
                                 <i class="fa-solid fa-circle-question"
-                                data-bs-toggle="tooltip" data-bs-placement="top" title="The changes will only reflect every friday."></i>
+                                data-bs-toggle="tooltip" data-bs-placement="top"
+                                title="The changes will only reflect every friday."></i>
                             </label>
                             <input id="max_overtime_hours" type="number" name="max_overtime_hours" class="form-control"
                                 value="<?php

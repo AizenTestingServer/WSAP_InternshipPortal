@@ -12,7 +12,7 @@
 
     $db = new Database();
     $date = new Date();
-    
+
     $db->query("SELECT intern_personal_information.*, intern_roles.*, roles.*
     FROM intern_personal_information, intern_roles, roles
     WHERE intern_personal_information.id=intern_roles.intern_id AND
@@ -59,7 +59,7 @@
     $overtime_hours = $db->fetch();
 
     $day = "friday";
-	
+
 	if (strtotime("today") < strtotime($day)) {
 	  $start_week_date = date("F j, Y", strtotime("last ".$day));
 	} else {
@@ -84,7 +84,7 @@
     if (!empty($max_overtime_hours["max_overtime_hours"])) {
         $overtime_hours_left = $max_overtime_hours["max_overtime_hours"];
     } else {
-        $overtime_hours_left = 10;   
+        $overtime_hours_left = 10;
     }
 
     if ($db->rowCount() == 0 || $overtime_hours["start_week_date"] != $start_week_date) {
@@ -102,7 +102,7 @@
         $db->query("SELECT * FROM overtime_hours WHERE intern_id=:intern_id ORDER BY id DESC LIMIT 1");
         $db->setInternId($_SESSION["intern_id"]);
         $db->execute();
-    
+
         $overtime_hours = $db->fetch();
     }
 
@@ -116,15 +116,73 @@
         $remind_time_out = isTimeOutEnabled($lts_att["time_in"], $lts_att["time_out"]);
     }
 
-    if (isset($_POST["goToAttendance"])) {
-        redirect("attendance.php");
+    if (isset($_POST["addNew"])) {
+        $title = fullTrim($_POST["title"]);
+        $start_date = $_POST["start_date"];
+        $description = fullTrim($_POST["description"]);
+        $progress = $_POST["progress"];
+
+        if (!empty($title) && !empty($start_date) && !empty($description)) {
+            $task = array(strtoupper($_SESSION["intern_id"]), $title, $description, $start_date, $progress);
+
+            $db->query("INSERT INTO tasks VALUES(null, :intern_id, :title, :description, :start_date, :progress)");
+            $db->insertTask($task);
+            $db->execute();
+            $db->closeStmt();
+            
+            $_SESSION["success"] = "Successfully added a task.";
+        } else {
+            $_SESSION["failed"] = "Please fill-out the required fields!";
+        }
+        redirect("dashboard.php");
+        exit();
+    }
+
+    if (isset($_POST["editTask"])) {
+        $id = $_POST["id"];
+        $title = fullTrim($_POST["title"]);
+        $start_date = $_POST["start_date"];
+        $description = fullTrim($_POST["description"]);
+        $progress = $_POST["progress"];
+
+        if (!empty($title) && !empty($start_date) && !empty($description)) {
+            $task = array($title, $description, $start_date, $progress, $id);
+
+            $db->query("UPDATE tasks SET title=:title, description=:description,
+            start_date=:start_date, progress=:progress WHERE id=:id");
+            $db->updateTask($task);
+            $db->execute();
+            $db->closeStmt();
+            
+            $_SESSION["success"] = "Successfully updated the task.";
+        } else {
+            $_SESSION["failed"] = "Please fill-out the required fields!";
+        }
+        redirect("dashboard.php");
+        exit();
+    }
+
+    if (isset($_POST["removeTask"])) {
+        $id = $_POST["id"];
+
+        if (!empty($id)) {
+            $db->query("DELETE FROM tasks WHERE id=:id");
+            $db->setId($id);
+            $db->execute();
+            $db->closeStmt();
+            
+            $_SESSION["success"] = "Successfully removed the task.";
+        } else {
+            $_SESSION["failed"] = "Please fill-out the required fields!";
+        }
+        redirect("dashboard.php");
         exit();
     }
 
     require_once "../Templates/header_view.php";
     setTitle("Dashboard");
-?> 
-<div class="my-container"> 
+?>
+<div class="my-container">
     <?php
         include_once "nav_side_bar.php";
         navSideBar("dashboard");
@@ -133,7 +191,7 @@
         <div class="aside">
             <?php include_once "profile_nav.php"; ?>
         </div>
-        
+
         <div class="row mb-3">
             <div>
                 <h3>Dashboard</h3>
@@ -147,7 +205,7 @@
                     ?>
                 </div> <?php
             } ?>
-            
+
             <div class="summary">
                 <a class="clickable-card" href="attendance.php" draggable="false">
                     <div class="summary-boxes">
@@ -191,7 +249,7 @@
                         </div>
                     </div>
                 </a>
-                
+
                 <a class="clickable-card" href="profile.php" draggable="false">
                     <div class="summary-boxes">
                         <div class="top">
@@ -218,7 +276,7 @@
                         </div>
                     </div>
                 </a>
-                
+
                 <a class="clickable-card" href="profile.php" draggable="false">
                     <div class="summary-boxes">
                         <div class="top">
@@ -258,7 +316,7 @@
                                         $rendering_days = round(($intern_wsap_info["target_rendering_hours"]-$intern_wsap_info["rendered_hours"])/8);
                                         $estimated_weekends = ceil(($rendering_days/5) * 2);
                                         $rendering_days += $estimated_weekends + 1;
-                                        
+
                                         echo date("j M Y", strtotime($date->getDate()." + ".$rendering_days." days"));
                                     } else {
                                         echo date("j M Y", strtotime($intern_wsap_info["offboard_date"]));
@@ -338,20 +396,120 @@
                     </div>
                 </a>
             </div>
+
+            <div class="modal fade" id="addNewModal" tabindex="-1" aria-labelledby="addNewModalLabel" aria-hidden="true">
+                <div class="modal-dialog modal-dialog-centered">
+                    <div class="modal-content">
+                        <div class="modal-header">
+                            <h5 class="modal-title" id="addNewModalLabel">Add</h5>
+                            <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Close"></button>
+                        </div>
+
+                        <form action="<?= htmlspecialchars($_SERVER["PHP_SELF"]);?>" method="post">
+                            <div class="modal-body">
+                                <div class="row">
+                                    <div class="col-sm-12 col-md-6 user_input my-1">
+                                        <label class="mb-2" for="title">Title
+                                            <span class="text-danger">*</span>
+                                        </label>
+                                        <input type="text" name="title" class="form-control" maxLength="32">
+                                    </div>
+                                    <div class="col-sm-12 col-md-6 user_input my-1">
+                                        <label class="mb-2" for="title">Start Date
+                                            <span class="text-danger">*</span>
+                                        </label>
+                                        <input type="date" name="start_date" class="form-control"
+                                            value="<?= date("Y-m-d", $date->getDateValue()) ?>">
+                                    </div>
+                                    <div class="col-12 user_input my-1">
+                                        <label class="mb-2" for="title">Description
+                                            <span class="text-danger">*</span>
+                                        </label>
+                                        <textarea type="multiline" name="description" class="form-control"
+                                            rows="5" maxLength="512"></textarea>
+                                    </div>
+                                    <div class="col-12 user_input my-1">
+                                        <label for="progress" class="form-label">Progress</label>
+                                        <div class="row align-items-center range-inputs">
+                                            <div class="col-sm-12 col-md-3">
+                                                <input type="number" class="form-control" min="0" max="100"
+                                                    id="progressInput" name="progress">
+                                            </div>
+                                            <div class="col-sm-12 col-md-9">
+                                                <input type="range" class="form-range" min="0" max="100" step="1"
+                                                    id="progressTrackbar" value="0">
+                                            </div>
+                                        </div>
+                                    </div>
+                                </div>
+                            </div>
+
+                            <div class="modal-footer">
+                                <button type="submit" name="addNew" class="btn btn-success">Submit</button>
+                            </div>
+                        </form>
+                    </div>
+                </div>
+            </div> <?php
+            $db->query("SELECT * FROM tasks WHERE intern_id=:intern_id");
+            $db->setInternid($_SESSION["intern_id"]);
+            $db->execute();
             
+            $tasks_count = $db->rowCount();
+
+            $db->query("SELECT * FROM tasks WHERE intern_id=:intern_id AND progress = 100");
+            $db->setInternid($_SESSION["intern_id"]);
+            $db->execute();
+            
+            $completed_tasks_count = $db->rowCount(); ?>
             <div class="section-content mt-2">
                 <div class="col-md-12 p-4" id="tasks">
-                    <div class="d-flex justify-content-between align-items-center mb-2">
-                        <h4 class="mt-4 fw-bold">Tasks and Reminders</h4>
-                        <!-- <div>
-                            <button class="btn btn-outline-dark fs-c">
+                    <div class="d-lg-flex d-sm-inline-block justify-content-between align-items-center mb-2">
+                        <div class="d-flex align-items-center mb-2">
+                            <h4 class="fw-bold m-0 me-2">Tasks and Reminders</h4>
+                            <a class="btn btn-secondary btn-sm d-none" href="tasks.php">
+                                Show All<i class="fa-solid fa-arrow-right ms-2"></i>
+                            </a>
+                        </div>
+                        <div class="d-none">
+                            <button class="btn btn-primary mb-2" data-bs-toggle="modal" 
+                                data-bs-target="#addNewModal">
                                 <i class="fa-solid fa-plus me-2"></i>Add New
                             </button>
-                        </div> -->
+                            <button class="btn btn-success mb-2" <?php
+                                if ($completed_tasks_count == 0 || !isDATEnabled()) { ?>
+                                    disabled <?php
+                                } ?>>Submit Completed
+                            </button>
+                            <button class="btn btn-smoke border-dark mb-2" <?php
+                                if ($tasks_count == 0 || !isDATEnabled()) { ?>
+                                    disabled <?php
+                                } ?>>
+                                <i class="fa-solid fa-circle-question me-1"
+                                data-bs-toggle="tooltip" data-bs-placement="left"
+                                title="The on-going tasks will still remain after you submit all."></i>
+                                Submit All
+                            </button>
+                        </div>
+                    </div> <?php
+                    if (isset($_SESSION["success"])) { ?>
+                        <div class="alert alert-success text-success">
+                            <?php
+                                echo $_SESSION["success"];
+                                unset($_SESSION["success"]);
+                            ?>
+                        </div> <?php
+                    }
 
-                    </div>
-
-                    <?php $record_count = 0; ?>
+                    if (isset($_SESSION["failed"])) { ?>
+                        <div class="alert alert-danger text-danger">
+                            <?php
+                                echo $_SESSION["failed"];
+                                unset($_SESSION["failed"]);
+                            ?>
+                        </div> <?php
+                    }
+                    $record_count = 0; ?>
                     <div class="daily_task"> <?php
                         if (!empty($lts_att)) {
                             $att_date = $lts_att["att_date"];
@@ -376,14 +534,12 @@
                                     </div>
                                 </div>
                                 <div class="task-box-action mt-2 d-flex justify-content-end align-items-center">
-                                    <form action="<?= htmlspecialchars($_SERVER["PHP_SELF"]);?>" method="post">
-                                        <button type="submit" name="goToAttendance" class="btn btn-success">Time in</button>
-                                    </form>
+                                    <a class="btn btn-success" href="attendance.php">Time in</a>
                                 </div>
                             </div> <?php
                         }
-                        
-                        if ($remind_time_out &&$intern_wsap_info["status"] == 1) {
+
+                        if ($remind_time_out && $intern_wsap_info["status"] == 1) {
                             $record_count++; ?>
                             <div class="task-box">
                                 <div class="task-box-status">
@@ -400,11 +556,202 @@
                                     </div>
                                 </div>
                                 <div class="task-box-action mt-2 d-flex justify-content-end align-items-center">
-                                    <form action="<?= htmlspecialchars($_SERVER["PHP_SELF"]);?>" method="post">
-                                        <button type="submit" name="goToAttendance" class="btn btn-danger">Time out</button>
-                                    </form>
+                                    <a class="btn btn-danger" href="attendance.php">Time out</a>
                                 </div>
-                            </div> <?php 
+                            </div> <?php
+                        }
+
+                        $sort = " ORDER BY id DESC";
+                        if (!empty($_GET["sort"])) {
+                            switch ($_GET["sort"]) {
+                                case "1":
+                                    $sort = " ORDER BY id DESC";
+                                    break;
+                                case "2":
+                                    $sort = " ORDER BY id";
+                                    break;
+                            }
+                        }
+        
+                        $conditions = " WHERE intern_id=:intern_id";
+        
+                        if (!empty($_GET["search"])) {
+                            if (strlen($conditions) > 6) {
+                                $conditions = $conditions." AND";
+                            }
+                            $conditions = $conditions." title LIKE CONCAT( '%', :search, '%') OR
+                            description LIKE CONCAT( '%', :search, '%')";
+                        }
+        
+                        $query = "SELECT * FROM tasks";
+        
+                        if (strlen($conditions) > 6) {
+                            $db->query($query.$conditions.$sort);
+        
+                            if (!empty($_GET["search"])) {
+                                $db->search($_GET["search"]);
+                            }
+                        } else {
+                            $db->query($query.$sort);
+                        }
+                        $db->setInternid($_SESSION["intern_id"]);
+                        $db->execute();
+        
+                        while ($row = $db->fetch()) {
+                            $record_count++; ?>
+                            <div class="modal fade" id="editModal<?= $row["id"] ?>" tabindex="-1" aria-labelledby="editModalLabel<?= $row["id"] ?>" aria-hidden="true">
+                                <div class="modal-dialog modal-dialog-centered">
+                                    <div class="modal-content">
+                                        <div class="modal-header">
+                                            <h5 class="modal-title" id="editModalLabel<?= $row["id"] ?>">Update</h5>
+                                            <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Close"></button>
+                                        </div>
+
+                                        <form action="<?= htmlspecialchars($_SERVER["PHP_SELF"]);?>" method="post">
+                                            <div class="modal-body">
+                                                <div class="row">
+                                                    <input type="text" name="id" class="form-control d-none" value=<?= $row["id"] ?>>
+                                                    <div class="col-sm-12 col-md-6 user_input my-1">
+                                                        <label class="mb-2" for="title">Title
+                                                            <span class="text-danger">*</span>
+                                                        </label>
+                                                        <input type="text" name="title" class="form-control"
+                                                            value=<?= $row["title"] ?> maxLength="32">
+                                                    </div>
+                                                    <div class="col-sm-12 col-md-6 user_input my-1">
+                                                        <label class="mb-2" for="title">Start Date
+                                                            <span class="text-danger">*</span>
+                                                        </label>
+                                                        <input type="date" name="start_date" class="form-control"
+                                                            value="<?= date("Y-m-d", strtotime( $row["start_date"])) ?>">
+                                                    </div>
+                                                    <div class="col-12 user_input my-1">
+                                                        <label class="mb-2" for="title">Description
+                                                            <span class="text-danger">*</span>
+                                                        </label>
+                                                        <textarea type="multiline" name="description" class="form-control"
+                                                            rows="5" maxLines="10" maxLength="512"><?= $row["description"] ?></textarea>
+                                                    </div>
+                                                    <div class="col-12 user_input my-1">
+                                                        <label for="progress" class="form-label">Progress</label>
+                                                        <div class="row align-items-center range-inputs">
+                                                            <div class="col-sm-12 col-md-3">
+                                                                <input type="number" class="form-control" min="0" max="100"
+                                                                    id="progressInput" name="progress" value=<?= $row["progress"] ?>>
+                                                            </div>
+                                                            <div class="col-sm-12 col-md-9">
+                                                                <input type="range" class="form-range" min="0" max="100" step="1"
+                                                                    id="progressTrackbar" value=<?= $row["progress"] ?>>
+                                                            </div>
+                                                        </div>
+                                                    </div>
+                                                </div>
+                                            </div>
+
+                                            <div class="modal-footer">
+                                                <button type="submit" name="editTask" class="btn btn-success">Submit</button>
+                                            </div>
+                                        </form>
+                                    </div>
+                                </div>
+                            </div>
+
+                            <div class="modal fade" id="removeTaskModal<?= $row["id"] ?>" tabindex="-1"
+                                aria-labelledby="removeTaskModalLabel" aria-hidden="true">
+                                <div class="modal-dialog modal-dialog-centered">
+                                    <div class="modal-content">
+                                        <div class="modal-header">
+                                            <h5 class="modal-title" id="removeTaskModalLabel">Remove Task</h5>
+                                            <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Close"></button>
+                                        </div>
+                                        
+                                        <form action="<?= htmlspecialchars($_SERVER["PHP_SELF"]);?>" method="post">
+                                            <div class="modal-body">
+                                                <input type="text" name="id" class="form-control d-none" value=<?= $row["id"] ?>>
+                                                <div class="task-box position-relative">
+                                                    <div class="task-box-status">
+                                                        <div>
+                                                            <h6 class="task-title fw-bold mb-0">
+                                                                <?= $row["title"] ?>
+                                                            </h6> <?php
+                                                            if ($row["progress"] == 100) { ?>
+                                                                <p class="bg-success text-light rounded w-fit px-2 py-1 mt-2 fs-d">
+                                                                    Completed
+                                                                </p> <?php
+                                                            } else { ?>
+                                                                <p class="bg-warning rounded w-fit px-2 py-1 mt-2 fs-d">
+                                                                    On-going
+                                                                </p> <?php
+                                                            } ?>
+                                                        </div>
+                                                    </div>
+                                                    <div class="scrollbar scrollbar-primary fs-e mb-5">
+                                                        <?= $row["description"] ?>
+                                                    </div>
+                                                    <div class="top-right">
+                                                        <div class="circular-progress" value="<?= $row["progress"] ?>">
+                                                            <span class="progress-value"><?= $row["progress"]."%" ?></span>
+                                                        </div>
+                                                    </div>
+                                                    <div class="task-box-action-2">
+                                                        <span><?= date("F j, Y", strtotime($row["start_date"])) ?></span>
+                                                    </div>
+                                                </div>
+                                            </div>
+
+                                            <div class="modal-footer">
+                                                <button type="submit" name="removeTask" class="btn btn-danger">Remove</button>
+                                            </div>
+                                        </form>
+                                    </div>
+                                </div>
+                            </div>
+
+                            <div class="task-box position-relative">
+                                <div class="task-box-status">
+                                    <div>
+                                        <h6 class="task-title fw-bold mb-0">
+                                            <?= $row["title"] ?>
+                                        </h6> <?php
+                                        if ($row["progress"] == 100) { ?>
+                                            <p class="bg-success text-light rounded w-fit px-2 py-1 mt-2 fs-d">
+                                                Completed
+                                            </p> <?php
+                                        } else { ?>
+                                            <p class="bg-warning rounded w-fit px-2 py-1 mt-2 fs-d">
+                                                On-going
+                                            </p> <?php
+                                        } ?>
+                                    </div>
+                                </div>
+                                <div class="scrollbar scrollbar-primary fs-e mb-5">
+                                    <?= $row["description"] ?>
+                                </div>
+                                <div class="top-right">
+                                    <div class="circular-progress" value="<?= $row["progress"] ?>">
+                                        <span class="progress-value"><?= $row["progress"]."%" ?></span>
+                                    </div>
+                                </div>
+                                <div class="task-box-action-2 d-flex align-items-center">
+                                    <span><?= date("F j, Y", strtotime($row["start_date"])) ?></span>
+                                    <div class="ms-auto">
+                                        <button class="btn btn-success btn-sm" <?php
+                                            if ($row["progress"] != 100 || !isDATEnabled()) { ?>
+                                                disabled <?php
+                                            } ?>>
+                                            Submit
+                                        </button>
+                                        <button class="btn btn-primary btn-sm" data-bs-toggle="modal" 
+                                            data-bs-target="#editModal<?= $row["id"] ?>">
+                                            <i class="fa-solid fa-pen"></i>
+                                        </button>
+                                        <button class="btn btn-danger btn-sm" data-bs-toggle="modal" 
+                                            data-bs-target="#removeTaskModal<?= $row["id"] ?>">
+                                            <i class="fa-solid fa-xmark"></i>
+                                        </button>
+                                    </div>
+                                </div>
+                            </div> <?php
                         } ?>
                     </div> <?php
                     if ($record_count == 0) { ?>
@@ -417,6 +764,49 @@
         </div>
     </div>
 </div>
+<script>
+    const tooltipTriggerList = document.querySelectorAll('[data-bs-toggle="tooltip"]');
+    const tooltipList = [...tooltipTriggerList].map(tooltipTriggerEl => new bootstrap.Tooltip(tooltipTriggerEl));
+
+    const circularProgressItems = document.querySelectorAll(".circular-progress");
+
+    var progressEndValues = [];
+    for (const circularProgress of circularProgressItems) {
+        const value = circularProgress.getAttribute("value");
+        progressEndValues.push(value);
+    }
+
+    for (var index = 0; index < circularProgressItems.length; index++) {
+        const circularProgress = circularProgressItems[index];
+        const progressValue = circularProgress.querySelector(".progress-value");
+
+        progressValue.textContent = `${progressEndValues[index]}%`
+        circularProgress.style.background = `conic-gradient(#0d6efd ${progressEndValues[index] * 3.6}deg, #fff 0deg)`
+    }
+
+    const rangeInputs = document.querySelectorAll(".range-inputs");
+
+    for (const rangeInput of rangeInputs) {        
+        const progressInput = rangeInput.children[0].children[0];
+        const progressTrackbar = rangeInput.children[1].children[0];
+
+        if (progressInput.value.length == 0) {
+            progressInput.value = 0;
+        }
+
+        progressInput.addEventListener("change", function (e) {
+            if (progressInput.value > 100) {
+                progressInput.value = 100;
+            }
+            progressTrackbar.value = progressInput.value;
+        });
+
+        progressTrackbar.addEventListener("change", function (e) {
+            progressInput.value = progressTrackbar.value;
+        });
+    }
+
+</script>
 <?php
     require_once "../Templates/footer.php";
 ?>

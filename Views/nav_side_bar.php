@@ -44,27 +44,6 @@
                         -->
                     </ul>
                 </li>
-                <!--
-                <li>
-                    <a href="department.php">
-                        <div class="icon-container">
-                            <i class="fa-solid fa-user-group fa-2x"></i>
-                        </div> Department
-                    </a>
-                </li>
-                <li class="dropdown-toggler">
-                    <a href="#">
-                        <div class="icon-container">
-                            <i class="fa-solid fa-bullhorn fa-2x"></i>
-                        </div> Brand
-                    </a>
-                    <ul class="dropdown-list">
-                        <li><a href="#">Organizational Chart</a></li>
-                        <li><a href="#">Promotions</a></li>
-                        <li><a href="brands.php">Websites</a></li>
-                    </ul>
-                </li>
-                -->
                 <li class="dropdown-toggler">
                     <a <?php
                     if ($target_active == "attendance") { ?>
@@ -81,36 +60,24 @@
                         <li><a href="interns_attendance.php">Interns' Attendance</a></li>
                         <li><a href="calendar.php?month=<?= $date->getMonthName() ?>&year=<?= $date->getYear() ?>">Calendar</a></li>
                         <li><a href="daily_time_record.php">Interns' DTR</a></li>
-                        <!-- 
-                        <li><a href="attendance_it.php">IT Dept</a></li>
-                        <li><a href="attendance_hr.php">HR Dept</a></li>
-                        <li><a href="attendance_mktg.php">Marketing Dept</a></li>
-                        <li><a href="attendance_ops.php">Operations Dept</a></li>
-                        <li><a href="attendance_acct.php">Acct Dept</a></li>
-                        <li><a href="attendance_bd.php">Business Dept</a></li>
-                        -->
                     </ul>
                 </li>
-                <!--
-                <li>
-                    <a href="schedule.php">
+                <!-- <li class="dropdown-toggler">
+                    <a <?php
+                    if ($target_active == "tasks") { ?>
+                        class="active" <?php
+                    } else { ?>
+                        class="inactive" <?php
+                    } ?>>
                         <div class="icon-container">
-                            <i class="fa-solid fa-calendar-week fa-2x"></i>
-                        </div> Events
+                            <i class="fa-solid fa-tasks fa-2x"></i>
+                        </div> Tasks
                     </a>
-                </li>
-                <li class="dropdown-toggler">
-                    <a href="#">
-                        <div class="icon-container"><i class="fa-solid fa-file-word fa-2x"></i></div> Request
-                    </a>
-                    <ul class="dropdown-list">
-                        <li><a href="#">OJT Documents</a></li>
-                        <li><a href="#">Change of Schedule</a></li>
-                        <li><a href="#">COC / DTR</a></li>
+                    <ul class="dropdown-list text-start">
+                        <li><a href="tasks.php">My Tasks</a></li>
+                        <li><a href="interns_tasks.php">Interns' Tasks</a></li>
                     </ul>
-                </li>
-                -->
-
+                </li> -->
                 <li class="dropdown-toggler">
                     <a <?php
                     if ($target_active == "interns") { ?>
@@ -144,12 +111,6 @@
                         Audit Logs
                     </a>
                 </li>
-                <!--
-                <li><a href="help.php">
-                        <div class="icon-container"><i class="fa-solid fa-handshake-angle fa-2x"></i></div> Help
-                    </a>
-                </li>
-                -->
             </ul>
         </div> <?php
     }

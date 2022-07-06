@@ -177,19 +177,19 @@
                                 } ?>
                                 <div>
                                     <p class="fs-e mb-1">MS</p>
-                                    <p class="bg-morning text-light rounded w-fit m-auto px-2 pt-1 pb-1">
+                                    <p class="bg-morning text-light rounded w-fit m-auto px-2 py-1">
                                         <?= $morning_shift_count ?>
                                     </p>
                                 </div>
                                 <div>
                                     <p class="fs-e mb-1">FT</p>
-                                    <p class="bg-info text-dark rounded w-fit m-auto px-2 pt-1 pb-1">
+                                    <p class="bg-info text-dark rounded w-fit m-auto px-2 py-1">
                                         <?= $value["present"] - $morning_shift_count - $afternoon_shift_count ?>
                                     </p>
                                 </div>
                                 <div>
                                     <p class="fs-e mb-1">AS</p>
-                                    <p class="bg-afternoon text-light rounded w-fit m-auto px-2 pt-1 pb-1">
+                                    <p class="bg-afternoon text-light rounded w-fit m-auto px-2 py-1">
                                         <?= $afternoon_shift_count ?>
                                     </p>
                                 </div>
@@ -197,13 +197,13 @@
                             <div class="bottom d-flex justify-content-evenly border border-top-0 py-1">
                                 <div>
                                     <p class="fs-e mb-1">Present</p>
-                                    <p class="bg-success text-light rounded w-fit m-auto px-2 pt-1 pb-1">
+                                    <p class="bg-success text-light rounded w-fit m-auto px-2 py-1">
                                         <?= $value["present"] ?>
                                     </p>
                                 </div>
                                 <div>
                                     <p class="fs-e mb-1">Absent</p>
-                                    <p class="bg-danger text-light rounded w-fit m-auto px-2 pt-1 pb-1">
+                                    <p class="bg-danger text-light rounded w-fit m-auto px-2 py-1">
                                         <?= $active_interns - $value["present"] ?>
                                     </p>
                                 </div>
