@@ -5,7 +5,7 @@
         $date = new Date(); ?>
         <div class="side-nav border-end p-1 vh-100 position-fixed">
             <div class="d-flex align-items-center flex-column">
-                <img class="img-responsive" src="../Assets/img/Brand_Logo/WSAP.png" alt=""
+                <img class="img-responsive" src="../Assets/img/brand_logo/WSAP.png" alt=""
                     onerror="this.src='../Assets/img/profile_imgs/no_image_found.jpeg';">
                 <span class="fw-bold">WSAP IP</span>
             </div>
