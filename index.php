@@ -106,7 +106,7 @@
     <div class="login-outside">
         <div class="login-form rounded shadow-lg p-4">
             <div class="text-center">
-                <img height="120" width="120" src="./Assets/img/Brand_Logo/WSAP.png" alt="">
+                <img height="120" width="120" src="./Assets/img/brand_logo/WSAP.png" alt="">
                 <div class="p-1 pb-0">
                     <h4 class="title">INTERNSHIP PORTAL</h4>
                 </div>

@@ -467,11 +467,11 @@
                     <div class="d-lg-flex d-sm-inline-block justify-content-between align-items-center mb-2">
                         <div class="d-flex align-items-center mb-2">
                             <h4 class="fw-bold m-0 me-2">Tasks and Reminders</h4>
-                            <a class="btn btn-secondary btn-sm d-none" href="tasks.php">
+                            <a class="btn btn-secondary btn-sm" href="tasks.php">
                                 Show All<i class="fa-solid fa-arrow-right ms-2"></i>
                             </a>
                         </div>
-                        <div class="d-none">
+                        <div>
                             <button class="btn btn-primary mb-2" data-bs-toggle="modal" 
                                 data-bs-target="#addNewModal">
                                 <i class="fa-solid fa-plus me-2"></i>Add New
