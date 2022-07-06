@@ -62,22 +62,6 @@
                         <li><a href="daily_time_record.php">Interns' DTR</a></li>
                     </ul>
                 </li>
-                <!-- <li class="dropdown-toggler">
-                    <a <?php
-                    if ($target_active == "tasks") { ?>
-                        class="active" <?php
-                    } else { ?>
-                        class="inactive" <?php
-                    } ?>>
-                        <div class="icon-container">
-                            <i class="fa-solid fa-tasks fa-2x"></i>
-                        </div> Tasks
-                    </a>
-                    <ul class="dropdown-list text-start">
-                        <li><a href="tasks.php">My Tasks</a></li>
-                        <li><a href="interns_tasks.php">Interns' Tasks</a></li>
-                    </ul>
-                </li> -->
                 <li class="dropdown-toggler">
                     <a <?php
                     if ($target_active == "interns") { ?>
