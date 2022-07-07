@@ -645,62 +645,66 @@
                 }
                 $db->execute();
 
-                while ($row = $db->fetch()) { ?>
-                    <a class="clickable-card" href="profile.php?intern_id=<?= $row["intern_id"] ?>"
-                        draggable="false">
-                        <div class="intern text-center">
-                            <div class="top">
-                                <img class="img-intern mx-auto" src="<?php {
-                                    if ($row["image"] == null || strlen($row["image"]) == 0) {
-                                        if ($row["gender"] == 0) {
-                                            echo "../Assets/img/profile_imgs/default_male.png";
+                while ($row = $db->fetch()) {
+                    if ($admin_roles_count != 0) { ?>
+                        <a class="clickable-card" href="profile.php?intern_id=<?= $row["intern_id"] ?>"
+                            draggable="false"> <?php
+                    } ?>
+                            <div class="intern text-center">
+                                <div class="top">
+                                    <img class="img-intern mx-auto" src="<?php {
+                                        if ($row["image"] == null || strlen($row["image"]) == 0) {
+                                            if ($row["gender"] == 0) {
+                                                echo "../Assets/img/profile_imgs/default_male.png";
+                                            } else {
+                                                echo "../Assets/img/profile_imgs/default_female.png";
+                                            }
                                         } else {
-                                            echo "../Assets/img/profile_imgs/default_female.png";
+                                            echo $row["image"];
                                         }
-                                    } else {
-                                        echo $row["image"];
-                                    }
-                                } ?>" onerror="this.src='../Assets/img/profile_imgs/no_image_found.jpeg';">
-                            </div>
-                            <div class="summary-total mt-2 w-fit mx-auto">
-                                <h5 class="mb-0 text-dark fs-regular">
-                                    <?= $row["last_name"].", ".$row["first_name"] ?>
-                                </h5>
-                                <h6 class="fs-f"><?= $row["name"] ?></h6>
-                            </div>
-                            <div class="bottom w-100 mt-3"> <?php
-                                if ($row["status"] == 0 || $row["status"] == 5) { ?>
-                                    <p class="bg-warning text-dark rounded w-fit m-auto px-2 py-1 fs-d"> <?php
-                                        if ($row["status"] == 0) {
-                                            echo "Inactive";
-                                        } else {
-                                            echo "Suspended";
-                                        } ?>
-                                    </p> <?php
-                                }  else if ($row["status"] == 1 || $row["status"] == 4) { ?>
-                                    <p class="bg-success text-light rounded w-fit m-auto px-2 py-1 fs-d"> <?php
-                                        if ($row["status"] == 1) {
-                                            echo "Active";
-                                        } else {
-                                            echo "Extended";
-                                        } ?>
-                                    </p> <?php
-                                }   else if ($row["status"] == 2) { ?>
-                                    <p class="bg-secondary text-light rounded w-fit m-auto px-2 py-1 fs-d">
-                                        Offboarded
-                                    </p> <?php
-                                }   else if ($row["status"] == 4) { ?>
-                                    <p class="bg-dark text-light rounded w-fit m-auto px-2 py-1 fs-d">
-                                        Withdrawn
-                                    </p> <?php
-                                }   else if ($row["status"] == 6) { ?>
-                                    <p class="bg-danger text-light rounded w-fit m-auto px-2 py-1">
-                                        Terminated
-                                    </p> <?php
-                                } ?>
-                            </div>
-                        </div>
-                    </a> <?php
+                                    } ?>" onerror="this.src='../Assets/img/profile_imgs/no_image_found.jpeg';">
+                                </div>
+                                <div class="summary-total mt-2 w-fit mx-auto">
+                                    <h5 class="mb-0 text-dark fs-regular">
+                                        <?= $row["last_name"].", ".$row["first_name"] ?>
+                                    </h5>
+                                    <h6 class="fs-f"><?= $row["name"] ?></h6>
+                                </div>
+                                <div class="bottom w-100 mt-3"> <?php
+                                    if ($row["status"] == 0 || $row["status"] == 5) { ?>
+                                        <p class="bg-warning text-dark rounded w-fit m-auto px-2 py-1 fs-d"> <?php
+                                            if ($row["status"] == 0) {
+                                                echo "Inactive";
+                                            } else {
+                                                echo "Suspended";
+                                            } ?>
+                                        </p> <?php
+                                    }  else if ($row["status"] == 1 || $row["status"] == 4) { ?>
+                                        <p class="bg-success text-light rounded w-fit m-auto px-2 py-1 fs-d"> <?php
+                                            if ($row["status"] == 1) {
+                                                echo "Active";
+                                            } else {
+                                                echo "Extended";
+                                            } ?>
+                                        </p> <?php
+                                    }   else if ($row["status"] == 2) { ?>
+                                        <p class="bg-secondary text-light rounded w-fit m-auto px-2 py-1 fs-d">
+                                            Offboarded
+                                        </p> <?php
+                                    }   else if ($row["status"] == 4) { ?>
+                                        <p class="bg-dark text-light rounded w-fit m-auto px-2 py-1 fs-d">
+                                            Withdrawn
+                                        </p> <?php
+                                    }   else if ($row["status"] == 6) { ?>
+                                        <p class="bg-danger text-light rounded w-fit m-auto px-2 py-1">
+                                            Terminated
+                                        </p> <?php
+                                    } ?>
+                                </div>
+                            </div> <?php
+                    if ($admin_roles_count != 0) { ?>
+                        </a> <?php
+                    }
                 } ?>
             </div> <?php
             if ($db->rowCount() == 0) { ?>
