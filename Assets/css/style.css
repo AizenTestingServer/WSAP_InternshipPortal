@@ -423,10 +423,6 @@ body {
 }
 
 .task-box-action {
-    width: 100%;
-}
-
-.task-box-action-2 {
     position: absolute;
     left: 1rem;
     right: 1rem;
@@ -443,6 +439,10 @@ body {
 
 .task-box {
     background: var(--white);
+}
+
+.digi-time {
+    height: 130px;
 }
 
 .line-separator {

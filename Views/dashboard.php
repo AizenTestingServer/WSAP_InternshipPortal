@@ -519,14 +519,12 @@
 
                         if (isTimeInEnabled($att_date) && $intern_wsap_info["status"] == 1) {
                             $record_count++; ?>
-                            <div class="task-box">
+                            <div class="task-box position-relative">
                                 <div class="task-box-status">
-                                    <div class="d-flex justify-content-between">
-                                        <h6 class="task-title fw-bold">
-                                            Time in
-                                        </h6>
-                                    </div>
-                                    <div class="col-md-12 text-center">
+                                    <h6 class="task-title fw-bold">
+                                        Time in
+                                    </h6>
+                                    <div class="digi-time text-center d-flex align-items-center justify-content-center">
                                         <iframe sandbox="allow-same-origin allow-scripts allow-popups allow-forms"
                                         src="https://www.zeitverschiebung.net/clock-widget-iframe-v2?language=en&size=small&timezone=Asia%2FManila"
                                         width="200" height="90" frameborder="0" seamless>
@@ -541,14 +539,12 @@
 
                         if ($remind_time_out && $intern_wsap_info["status"] == 1) {
                             $record_count++; ?>
-                            <div class="task-box">
+                            <div class="task-box position-relative">
                                 <div class="task-box-status">
-                                    <div class="d-flex justify-content-between">
-                                        <h6 class="task-title fw-bold">
-                                            Time out
-                                        </h6>
-                                    </div>
-                                    <div class="col-md-12 text-center">
+                                    <h6 class="task-title fw-bold">
+                                        Time out
+                                    </h6>
+                                    <div class="digi-time text-center d-flex align-items-center justify-content-center">
                                         <iframe sandbox="allow-same-origin allow-scripts allow-popups allow-forms"
                                         src="https://www.zeitverschiebung.net/clock-widget-iframe-v2?language=en&size=small&timezone=Asia%2FManila"
                                         width="200" height="90" frameborder="0" seamless>
@@ -693,7 +689,7 @@
                                                             <span class="progress-value"><?= $row["progress"]."%" ?></span>
                                                         </div>
                                                     </div>
-                                                    <div class="task-box-action-2">
+                                                    <div class="task-box-action">
                                                         <span><?= date("F j, Y", strtotime($row["start_date"])) ?></span>
                                                     </div>
                                                 </div>
@@ -732,7 +728,7 @@
                                         <span class="progress-value"><?= $row["progress"]."%" ?></span>
                                     </div>
                                 </div>
-                                <div class="task-box-action-2 d-flex align-items-center">
+                                <div class="task-box-action d-flex align-items-center">
                                     <span><?= date("F j, Y", strtotime($row["start_date"])) ?></span>
                                     <div class="ms-auto">
                                         <button class="btn btn-success btn-sm" <?php
