@@ -95,8 +95,7 @@
         }  
 
         function time_in_disabled() { ?>
-             <button type="button" class="btn btn-success me-1" data-bs-toggle="modal" 
-            data-bs-target="#timeInModal" disabled>Time in</button> <?php
+             <button type="button" class="btn btn-success me-1" disabled>Time in</button> <?php
         }    
 
         function time_out_enabled() { ?>
@@ -105,8 +104,7 @@
         }
 
         function time_out_disabled() { ?>
-            <button type="button" class="btn btn-danger" data-bs-toggle="modal" 
-            data-bs-target="#timeOutModal" disabled>Time out</button> <?php
+            <button type="button" class="btn btn-danger" disabled>Time out</button> <?php
         }
 
         function dat_start() {

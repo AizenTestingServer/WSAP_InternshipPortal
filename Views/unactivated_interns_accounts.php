@@ -471,7 +471,7 @@
                             } else {
                                 $interns_info_text .= "\\n\"\n";
                             } ?>
-                            <div class="modal fade" id="removeAccountModal<?= $row["id"] ?>" tabindex="-1"
+                            <div class="modal fade" id="removeAccountModal<?= $row["intern_id"] ?>" tabindex="-1"
                                 aria-labelledby="removeAccountModalLabel" aria-hidden="true">
                                 <div class="modal-dialog modal-dialog-centered">
                                     <div class="modal-content">
@@ -533,7 +533,7 @@
                                     </div>
                                 </div>
                                 <button class="btn btn-danger btn-sm top-right" data-bs-toggle="modal" 
-                                    data-bs-target="#removeAccountModal<?= $row["id"] ?>">
+                                    data-bs-target="#removeAccountModal<?= $row["intern_id"] ?>">
                                     <i class="fa-solid fa-xmark fs-c"></i>
                                 </button>
                             </div> <?php

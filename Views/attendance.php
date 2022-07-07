@@ -100,7 +100,19 @@
             $time_out_enabled = isTimeOutEnabled($lts_att["time_in"], $lts_att["time_out"]);
         }
 
-        if (isset($_POST["timeIn"])) { 
+        if (isset($_POST["timeIn"])) {
+            if (!empty($lts_att)) {
+                $att_date = $lts_att["att_date"];
+            } else {
+                $att_date = "";
+            }
+
+            if (!(isTimeInEnabled($att_date) && $intern_wsap_info["status"] == 1)) {
+                $_SESSION["error"] = "You are unable to time in.";
+                redirect("attendance.php");
+                exit();
+            }
+
             if ($date->getDateTimeValue() > $date->morning_briefing() && $date->getDateTimeValue() < $date->morning_shift_end()) {
                 $time_in = $date->getTime()." L";
             } else {
@@ -132,6 +144,12 @@
         }
     
         if (isset($_POST["timeOut"])) {
+            if (!($time_out_enabled && $intern_wsap_info["status"] == 1)) {
+                $_SESSION["error"] = "You are unable to time out.";
+                redirect("attendance.php");
+                exit();
+            }
+
             if (!empty($lts_att["time_in"]) && empty($lts_att["time_out"])) {
                 $time_out = $date->getTime();
                

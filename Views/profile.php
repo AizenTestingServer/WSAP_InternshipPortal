@@ -23,6 +23,11 @@
     $db->execute();
     $admin_roles_count = $db->rowCount();
 
+    if (!empty($_GET["intern_id"]) && $admin_roles_count == 0) {
+        redirect("profile.php");
+        exit();
+    }
+
     $db->query("SELECT intern_wsap_information.*, intern_personal_information.*, intern_educational_information.*, intern_accounts.*
     FROM intern_wsap_information, intern_personal_information, intern_educational_information, intern_accounts
     WHERE intern_wsap_information.id=:intern_id AND
