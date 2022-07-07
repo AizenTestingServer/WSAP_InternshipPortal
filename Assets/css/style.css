@@ -301,6 +301,11 @@ body {
     margin-bottom: 0;
 }
 
+.navs {
+    min-height: fit-content;
+    height: calc(100% - 180px);
+}
+
 .side-nav-list {
     line-height: 2.5rem;
 }
