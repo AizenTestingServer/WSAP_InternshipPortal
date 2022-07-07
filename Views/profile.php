@@ -119,25 +119,25 @@
         $first_name = toProper(fullTrim($_POST["firstName"]));
         $middle_name = toProper(fullTrim($_POST["middleName"]));
         $gender = $_POST["gender"];
-        $birthday = $_POST["birthday"];
+        $birthdate = $_POST["birthdate"];
 
         $_SESSION["last_name"] = $last_name;
         $_SESSION["first_name"] = $first_name;
         $_SESSION["middle_name"] = $middle_name;
         $_SESSION["gender"] = $gender;
-        $_SESSION["birthday"] = $birthday;
+        $_SESSION["birthdate"] = $birthdate;
 
-        if (!empty($last_name) && !empty($first_name) && !empty($birthday)) {
+        if (!empty($last_name) && !empty($first_name) && !empty($birthdate)) {
             $personal_info = array($last_name,
             $first_name,
             $middle_name,
             $gender,
-            $birthday,
+            $birthdate,
             $_SESSION["intern_id"]);
     
             $db->query("UPDATE intern_personal_information
             SET last_name=:last_name, first_name=:first_name, middle_name=:middle_name,
-            gender=:gender, birthday=:birthday WHERE id=:intern_id");
+            gender=:gender, birthdate=:birthdate WHERE id=:intern_id");
             $db->setPersonalInfo($personal_info);
             $db->execute();
             $db->closeStmt();
@@ -146,7 +146,7 @@
             unset($_SESSION["last_name"]);
             unset($_SESSION["first_name"]);
             unset($_SESSION["middle_name"]);
-            unset($_SESSION["birthday"]);
+            unset($_SESSION["birthdate"]);
             unset($_SESSION["gender"]);
         } else {
             $_SESSION["personal_failed"] = "Please fill-out the required fields!";
@@ -160,7 +160,7 @@
         unset($_SESSION["first_name"]);
         unset($_SESSION["middle_name"]);
         unset($_SESSION["gender"]);
-        unset($_SESSION["birthday"]);
+        unset($_SESSION["birthdate"]);
 
         redirect("profile.php#personal-info");
         exit();
@@ -527,21 +527,21 @@
                                     mb-4 <?php
                                 } ?>">
                                 <div class="col-lg-4 col-md-12 user_input my-1">
-                                    <label class="mb-2" for="birthday">Birthday <?php
+                                    <label class="mb-2" for="birthdate">Birthdate <?php
                                         if (empty($_GET["intern_id"])) { ?>
                                             <span class="text-danger">*</span> <?php
                                         } ?>
                                     </label> <?php
                                     if (!empty($_GET["intern_id"])) { ?>
-                                         <input type="text" name="birthday" class="form-control fw-bold"
-                                         value="<?= date("F j, Y", strtotime($value["birthday"])) ?>" disabled> <?php
+                                         <input type="text" name="birthdate" class="form-control fw-bold"
+                                         value="<?= date("F j, Y", strtotime($value["birthdate"])) ?>" disabled> <?php
                                     } else { ?>
-                                    <input type="date" name="birthday" class="form-control" 
+                                    <input type="date" name="birthdate" class="form-control" 
                                         value="<?php
-                                        if (isset($_SESSION["birthday"])) {
-                                            echo $_SESSION["birthday"];
+                                        if (isset($_SESSION["birthdate"])) {
+                                            echo $_SESSION["birthdate"];
                                         } else {
-                                            echo date("Y-m-d", strtotime($value["birthday"]));
+                                            echo date("Y-m-d", strtotime($value["birthdate"]));
                                         } ?>"> <?php
                                     } ?>
                                 </div>
@@ -590,7 +590,7 @@
                 unset($_SESSION["first_name"]);
                 unset($_SESSION["middle_name"]);
                 unset($_SESSION["gender"]);
-                unset($_SESSION["birthday"]); ?>
+                unset($_SESSION["birthdate"]); ?>
             </div>
         </div>
 

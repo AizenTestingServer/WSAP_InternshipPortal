@@ -27,7 +27,7 @@
         $first_name = toProper(fullTrim($_POST["firstName"]));
         $middle_name = toProper(fullTrim($_POST["middleName"]));
         $gender = $_POST["gender"];
-        $birthday = $_POST["birthday"];
+        $birthdate = $_POST["birthdate"];
         
         $status = $_POST["status"];
         $onboard_date = $_POST["onboardDate"];
@@ -46,7 +46,7 @@
         $_SESSION["first_name"] = $first_name;
         $_SESSION["middle_name"] = $middle_name;
         $_SESSION["gender"] = $gender;
-        $_SESSION["birthday"] = $birthday;
+        $_SESSION["birthdate"] = $birthdate;
 
         $_SESSION["status"] = $status;
         $_SESSION["onboard_date"] = $onboard_date;
@@ -63,7 +63,7 @@
 
         $personal_completed = !empty($last_name) && 
         !empty($first_name) && 
-        !empty($birthday);
+        !empty($birthdate);
 
         $wsap_completed = !empty($onboard_date) &&
         !empty($target_rendering_hours) &&
@@ -101,12 +101,12 @@
                                                 $first_name,
                                                 $middle_name,
                                                 $gender,
-                                                $birthday,
+                                                $birthdate,
                                                 $_SESSION["intern_id"]);
                                         
                                                 $db->query("UPDATE intern_personal_information
                                                 SET last_name=:last_name, first_name=:first_name, middle_name=:middle_name,
-                                                gender=:gender, birthday=:birthday WHERE id=:intern_id");
+                                                gender=:gender, birthdate=:birthdate WHERE id=:intern_id");
                                                 $db->setPersonalInfo($personal_info);
                                                 $db->execute();
                                                 $db->closeStmt();
@@ -326,13 +326,13 @@
                         <div class="col-lg-12 col-md-12 col-sm-6">
                             <div class="row">
                                 <div class="col-lg-4 col-md-12 user_input my-1">
-                                    <label class="mb-2" for="birthday">Birthday
+                                    <label class="mb-2" for="birthdate">Birthdate
                                         <span class="text-danger">*</span>
                                     </label>
-                                    <input type="date" name="birthday" class="form-control"
+                                    <input type="date" name="birthdate" class="form-control"
                                         value="<?php
-                                        if (isset($_SESSION["birthday"])) {
-                                            echo $_SESSION["birthday"];
+                                        if (isset($_SESSION["birthdate"])) {
+                                            echo $_SESSION["birthdate"];
                                         } ?>">
                                 </div>
                                 <div class="col-lg-4 col-md-12 user_input my-1">

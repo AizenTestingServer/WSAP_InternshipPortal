@@ -186,7 +186,7 @@ class Database {
         $this->stmt->bindValue(":first_name", $personal_info[1]);
         $this->stmt->bindValue(":middle_name", $personal_info[2]);
         $this->stmt->bindValue(":gender", $personal_info[3]);
-        $this->stmt->bindValue(":birthday", $personal_info[4]);
+        $this->stmt->bindValue(":birthdate", $personal_info[4]);
         $this->stmt->bindValue(":intern_id", $personal_info[5]);
     }
 
