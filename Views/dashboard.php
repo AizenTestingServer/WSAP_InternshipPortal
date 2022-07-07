@@ -36,7 +36,10 @@
         $total_interns = $value["total_interns"];
     }
 
-    $db->query("SELECT COUNT(*) AS active_interns FROM intern_wsap_information WHERE status = 1");
+    $db->query("SELECT COUNT(*) AS active_interns
+    FROM intern_wsap_information, intern_accounts
+    WHERE intern_wsap_information.status = 1 AND
+    intern_wsap_information.id = intern_accounts.id");
     $db->execute();
 
     $active_interns = 0;
