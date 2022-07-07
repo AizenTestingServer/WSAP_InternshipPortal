@@ -55,20 +55,6 @@
         $brand_count = $value["brand_count"];
     }
 
-    $db->query("SELECT * FROM overtime_hours WHERE intern_id=:intern_id ORDER BY id DESC LIMIT 1");
-    $db->setInternId($_SESSION["intern_id"]);
-    $db->execute();
-
-    $overtime_hours = $db->fetch();
-
-    $day = "friday";
-
-	if (strtotime("today") < strtotime($day)) {
-	  $start_week_date = date("F j, Y", strtotime("last ".$day));
-	} else {
-	  $start_week_date = date("F j, Y", strtotime($day));
-	}
-
     $db->query("SELECT roles.*
     FROM roles
     WHERE max_overtime_hours=(SELECT MAX(roles.max_overtime_hours)
@@ -89,6 +75,20 @@
     } else {
         $overtime_hours_left = 10;
     }
+
+    $db->query("SELECT * FROM overtime_hours WHERE intern_id=:intern_id ORDER BY id DESC LIMIT 1");
+    $db->setInternId($_SESSION["intern_id"]);
+    $db->execute();
+
+    $overtime_hours = $db->fetch();
+
+    $day = "friday";
+
+	if (strtotime("today") < strtotime($day)) {
+	  $start_week_date = date("F j, Y", strtotime("last ".$day));
+	} else {
+	  $start_week_date = date("F j, Y", strtotime($day));
+	}
 
     if ($db->rowCount() == 0 || $overtime_hours["start_week_date"] != $start_week_date) {
         $overtime_data = array(
@@ -465,7 +465,7 @@
             $db->execute();
             
             $completed_tasks_count = $db->rowCount(); ?>
-            <div class="section-content mt-2">
+            <div class="section-content my-2">
                 <div class="col-md-12 p-4" id="tasks">
                     <div class="d-lg-flex d-sm-inline-block justify-content-between align-items-center mb-2">
                         <div class="d-flex align-items-center mb-2">

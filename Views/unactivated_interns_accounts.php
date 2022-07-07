@@ -380,11 +380,11 @@
                             </div>
                             
                             <div class="w-fit ms-auto">
-                                <button type="button" class="btn btn-primary" data-bs-toggle="modal" 
+                                <button type="button" class="btn btn-primary mb-1" data-bs-toggle="modal" 
                                     data-bs-target="#addInternModal">
                                     <i class="fa-solid fa-plus me-2"></i>Add Intern
                                 </button>
-                                <button class="btn btn-secondary" onclick="copyRecords()">
+                                <button class="btn btn-secondary mb-1" onclick="copyRecords()">
                                     Copy Records as Text
                                 </button>
                             </div>
@@ -553,7 +553,7 @@
 </div>
 <script>
     function copyRecords() {
-        var copyText = <?= $interns_info_text; ?>;
+        var copyText = <?= "\"WSAP Internship Portal: https://wsapinternshipportal.com/\\n\\n\" +\n".$interns_info_text; ?>;
         navigator.clipboard.writeText(copyText.trim());
         alert("The records are copied to clipboard.");
     }

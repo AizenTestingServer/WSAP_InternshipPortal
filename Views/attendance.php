@@ -21,20 +21,6 @@
 
     $intern_wsap_info = $db->fetch();
 
-    $db->query("SELECT * FROM overtime_hours WHERE intern_id=:intern_id ORDER BY id DESC LIMIT 1");
-    $db->setInternId($_SESSION["intern_id"]);
-    $db->execute();
-
-    $overtime_hours = $db->fetch();
-
-    $day = "friday";
-	
-	if (strtotime("today") < strtotime($day)) {
-	  $start_week_date = date("F j, Y", strtotime("last ".$day));
-	} else {
-	  $start_week_date = date("F j, Y", strtotime($day));
-	}
-
     $db->query("SELECT roles.*
     FROM roles
     WHERE max_overtime_hours=(SELECT MAX(roles.max_overtime_hours)
@@ -55,6 +41,20 @@
     } else {
         $overtime_hours_left = 10;   
     }
+
+    $db->query("SELECT * FROM overtime_hours WHERE intern_id=:intern_id ORDER BY id DESC LIMIT 1");
+    $db->setInternId($_SESSION["intern_id"]);
+    $db->execute();
+
+    $overtime_hours = $db->fetch();
+
+    $day = "friday";
+	
+	if (strtotime("today") < strtotime($day)) {
+	  $start_week_date = date("F j, Y", strtotime("last ".$day));
+	} else {
+	  $start_week_date = date("F j, Y", strtotime($day));
+	}
 
     if ($db->rowCount() == 0 || $overtime_hours["start_week_date"] != $start_week_date) {
         $overtime_data = array(
