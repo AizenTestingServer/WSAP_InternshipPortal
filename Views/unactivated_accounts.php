@@ -65,7 +65,7 @@
         } else {
             $_SESSION["failed"] = "Please fill-out the required fields!";
         }
-        redirect("unactivated_interns_accounts.php");
+        redirect("unactivated_accounts.php");
         exit();
     }
     
@@ -98,7 +98,7 @@
         } else {
             $_SESSION["failed"] = "Please fill-out the required fields!";
         }
-        redirect("unactivated_interns_accounts.php");
+        redirect("unactivated_accounts.php");
         exit();
     }
 
@@ -119,21 +119,21 @@
         }
 
         if (strlen($parameters) > 1) {
-            redirect("unactivated_interns_accounts.php".$parameters);
+            redirect("unactivated_accounts.php".$parameters);
         } else {
-            redirect("unactivated_interns_accounts.php");
+            redirect("unactivated_accounts.php");
         }
         
         exit();
     }
 
     if (isset($_POST["reset"])) {
-        redirect("unactivated_interns_accounts.php");
+        redirect("unactivated_accounts.php");
         exit();
     }
 
     require_once "../Templates/header_view.php";
-    setTitle("Unacivated Interns' Accounts");
+    setTitle("Unacivated Accounts");
 ?>
 <div class="my-container"> 
     <?php
@@ -147,7 +147,7 @@
         
         <div class="d-flex align-items-center mb-2">
             <div>
-                <h3>Unactivated Interns' Accounts</h3>
+                <h3>Unactivated Accounts</h3>
             </div>
         </div> <?php
         if ($admin_roles_count != 0) { ?>
@@ -267,9 +267,9 @@
                                             }
 
                                             if (strlen($parameters) > 1) { ?>
-                                                href="<?= "unactivated_interns_accounts.php".$parameters ?>" <?php
+                                                href="<?= "unactivated_accounts.php".$parameters ?>" <?php
                                             } else { ?>
-                                                href="<?= "unactivated_interns_accounts.php" ?>" <?php
+                                                href="<?= "unactivated_accounts.php" ?>" <?php
                                             } ?>> All Departments </a></li> <?php
                                             
                                             $db->query("SELECT * FROM departments ORDER BY name");
@@ -293,9 +293,9 @@
                                                 }
 
                                                 if (strlen($parameters) > 1) { ?>
-                                                    href="<?= "unactivated_interns_accounts.php".$parameters ?>" <?php
+                                                    href="<?= "unactivated_accounts.php".$parameters ?>" <?php
                                                 } else { ?>
-                                                    href="<?= "unactivated_interns_accounts.php" ?>" <?php
+                                                    href="<?= "unactivated_accounts.php" ?>" <?php
                                                 } ?>> <?= $row["name"] ?>
                                                 </a></li> <?php
                                             } ?>
@@ -332,9 +332,9 @@
                                                 }
 
                                                 if (strlen($parameters) > 1) { ?>
-                                                    href="<?= "unactivated_interns_accounts.php".$parameters ?>" <?php
+                                                    href="<?= "unactivated_accounts.php".$parameters ?>" <?php
                                                 } else { ?>
-                                                    href="<?= "unactivated_interns_accounts.php" ?>" <?php
+                                                    href="<?= "unactivated_accounts.php" ?>" <?php
                                                 } ?>>Default</a></li>
                                             <li><a class="dropdown-item btn-smoke" <?php
                                                 $parameters = "?";
@@ -351,9 +351,9 @@
                                                 $parameters = $parameters."sort=1";
 
                                                 if (strlen($parameters) > 1) { ?>
-                                                    href="<?= "unactivated_interns_accounts.php".$parameters ?>" <?php
+                                                    href="<?= "unactivated_accounts.php".$parameters ?>" <?php
                                                 } else { ?>
-                                                    href="<?= "unactivated_interns_accounts.php" ?>" <?php
+                                                    href="<?= "unactivated_accounts.php" ?>" <?php
                                                 } ?>>A-Z</a></li>
                                             <li><a class="dropdown-item btn-smoke" <?php
                                                 $parameters = "?";
@@ -370,9 +370,9 @@
                                                 $parameters = $parameters."sort=2";
 
                                                 if (strlen($parameters) > 1) { ?>
-                                                    href="<?= "unactivated_interns_accounts.php".$parameters ?>" <?php
+                                                    href="<?= "unactivated_accounts.php".$parameters ?>" <?php
                                                 } else { ?>
-                                                    href="<?= "unactivated_interns_accounts.php" ?>" <?php
+                                                    href="<?= "unactivated_accounts.php" ?>" <?php
                                                 } ?>>Z-A</a></li>
                                         </ul>
                                     </div>
@@ -456,7 +456,7 @@
                         }
                         $db->execute();
 
-                        $interns_info_text = "\"Unactivated Interns' Accounts\\n\\n\"\n";
+                        $interns_info_text = "\"Unactivated Accounts\\n\\n\"\n";
 
                         if (empty($_GET["department"])) {
                             $interns_info_text .= "+ \"All Departments:\\n\"\n";

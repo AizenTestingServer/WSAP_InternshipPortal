@@ -580,7 +580,7 @@
                         <h3>No Record</h3>
                     </div> <?php
                 } else { ?>
-                    <a class="btn btn-secondary w-fit mx-auto" href="unactivated_interns_accounts.php">
+                    <a class="btn btn-secondary w-fit mx-auto" href="unactivated_accounts.php">
                         Show All<i class="fa-solid fa-arrow-right ms-2"></i>
                     </a> <?php
                 }
