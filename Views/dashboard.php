@@ -28,6 +28,8 @@
 
     $intern_wsap_info = $db->fetch();
 
+    $i_am_active = isActiveIntern($intern_wsap_info["onboard_date"], $intern_wsap_info["offboard_date"], $date->getDate());
+
     $db->query("SELECT COUNT(*) AS total_interns FROM intern_personal_information");
     $db->execute();
 
@@ -520,7 +522,7 @@
                             $att_date = "";
                         }
 
-                        if (isTimeInEnabled($att_date) && $intern_wsap_info["status"] == 1) {
+                        if (isTimeInEnabled($att_date) && $intern_wsap_info["status"] == 1 && $i_am_active) {
                             $record_count++; ?>
                             <div class="task-box position-relative">
                                 <div class="task-box-status">
@@ -540,7 +542,7 @@
                             </div> <?php
                         }
 
-                        if ($remind_time_out && $intern_wsap_info["status"] == 1) {
+                        if ($remind_time_out && $intern_wsap_info["status"] == 1 && $i_am_active) {
                             $record_count++; ?>
                             <div class="task-box position-relative">
                                 <div class="task-box-status">

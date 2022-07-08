@@ -21,6 +21,8 @@
 
     $intern_wsap_info = $db->fetch();
 
+    $i_am_active = isActiveIntern($intern_wsap_info["onboard_date"], $intern_wsap_info["offboard_date"], $date->getDate());
+
     $db->query("SELECT roles.*
     FROM roles
     WHERE max_overtime_hours=(SELECT MAX(roles.max_overtime_hours)
@@ -101,18 +103,6 @@
         }
 
         if (isset($_POST["timeIn"])) {
-            if (!empty($lts_att)) {
-                $att_date = $lts_att["att_date"];
-            } else {
-                $att_date = "";
-            }
-
-            if (!(isTimeInEnabled($att_date) && $intern_wsap_info["status"] == 1)) {
-                $_SESSION["error"] = "You are unable to time in.";
-                redirect("attendance.php");
-                exit();
-            }
-
             if ($date->getDateTimeValue() > $date->morning_briefing() && $date->getDateTimeValue() < $date->morning_shift_end()) {
                 $time_in = $date->getTime()." L";
             } else {
@@ -144,19 +134,18 @@
         }
     
         if (isset($_POST["timeOut"])) {
-            if (!($time_out_enabled && $intern_wsap_info["status"] == 1)) {
-                $_SESSION["error"] = "You are unable to time out.";
-                redirect("attendance.php");
-                exit();
-            }
-
             if (!empty($lts_att["time_in"]) && empty($lts_att["time_out"])) {
+                $time_in = $lts_att["time_in"];
                 $time_out = $date->getTime();
+
+                if (strlen($time_in) > 8) {
+                    $time_in = trim(substr($time_in, 0, 8));
+                }
                
-                if (isMorningShift($lts_att["time_in"], $date->getTime())) {
+                if (isMorningShift($time_in, $date->getTime())) {
                     $time_out =  $time_out." MS";
                 }
-                if (isAfternoonShift($lts_att["time_in"], $date->getTime())) {
+                if (isAfternoonShift($time_in, $date->getTime())) {
                     $time_out =  $time_out." AS";
                 }
                 if (isOvertime($date->getTime())) {
@@ -173,12 +162,7 @@
                 $db->execute();
                 $db->closeStmt();
                 
-                $time_in = $lts_att["time_in"];
                 $time_out = $date->getTime();
-
-                if (strlen($time_out) > 8) {
-                    $time_out = substr($time_out, 0, 8);
-                }
                                     
                 if (isMorningShift($time_in, $time_out) || isAfternoonShift($time_in, $time_out)) {
                     $rendered_hours = 4;
@@ -333,13 +317,13 @@
                                 $att_date = "";
                             }
 
-                            if (isTimeInEnabled($att_date) && $intern_wsap_info["status"] == 1) {
+                            if (isTimeInEnabled($att_date) && $intern_wsap_info["status"] == 1 && $i_am_active) {
                                 $date->time_in_enabled();
                             } else {
                                 $date->time_in_disabled();
                             }
                             
-                            if ($time_out_enabled && $intern_wsap_info["status"] == 1) {
+                            if ($time_out_enabled && $intern_wsap_info["status"] == 1 && $i_am_active) {
                                 $date->time_out_enabled();
                             } else {
                                 $date->time_out_disabled();
@@ -366,7 +350,7 @@
                     ?>">
                         <b><?= $overtime_hours["overtime_hours_left"] ?> Overtime Hours Left</b>
                         since <?= $overtime_hours["start_week_date"] ?>
-                        <i>(Resets every Friday)</i>.
+                        <i>(Resets every <?= ucwords($day) ?>)</i>.
                     </h6>
                 </div> <?php
             }

@@ -97,7 +97,7 @@
             $time_out_time_type = $date->getTimeType();
         } else {
             if (strlen($time_out) > 8) {
-                $time_out = substr($time_out, 0, 8);
+                $time_out = trim(substr($time_out, 0, 8));
             }
 
             $time_out_hr = date("g", strtotime($time_out));
@@ -106,7 +106,7 @@
         }
 
         if (strlen($time_in) > 8) {
-            $time_in = substr($time_in, 0, 8);
+            $time_in = trim(substr($time_in, 0, 8));
         }
 
         $time_in_hr = date("g", strtotime($time_in));
@@ -147,13 +147,19 @@
     if (isset($_POST["submit"])) {
         if (!empty($_POST["time_out_hr"]) && !empty($_POST["time_out_min"]) &&
             !empty($_POST["time_out_time_type"]) && !empty($_POST["att_date"])) {
-        $time_out = $_POST["time_out_hr"].":".$_POST["time_out_min"]." ".$_POST["time_out_time_type"];
-            
-        $tmp_time_out = $time_out;
-            if (isMorningShift($selected_att["time_in"], $time_out)) {
+
+            $time_in = $selected_att["time_in"];
+            $time_out = $_POST["time_out_hr"].":".$_POST["time_out_min"]." ".$_POST["time_out_time_type"];
+
+            if (strlen($time_in) > 8) {
+                $time_in = trim(substr($time_in, 0, 8));
+            }
+                
+            $tmp_time_out = $time_out;
+            if (isMorningShift($time_in, $time_out)) {
                 $tmp_time_out =  $tmp_time_out." MS";
             }
-            if (isAfternoonShift($selected_att["time_in"], $time_out)) {
+            if (isAfternoonShift($time_in, $time_out)) {
                 $tmp_time_out =  $tmp_time_out." AS";
             }
             if (isOvertime($time_out)) {
@@ -170,11 +176,9 @@
             $db->timeOut($attendance);
             $db->execute();
             $db->closeStmt();
-            
-            $time_in = $selected_att["time_in"];
 
             if (strlen($time_out) > 8) {
-                $time_out = substr($time_out, 0, 8);
+                $time_out = trim(substr($time_out, 0, 8));
             }
                                 
             if (isMorningShift($time_in, $time_out) || isAfternoonShift($time_in, $time_out)) {
@@ -294,7 +298,7 @@
             $time_out = $att["time_out"];
 
             if (strlen($time_out) > 8) {
-                $time_out = substr($time_out, 0, 8);
+                $time_out = trim(substr($time_out, 0, 8));
             }
 
             if (isOvertime($time_out)) {

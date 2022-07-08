@@ -162,11 +162,11 @@
                                     $time_out = $row["time_out"];
 
                                     if (strlen($time_in) > 8) {
-                                        $time_in = substr($time_in, 0, 8);
+                                        $time_in = trim(substr($time_in, 0, 8));
                                     }
                                     
                                     if (strlen($time_out) > 8) {
-                                        $time_out = substr($time_out, 0, 8);
+                                        $time_out = trim(substr($time_out, 0, 8));
                                     }
 
                                     if (isMorningShift($time_in, $time_out)) {

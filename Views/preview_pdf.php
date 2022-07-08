@@ -263,10 +263,10 @@
                                                 
                                                 if (!empty($time_in_am) && !empty($time_out_pm) && $time_out_pm != "NTO") {
                                                     if (strlen($time_in_am) > 8) {
-                                                        $time_in_am = substr($time_in_am, 0, 8);
+                                                        $time_in_am = trim(substr($time_in_am, 0, 8));
                                                     }                                    
                                                     if (strlen($time_out_pm) > 8) {
-                                                        $time_out_pm = substr($time_out_pm, 0, 8);
+                                                        $time_out_pm = trim(substr($time_out_pm, 0, 8));
                                                     }
 
                                                     if (isMorningShift($time_in_am, $time_out_pm) || isAfternoonShift($time_in_am, $time_out_pm)) {
