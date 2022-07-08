@@ -172,19 +172,21 @@
         if ($admin_roles_count != 0) {
             if (!empty($_GET["intern_id"])) { ?>
                 <div class="w-100 d-md-flex p-3 w-fit">
-                    <div class="top me-md-2">
-                        <img class="img-intern mx-auto d-block" src="<?php {
-                            if ($value["image"] == null || strlen($value["image"]) == 0) {
-                                if ($value["gender"] == 0) {
-                                    echo "../Assets/img/profile_imgs/default_male.png";
+                    <a class="clickable-card" href="profile.php?intern_id=<?= $_GET["intern_id"] ?>" draggable="false">
+                        <div class="top me-md-2">
+                            <img class="img-intern mx-auto d-block" src="<?php {
+                                if ($value["image"] == null || strlen($value["image"]) == 0) {
+                                    if ($value["gender"] == 0) {
+                                        echo "../Assets/img/profile_imgs/default_male.png";
+                                    } else {
+                                        echo "../Assets/img/profile_imgs/default_female.png";
+                                    }
                                 } else {
-                                    echo "../Assets/img/profile_imgs/default_female.png";
+                                    echo $value["image"];
                                 }
-                            } else {
-                                echo $value["image"];
-                            }
-                        } ?>" onerror="this.src='../Assets/img/profile_imgs/no_image_found.jpeg';">
-                    </div>
+                            } ?>" onerror="this.src='../Assets/img/profile_imgs/no_image_found.jpeg';">
+                        </div>
+                    </a>
                     <div class="w-100">
                         <div class="summary-total w-fit text-md-start text-center mx-auto ms-md-0 mt-2">
                             <h5 class="mb-0 text-dark">

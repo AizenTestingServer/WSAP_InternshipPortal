@@ -23,9 +23,11 @@
     $admin_roles_count = $db->rowCount();
 
     $db_interns = new Database();
-    $db_interns->query("SELECT intern_wsap_information.*, intern_accounts.*
-    FROM intern_wsap_information, intern_accounts
-    WHERE intern_wsap_information.id = intern_accounts.id");
+    $db_interns->query("SELECT intern_personal_information.*, intern_wsap_information.*, intern_accounts.*
+    FROM intern_personal_information, intern_wsap_information, intern_accounts
+    WHERE intern_personal_information.id = intern_wsap_information.id AND
+    intern_wsap_information.id = intern_accounts.id
+    ORDER BY last_name");
 
     require_once "../Templates/header_view.php";
     setTitle("Calendar");
@@ -139,9 +141,7 @@
 
                                 $active_interns = 0;
                                 while ($row_interns = $db_interns->fetch()) {
-                                    if (strtotime($row_interns["onboard_date"]) <= strtotime($row["att_date"]) &&
-                                        (empty($row_interns["offboard_date"]) ||
-                                        strtotime($row_interns["offboard_date"]) >= strtotime($row["att_date"]))) {
+                                    if (isActiveIntern($row_interns["onboard_date"], $row_interns["offboard_date"], $row["att_date"])) {
                                         $active_interns++;
                                     }
                                 }
@@ -157,7 +157,7 @@
 
                                 $morning_shift_count = 0;
                                 $afternoon_shift_count = 0;
-                                while($row = $db->fetch()) {
+                                while ($row = $db->fetch()) {
                                     $time_in = $row["time_in"];
                                     $time_out = $row["time_out"];
 
@@ -169,9 +169,9 @@
                                         $time_out = substr($time_out, 0, 8);
                                     }
 
-                                    if (isMorningShift(strtotime($time_in), strtotime($time_out))) {
+                                    if (isMorningShift($time_in, $time_out)) {
                                         $morning_shift_count++;
-                                    } else if (isAfternoonShift(strtotime($time_in), strtotime($time_out))) {
+                                    } else if (isAfternoonShift($time_in, $time_out)) {
                                         $afternoon_shift_count++;
                                     }
                                 } ?>

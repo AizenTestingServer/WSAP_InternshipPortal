@@ -410,19 +410,21 @@
         if ($admin_roles_count != 0) {
             if (!empty($_GET["intern_id"])) { ?>
                 <div class="intern info d-md-flex p-3 w-fit" style="height: 230px">
-                    <div class="top me-md-2">
-                        <img class="img-intern mx-auto d-block" src="<?php {
-                            if ($value["image"] == null || strlen($value["image"]) == 0) {
-                                if ($value["gender"] == 0) {
-                                    echo "../Assets/img/profile_imgs/default_male.png";
+                    <a class="clickable-card" href="profile.php?intern_id=<?= $_GET["intern_id"] ?>" draggable="false">
+                        <div class="top me-md-2">
+                            <img class="img-intern mx-auto d-block" src="<?php {
+                                if ($value["image"] == null || strlen($value["image"]) == 0) {
+                                    if ($value["gender"] == 0) {
+                                        echo "../Assets/img/profile_imgs/default_male.png";
+                                    } else {
+                                        echo "../Assets/img/profile_imgs/default_female.png";
+                                    }
                                 } else {
-                                    echo "../Assets/img/profile_imgs/default_female.png";
+                                    echo $value["image"];
                                 }
-                            } else {
-                                echo $value["image"];
-                            }
-                        } ?>" onerror="this.src='../Assets/img/profile_imgs/no_image_found.jpeg';">
-                    </div>
+                            } ?>" onerror="this.src='../Assets/img/profile_imgs/no_image_found.jpeg';">
+                        </div>
+                    </a>
                     <div class="w-100">
                         <div class="summary-total w-fit text-md-start text-center mx-auto ms-md-0 mt-2">
                             <h5 class="mb-0 text-dark">
@@ -606,25 +608,25 @@
                         </div>
                     </div> <?php
                     
-                    $nto_array = array($_SESSION["intern_id"], "NTO");
+                    $nto_array = array($_GET["intern_id"], "NTO");
                     $db->query("SELECT COUNT(*) as count FROM attendance
                     WHERE intern_id=:intern_id AND time_out=:time_out");
                     $db->selectInternIdAndTimeOut($nto_array);
                     $db->execute();
                     $nto_value = $db->fetch(); ?>
                                         
-                    <div class="w-fit ms-auto my-2">
-                        <button id="exportToExcel" class="btn btn-excel">
+                    <div class="w-fit ms-auto">
+                        <button id="exportToExcel" class="btn btn-excel mb-2">
                             Export as Excel
                         </button> <?php
                         if ($nto_value["count"] == 0) { ?>
-                            <a class="btn btn-pdf"
+                            <a class="btn btn-pdf mb-2"
                                 href="preview_pdf.php?intern_id=<?= strtoupper($_SESSION["intern_id"]) ?>"
                                 target="window">
                                 Preview DTR as PDF
                             </a> <?php
                         } else { ?>
-                            <a class="btn btn-pdf disabled">
+                            <a class="btn btn-pdf mb-2 disabled">
                                 Preview DTR as PDF
                             </a> <?php
                         } ?>
@@ -659,7 +661,7 @@
                             } else {
                                 $db->query("SELECT * FROM attendance WHERE intern_id=:intern_id ORDER BY id DESC");
                             }
-                            $db->setInternId($_SESSION["intern_id"]);
+                            $db->setInternId($_GET["intern_id"]);
                             $db->execute();
 
                             $count = 0;

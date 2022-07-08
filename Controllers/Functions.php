@@ -102,6 +102,11 @@
             strtotime($time_out) < $date->time_out_overtime_end();
     }
 
+    function isActiveIntern($onboard_date, $offboard_date, $att_date) {
+        return strtotime($onboard_date) <= strtotime($att_date) &&
+            (empty($offboard_date) || strtotime($offboard_date) >= strtotime($att_date));
+    }
+
     function getMonths() {
         return array("January", "February", "March", "April", "May", "June",
             "July", "August", "September", "October", "November", "December");

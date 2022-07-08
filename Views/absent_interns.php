@@ -281,13 +281,12 @@
                                 </div>
                             </div>
                         </div>
-                        
-                            
-                        <div class="w-fit ms-auto">
-                            <button class="btn btn-secondary mb-1" onclick="copyRecords()">
-                                Copy Records as Text
-                            </button>
-                        </div>
+                    </div>
+                    
+                    <div class="w-fit ms-auto">
+                        <button class="btn btn-secondary mb-1" onclick="copyRecords()">
+                            Copy Records as Text
+                        </button>
                     </div>
                 </div>
             </div>
@@ -306,6 +305,7 @@
                         }
 
                         $conditions = " WHERE intern_personal_information.id = intern_wsap_information.id AND
+                        intern_personal_information.id = intern_accounts.id AND
                         intern_wsap_information.department_id = departments.id AND
                         NOT EXISTS (SELECT * FROM attendance
                         WHERE intern_personal_information.id = attendance.intern_id AND
@@ -326,8 +326,8 @@
                         }
     
                         $query = "SELECT intern_personal_information.*, intern_personal_information.id AS intern_id,
-                        intern_wsap_information.*, departments.*
-                        FROM intern_personal_information, intern_wsap_information, departments";
+                        intern_wsap_information.*, intern_accounts.*, departments.*
+                        FROM intern_personal_information, intern_wsap_information, intern_accounts, departments";
     
                         if (strlen($conditions) > 6) {
                             $db->query($query.$conditions.$sort);
@@ -343,6 +343,12 @@
                         $db->execute();
 
                         $absent_interns_text = "\"Absent Interns: ".$selected_date."\\n\\n\"\n";
+
+                        if (empty($_GET["department"])) {
+                            $absent_interns_text .= "+ \"All Departments:\\n\"\n";
+                        } else {
+                            $absent_interns_text .= "+ \"".$_GET["department"]." Department:\\n\"\n";
+                        }
 
                         while ($row = $db->fetch()) {
                             $absent_interns_text .= "+ \"".$row["last_name"].", ".$row["first_name"]." - ".$row["intern_id"];
