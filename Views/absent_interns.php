@@ -123,7 +123,7 @@
                             </div>
 
                             <!--DEPARTMENT DROPDOWN-->
-                            <div class="w-fit d-flex">
+                            <div class="w-fit d-flex mb-2">
                                 <div class="dropdown align-center me-2">
                                     <button class="btn btn-light border-dark dropdown-toggle" type="button" id="dropdownMenuButton1"
                                     data-bs-toggle="dropdown" aria-expanded="false" name="department"> <?php
@@ -281,6 +281,13 @@
                                 </div>
                             </div>
                         </div>
+                        
+                            
+                        <div class="w-fit ms-auto">
+                            <button class="btn btn-secondary mb-1" onclick="copyRecords()">
+                                Copy Records as Text
+                            </button>
+                        </div>
                     </div>
                 </div>
             </div>
@@ -298,58 +305,52 @@
                             }
                         }
 
-
-                        if (!empty($_GET["department"]) && !empty($_GET["search"])) {
-                            $absent_interns = array($selected_date, $_GET["department"], $_GET["search"]);
-                            
-                            $db->query("SELECT intern_personal_information.*, intern_wsap_information.*, departments.*
-                            FROM intern_personal_information, intern_wsap_information, departments
-                            WHERE intern_personal_information.id = intern_wsap_information.id AND
-                            intern_wsap_information.department_id = departments.id AND name=:dept_name AND
-                            (CONCAT(last_name, ' ', first_name) LIKE CONCAT( '%', :intern_name, '%') OR
-                            CONCAT(first_name, ' ', last_name) LIKE CONCAT( '%', :intern_name, '%')) AND
-                            NOT EXISTS (SELECT * FROM attendance
-                            WHERE intern_personal_information.id = attendance.intern_id AND
-                            att_date=:att_date)".$sort);
-                            $db->selectInternsAttendance3($absent_interns);
-                        } else if (!empty($_GET["department"])) {
-                            $absent_interns = array($selected_date, $_GET["department"]);
-                            
-                            $db->query("SELECT intern_personal_information.*, intern_wsap_information.*, departments.*
-                            FROM intern_personal_information, intern_wsap_information, departments
-                            WHERE intern_personal_information.id = intern_wsap_information.id AND
-                            intern_wsap_information.department_id = departments.id AND name=:dept_name AND
-                            NOT EXISTS (SELECT * FROM attendance
-                            WHERE intern_personal_information.id = attendance.intern_id AND
-                            att_date=:att_date)".$sort);
-                            $db->selectInternsAttendance($absent_interns);
-                        } else if (!empty($_GET["search"])) {
-                            $absent_interns = array($selected_date, $_GET["search"]);
-                            
-                            $db->query("SELECT intern_personal_information.*, intern_wsap_information.*, departments.*
-                            FROM intern_personal_information, intern_wsap_information, departments
-                            WHERE intern_personal_information.id = intern_wsap_information.id AND
-                            intern_wsap_information.department_id = departments.id AND
-                            (CONCAT(last_name, ' ', first_name) LIKE CONCAT( '%', :intern_name, '%') OR
-                            CONCAT(first_name, ' ', last_name) LIKE CONCAT( '%', :intern_name, '%')) AND
-                            NOT EXISTS (SELECT * FROM attendance
-                            WHERE intern_personal_information.id = attendance.intern_id AND
-                            att_date=:att_date)".$sort);
-                            $db->selectInternsAttendance2($absent_interns);
-                        } else {
-                            $db->query("SELECT intern_personal_information.*, intern_personal_information.id AS intern_id,
-                            intern_wsap_information.*, departments.*
-                            FROM intern_personal_information, intern_wsap_information, departments
-                            WHERE intern_personal_information.id = intern_wsap_information.id AND
-                            intern_wsap_information.department_id = departments.id AND
-                            NOT EXISTS (SELECT * FROM attendance
-                            WHERE intern_personal_information.id = attendance.intern_id AND
-                            att_date=:att_date)".$sort);
+                        $conditions = " WHERE intern_personal_information.id = intern_wsap_information.id AND
+                        intern_wsap_information.department_id = departments.id AND
+                        NOT EXISTS (SELECT * FROM attendance
+                        WHERE intern_personal_information.id = attendance.intern_id AND
+                        att_date=:att_date)";
+    
+                        if (!empty($_GET["search"])) {
+                            if (strlen($conditions) > 6) {
+                                $conditions = $conditions." AND";
+                            }
+                            $conditions = $conditions." (CONCAT(last_name, ' ', first_name) LIKE CONCAT( '%', :intern_name, '%') OR
+                            CONCAT(first_name, ' ', last_name) LIKE CONCAT( '%', :intern_name, '%'))";
+                        }
+                        if (!empty($_GET["department"])) {
+                            if (strlen($conditions) > 6) {
+                                $conditions = $conditions." AND";
+                            }
+                            $conditions = $conditions." departments.name=:dept_name";
+                        }
+    
+                        $query = "SELECT intern_personal_information.*, intern_personal_information.id AS intern_id,
+                        intern_wsap_information.*, departments.*
+                        FROM intern_personal_information, intern_wsap_information, departments";
+    
+                        if (strlen($conditions) > 6) {
+                            $db->query($query.$conditions.$sort);
                             $db->setAttDate($selected_date);
+        
+                            if (!empty($_GET["search"])) {
+                                $db->selectInternName($_GET["search"]);
+                            }
+                            if (!empty($_GET["department"])) {
+                                $db->selectDepartment($_GET["department"]);
+                            }
                         }
                         $db->execute();
 
-                        while ($row = $db->fetch()) { ?>
+                        $absent_interns_text = "\"Absent Interns: ".$selected_date."\\n\\n\"\n";
+
+                        while ($row = $db->fetch()) {
+                            $absent_interns_text .= "+ \"".$row["last_name"].", ".$row["first_name"]." - ".$row["intern_id"];
+                            if (empty($_GET["department"])) {
+                                $absent_interns_text .= " - ".$row["name"]."\\n\"\n";
+                            } else {
+                                $absent_interns_text .= "\\n\"\n";
+                            } ?>
                             <a class="clickable-card" href="daily_time_record.php?intern_id=<?= $row["intern_id"] ?>" draggable="false">
                                 <div class="attendance text-center">
                                     <div class="top">
@@ -388,6 +389,13 @@
         } ?>        
     </div>
 </div>
+<script>
+    function copyRecords() {
+        var copyText = <?= "\"WSAP Internship Portal: https://wsapinternshipportal.com/\\n\\n\" +\n".$absent_interns_text; ?>;
+        navigator.clipboard.writeText(copyText.trim());
+        alert("The records are copied to clipboard.");
+    }
+</script>
 <?php
     require_once "../Templates/footer.php";
 ?>

@@ -70,7 +70,7 @@
 
     $max_overtime_hours = $db->fetch();
 
-    if (!empty($max_overtime_hours["max_overtime_hours"])) {
+    if ($db->rowCount() != 0) {
         $overtime_hours_left = $max_overtime_hours["max_overtime_hours"];
     } else {
         $overtime_hours_left = 10;

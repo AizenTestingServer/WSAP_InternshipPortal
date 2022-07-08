@@ -36,10 +36,10 @@
 
     $max_overtime_hours = $db->fetch();
 
-    if (!empty($max_overtime_hours["max_overtime_hours"])) {
+    if ($db->rowCount() != 0) {
         $overtime_hours_left = $max_overtime_hours["max_overtime_hours"];
     } else {
-        $overtime_hours_left = 10;   
+        $overtime_hours_left = 10;
     }
 
     $db->query("SELECT * FROM overtime_hours WHERE intern_id=:intern_id ORDER BY id DESC LIMIT 1");

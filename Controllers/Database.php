@@ -257,22 +257,6 @@ class Database {
         $this->stmt->bindValue(":intern_id", $new_password[1]);
     }
 
-    function selectInternsAttendance($interns_attendance) {
-        $this->stmt->bindValue(":att_date", $interns_attendance[0]);
-        $this->stmt->bindValue(":dept_name", $interns_attendance[1]);
-    }
-
-    function selectInternsAttendance2($interns_attendance) {
-        $this->stmt->bindValue(":att_date", $interns_attendance[0]);
-        $this->stmt->bindValue(":intern_name", $interns_attendance[1]);
-    }
-
-    function selectInternsAttendance3($interns_attendance) {
-        $this->stmt->bindValue(":att_date", $interns_attendance[0]);
-        $this->stmt->bindValue(":dept_name", $interns_attendance[1]);
-        $this->stmt->bindValue(":intern_name", $interns_attendance[2]);
-    }
-
     function selectInternName($intern_name) {
         $this->stmt->bindValue(":intern_name", $intern_name);
     }
