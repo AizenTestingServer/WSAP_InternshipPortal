@@ -456,20 +456,20 @@
                         }
                         $db->execute();
 
-                        $interns_info_text = "\"Unactivated Accounts\\n\\n\"\n";
+                        $text = "\"Unactivated Accounts\\n\\n\"\n";
 
                         if (empty($_GET["department"])) {
-                            $interns_info_text .= "+ \"All Departments:\\n\"\n";
+                            $text .= "+ \"All Departments:\\n\"\n";
                         } else {
-                            $interns_info_text .= "+ \"".$_GET["department"]." Department:\\n\"\n";
+                            $text .= "+ \"".$_GET["department"]." Department:\\n\"\n";
                         }
 
                         while ($row = $db->fetch()) {
-                            $interns_info_text .= "+ \"".$row["last_name"].", ".$row["first_name"]." - ".$row["intern_id"];
+                            $text .= "+ \"".$row["last_name"].", ".$row["first_name"]." - ".$row["intern_id"];
                             if (empty($_GET["department"])) {
-                                $interns_info_text .= " - ".$row["name"]."\\n\"\n";
+                                $text .= " - ".$row["name"]."\\n\"\n";
                             } else {
-                                $interns_info_text .= "\\n\"\n";
+                                $text .= "\\n\"\n";
                             } ?>
                             <div class="modal fade" id="removeAccountModal<?= $row["intern_id"] ?>" tabindex="-1"
                                 aria-labelledby="removeAccountModalLabel" aria-hidden="true">
@@ -540,7 +540,7 @@
                         } ?>
                 </div> <?php
                 if ($db->rowCount() == 0) { 
-                    $interns_info_text .= "+ \"No Record\"\n"; ?>
+                    $text .= "+ \"No Record\"\n"; ?>
                     <div class="w-100 text-center my-5">
                         <h3>No Record</h3>
                     </div> <?php
@@ -551,13 +551,8 @@
         } ?>
     </div>
 </div>
-<script>
-    function copyRecords() {
-        var copyText = <?= "\"WSAP Internship Portal: https://wsapinternshipportal.com/\\n\\n\" +\n".$interns_info_text; ?>;
-        navigator.clipboard.writeText(copyText.trim());
-        alert("The records are copied to clipboard.");
-    }
-</script>
 <?php
+    require_once "../Controllers/PHP_JS.php";
+    copyFunction($text);
     require_once "../Templates/footer.php";
 ?>

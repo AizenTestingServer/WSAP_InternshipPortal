@@ -342,20 +342,20 @@
                         }
                         $db->execute();
 
-                        $absent_interns_text = "\"Absent Interns: ".$selected_date."\\n\\n\"\n";
+                        $text = "\"Absent Interns: ".$selected_date."\\n\\n\"\n";
 
                         if (empty($_GET["department"])) {
-                            $absent_interns_text .= "+ \"All Departments:\\n\"\n";
+                            $text .= "+ \"All Departments:\\n\"\n";
                         } else {
-                            $absent_interns_text .= "+ \"".$_GET["department"]." Department:\\n\"\n";
+                            $text .= "+ \"".$_GET["department"]." Department:\\n\"\n";
                         }
 
                         while ($row = $db->fetch()) {
-                            $absent_interns_text .= "+ \"".$row["last_name"].", ".$row["first_name"]." - ".$row["intern_id"];
+                            $text .= "+ \"".$row["last_name"].", ".$row["first_name"]." - ".$row["intern_id"];
                             if (empty($_GET["department"])) {
-                                $absent_interns_text .= " - ".$row["name"]."\\n\"\n";
+                                $text .= " - ".$row["name"]."\\n\"\n";
                             } else {
-                                $absent_interns_text .= "\\n\"\n";
+                                $text .= "\\n\"\n";
                             } ?>
                             <a class="clickable-card" href="daily_time_record.php?intern_id=<?= $row["intern_id"] ?>" draggable="false">
                                 <div class="attendance text-center">
@@ -384,7 +384,8 @@
                             </a> <?php
                         } ?>
                 </div> <?php
-                if ($db->rowCount() == 0) { ?>
+                if ($db->rowCount() == 0) { 
+                    $text .= "+ \"No Record\"\n"; ?>?>
                     <div class="w-100 text-center my-5">
                         <h3>No Record</h3>
                     </div> <?php
@@ -395,13 +396,8 @@
         } ?>        
     </div>
 </div>
-<script>
-    function copyRecords() {
-        var copyText = <?= "\"WSAP Internship Portal: https://wsapinternshipportal.com/\\n\\n\" +\n".$absent_interns_text; ?>;
-        navigator.clipboard.writeText(copyText.trim());
-        alert("The records are copied to clipboard.");
-    }
-</script>
 <?php
+    require_once "../Controllers/PHP_JS.php";
+    copyFunction($text);
     require_once "../Templates/footer.php";
 ?>

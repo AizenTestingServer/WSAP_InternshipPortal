@@ -144,7 +144,7 @@
         exit();
     }
 
-    if (isset($_POST["submit"])) {
+    if (isset($_POST["editTimeOut"])) {
         if (!empty($_POST["time_out_hr"]) && !empty($_POST["time_out_min"]) &&
             !empty($_POST["time_out_time_type"]) && !empty($_POST["att_date"])) {
 
@@ -482,7 +482,7 @@
                             <form method="post">
                                 <div class="row mb-4">
                                     <div class="col-md-12 col-lg-6 user_input my-1">
-                                        <label class="mb-2" for="timeIn">Time out</label>
+                                        <label class="mb-2" for="timeOut">Time out</label>
                                         <div class="row">
                                             <div class="col-4">
                                                 <select class="form-select" name="time_out_hr"> <?php
@@ -525,7 +525,34 @@
                                     </div>
                                 </div>
                                 <div class="bottom-right">
-                                    <button class="btn btn-indigo" type="submit" name="submit">Submit</button>
+                                    <button class="btn btn-indigo" type="submit" name="editTimeOut">Submit</button>
+                                    <button class="btn btn-secondary" name="cancel">Cancel</button>
+                                </div>
+                            </form>
+                        </div>
+                    </div> <?php
+                }
+
+                if (!empty($_GET["id"]) && $selected_att["time_out"] != "NTO" &&
+                    $selected_att["intern_id"] == $_GET["intern_id"] && $_GET["edit"] == "rendered_hours") { ?>
+                    <div class="row rounded shadow mb-4 pb-4 position-relative">
+                        <div class="rounded shadow px-0">
+                            <h6 class="d-block text-light px-3 pt-2 pb-2 bg-indigo rounded mb-0">
+                               <?=  $selected_att["att_date"]." | ".date("l", strtotime($selected_att["att_date"])) ?>
+                            </h6>
+                        </div>
+                        <div class="col-12 p-4">
+                            <form method="post">
+                                <div class="row mb-4">
+                                    <div class="col-md-12 col-lg-6 user_input my-1">
+                                        <label class="mb-2" for="renderedHours">Rendered Hours
+                                            <span class="text-danger">*</span></label>
+                                        <input type="number" name="renderedHours" class="form-control"
+                                            value="<?= $selected_att["rendered_hours"] ?>">
+                                    </div>
+                                </div>
+                                <div class="bottom-right">
+                                    <button class="btn btn-indigo" type="submit" name="editRenderedHours">Submit</button>
                                     <button class="btn btn-secondary" name="cancel">Cancel</button>
                                 </div>
                             </form>

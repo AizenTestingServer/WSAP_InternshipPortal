@@ -28,7 +28,7 @@
     <link rel="stylesheet" href="../Assets/css/style.css">
     <link rel="icon" href="../Assets/img/brand_logo/WSAP.png">
 
-    <script src="https://raw.githack.com/eKoopmans/html2pdf/master/dist/html2pdf.bundle.js"></script>
+    <script src="../Assets/js/html2pdf.js"></script>
     <script src="../Assets/js/table2excel.js"></script>
 
     <?php

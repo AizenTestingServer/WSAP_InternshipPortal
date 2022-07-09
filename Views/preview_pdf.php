@@ -32,7 +32,7 @@
     $db = new Database();
     $date = new Date();
 
-    $nto_array = array($_SESSION["intern_id"], "NTO");
+    $nto_array = array($_GET["intern_id"], "NTO");
     $db->query("SELECT COUNT(*) as count FROM attendance
     WHERE intern_id=:intern_id AND time_out=:time_out");
     $db->selectInternIdAndTimeOut($nto_array);
@@ -411,7 +411,7 @@
 <script> <?php 
     if (isset($_SESSION["print"])) { ?>
         const dtr = document.getElementById("dtr-document");
-        html2pdf().from(dtr).save(); <?php
+        html2pdf().from(dtr, null, "<?= $intern_info["last_name"].", ".$intern_info["first_name"]."'s Daily Time Record" ?>").save(); <?php
         unset($_SESSION["print"]);
     } ?>
 </script>
