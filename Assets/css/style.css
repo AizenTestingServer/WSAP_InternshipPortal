@@ -26,6 +26,7 @@
 
 body {
     font-family: "Montserrat", sans-serif;
+    overflow-x: hidden;
 }
 
 /* colors */
@@ -99,6 +100,12 @@ textarea {
 
 /* absolute-posiitons */
 
+.absolute-w-100 {
+    position: absolute;
+    left: 0;
+    right: 0;
+}
+
 .bottom-right {
     position: absolute;
     right: 1rem;
@@ -109,6 +116,21 @@ textarea {
     position: absolute;
     right: 1rem;
     top: 1rem;
+}
+
+.absolute-left {
+    position: absolute;
+    left: 1rem;
+}
+
+.absolute-right {
+    position: absolute;
+    right: 1rem;
+}
+
+.absolute-bottom {
+    position: absolute;
+    bottom: 1rem;
 }
 
 /* Handle on hover */

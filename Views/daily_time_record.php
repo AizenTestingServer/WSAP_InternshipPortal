@@ -471,7 +471,7 @@
                 </div> <?php
                         
                 if (!empty($_GET["id"]) && $selected_att["time_out"] == "NTO" &&
-                    $selected_att["intern_id"] == $_GET["intern_id"]) { ?>
+                    $selected_att["intern_id"] == $_GET["intern_id"] && $_GET["edit"] == "time_out") { ?>
                     <div class="row rounded shadow mb-4 pb-4 position-relative">
                         <div class="rounded shadow px-0">
                             <h6 class="d-block text-light px-3 pt-2 pb-2 bg-indigo rounded mb-0">
@@ -625,7 +625,7 @@
                         </button> <?php
                         if ($nto_value["count"] == 0) { ?>
                             <a class="btn btn-pdf mb-2"
-                                href="preview_pdf.php?intern_id=<?= strtoupper($_SESSION["intern_id"]) ?>"
+                                href="preview_pdf.php?intern_id=<?= strtoupper($_GET["intern_id"]) ?>"
                                 target="window">
                                 Preview DTR as PDF
                             </a> <?php
@@ -785,18 +785,47 @@
                                         } ?>
                                     </td>
                                     <td><?= $row["rendered_hours"] ?></td>
-                                    <td> <?php
-                                        if ($row["time_out"] == "NTO") { ?>
-                                            <a class="btn btn-secondary btn-sm"
-                                            href="daily_time_record.php?intern_id=<?= $_GET["intern_id"] ?>&id=<?= $row["id"] ?>">
-                                                <i class="fa-solid fa-pen fs-a"></i>
-                                            </a> <?php
-                                        } else if (!empty($row["time_out"])) { ?>
-                                            <button class="btn btn-danger btn-sm" data-bs-toggle="modal" 
-                                                data-bs-target="#removeTimeOutModal<?= $row["id"] ?>">
-                                                <i class="fa-solid fa-xmark fs-a"></i>
-                                            </button> <?php
-                                        } ?>
+                                    <td>
+                                        <div class="d-flex justify-content-center"> <?php
+                                            if ($row["time_out"] == "NTO") {  ?>
+                                                <div class="w-fit p-0 me-1" data-bs-toggle="tooltip" data-bs-placement="left"
+                                                    title="Edit Time out"> <?php
+                                                    if ($_GET["id"] != $row["id"] || $_GET["edit"] != "time_out") { ?>
+                                                        <a class="btn btn-secondary btn-sm"
+                                                        href="daily_time_record.php?intern_id=<?= $_GET["intern_id"] ?>&id=<?= $row["id"] ?>&edit=time_out">
+                                                            <i class="fa-solid fa-pen fs-a"></i>
+                                                        </a> <?php
+                                                    } else { ?> 
+                                                        <a class="btn btn-secondary btn-sm disabled">
+                                                            <i class="fa-solid fa-pen fs-a"></i>
+                                                        </a> <?php
+                                                    } ?>
+                                                </div> <?php
+                                            } else if (!empty($row["time_out"])) { ?>
+                                                <div class="w-fit p-0 d-flex">
+                                                    <div class="w-fit p-0 me-1" data-bs-toggle="tooltip" data-bs-placement="left"
+                                                        title="Edit Rendered Hours"> <?php
+                                                            if ($_GET["id"] != $row["id"] || $_GET["edit"] != "rendered_hours") { ?>
+                                                                <a class="btn btn-secondary btn-sm"
+                                                                    href="daily_time_record.php?intern_id=<?= $_GET["intern_id"] ?>&id=<?= $row["id"] ?>&edit=rendered_hours">
+                                                                    <i class="fa-solid fa-pen fs-a"></i>
+                                                                </a> <?php
+                                                            } else { ?>
+                                                                <a class="btn btn-secondary btn-sm disabled">
+                                                                    <i class="fa-solid fa-pen fs-a"></i>
+                                                                </a> <?php
+                                                            } ?>
+                                                    </div>
+                                                    <div class="w-fit p-0" data-bs-toggle="tooltip" data-bs-placement="left"
+                                                            title="Remove time out">
+                                                        <button class="btn btn-danger btn-sm"
+                                                            data-bs-toggle="modal"  data-bs-target="#removeTimeOutModal<?= $row["id"] ?>">
+                                                            <i class="fa-solid fa-xmark fs-a"></i>
+                                                        </button>
+                                                    </div>
+                                                </div> <?php
+                                            } ?>
+                                        </div>
                                     </td>
                                 </tr> <?php
                             }
@@ -1137,11 +1166,14 @@
     </div>
 </div>
 <script>
-  document.getElementById("exportToExcel").addEventListener("click", function() {
-    var table2excel = new Table2Excel();
-    table2excel.export(document.getElementById("dtr"),
-        "<?= $value["last_name"].", ".$value["first_name"]."'s Daily Time Record" ?>");
-  });
+    const tooltipTriggerList = document.querySelectorAll('[data-bs-toggle="tooltip"]');
+    const tooltipList = [...tooltipTriggerList].map(tooltipTriggerEl => new bootstrap.Tooltip(tooltipTriggerEl));
+
+    document.getElementById("exportToExcel").addEventListener("click", function() {
+        var table2excel = new Table2Excel();
+        table2excel.export(document.getElementById("dtr"),
+            "<?= $value["last_name"].", ".$value["first_name"]."'s Daily Time Record" ?>");
+    });
 </script>
 <?php
     require_once "../Templates/footer.php";

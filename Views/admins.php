@@ -337,8 +337,8 @@
                     while ($row = $db->fetch()) { ?>
                         <a class="clickable-card" href="profile.php?intern_id=<?= $row["intern_id"] ?>"
                             draggable="false">
-                            <div class="intern text-center">
-                                <div class="top">
+                            <div class="h-100 intern text-center position-relative pb-5">
+                                <div class="top" style="height: 100px;">
                                     <img class="img-intern mx-auto" src="<?php {
                                         if ($row["image"] == null || strlen($row["image"]) == 0) {
                                             if ($row["gender"] == 0) {
@@ -351,7 +351,7 @@
                                         }
                                     } ?>" onerror="this.src='../Assets/img/profile_imgs/no_image_found.jpeg';">
                                 </div>
-                                <div class="summary-total mt-2 w-fit mx-auto">
+                                <div class="summary-total w-fit mx-auto mt-2 mb-4">
                                     <h5 class="mb-0 text-dark fs-regular">
                                         <?= $row["last_name"].", ".$row["first_name"] ?>
                                     </h5>
@@ -364,7 +364,7 @@
                                         } ?>
                                      </h6>
                                 </div>
-                                <div class="bottom w-100 mt-3"> <?php
+                                <div class="absolute-bottom absolute-w-100 py-3 d-flex justify-content-center" style="bottom: 0;"> <?php
                                     if ($row["status"] == 0 || $row["status"] == 5) { ?>
                                         <p class="bg-warning text-dark rounded w-fit m-auto px-2 py-1 fs-d"> <?php
                                             if ($row["status"] == 0) {
