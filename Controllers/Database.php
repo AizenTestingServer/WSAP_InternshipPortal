@@ -133,6 +133,10 @@ class Database {
         $this->stmt->bindValue(":time_out", $value[1]);
     }
 
+    function selectTimeOut($time_out) {
+        $this->stmt->bindValue(":time_out", $time_out);
+    }
+
     function setAbsent($attendance) {
         $this->stmt->bindValue(":time_in", $attendance[0]);
         $this->stmt->bindValue(":time_out", $attendance[1]);
