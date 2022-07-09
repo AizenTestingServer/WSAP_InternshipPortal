@@ -45,30 +45,65 @@
         return ucwords(strtolower($string));
     }
 
-    function atMorningShift() {
+    function atMorningShift($time_out) {
         $date = new Date();
-        return $date->getDateTimeValue() < $date->morning_shift_end();
+
+        if (empty($time_out)) {
+            $time_out = $date->getDateTimeValue();
+        } else {
+            $time_out = strtotime($time_out);
+        }
+        
+        return $time_out < $date->morning_shift_end();
     }
 
-    function atAfternoonShift() {
+    function atAfternoonShift($time_out) {
         $date = new Date();
-        return $date->getDateTimeValue() >= $date->afternoon_shift_start() && $date->getDateTimeValue() < $date->time_out_start();
+
+        if (empty($time_out)) {
+            $time_out = $date->getDateTimeValue();
+        } else {
+            $time_out = strtotime($time_out);
+        }
+        
+        return $time_out >= $date->afternoon_shift_start() && $time_out < $date->time_out_start();
     }
 
-    function atOvertime() {
+    function atOvertime($time_out) {
         $date = new Date();
-        return $date->getDateTimeValue() >= $date->time_out_end() && $date->getDateTimeValue() < $date->time_out_overtime_start();
+
+        if (empty($time_out)) {
+            $time_out = $date->getDateTimeValue();
+        } else {
+            $time_out = strtotime($time_out);
+        }
+        
+        return $time_out >= $date->time_out_end() && $time_out < $date->time_out_overtime_start();
     }
 
-    function atEndOfDay() {
+    function atEndOfDay($time_out) {
         $date = new Date();
-        return $date->getDateTimeValue() >= $date->time_out_overtime_end();
+
+        if (empty($time_out)) {
+            $time_out = $date->getDateTimeValue();
+        } else {
+            $time_out = strtotime($time_out);
+        }
+        
+        return $time_out >= $date->time_out_overtime_end();
     }
 
-    function atAfternoonTimeIn($time_in) {
+    function atAfternoonTimeIn($time_in, $time_out) {
         $date = new Date();
+
+        if (empty($time_out)) {
+            $time_out = $date->getDateTimeValue();
+        } else {
+            $time_out = strtotime($time_out);
+        }
+
         return strtotime($time_in) >= $date->morning_shift_end() && strtotime($time_in) < $date->afternoon_shift_start() &&
-            $date->getDateTimeValue() >= $date->morning_shift_end() && $date->getDateTimeValue() < $date->afternoon_shift_start();
+            $time_out >= $date->morning_shift_end() && $time_out < $date->afternoon_shift_start();
     }
 
     function isTimeInEnabled($att_date) {
@@ -80,8 +115,15 @@
 
     function isTimeOutEnabled($time_in, $time_out) {
         $date = new Date();
-        return !(!empty($time_out) || atMorningShift() || atAfternoonShift() ||
-            atOvertime() || atEndOfDay() || atAfternoonTimeIn($time_in));
+
+        return !(!empty($time_out) || atMorningShift($time_out) || atAfternoonShift($time_out) ||
+            atOvertime($time_out) || atEndOfDay($time_out) || atAfternoonTimeIn($time_in, $time_out));
+    }
+
+    function isTimeOutInSchedule($time_in, $time_out) {
+        $date = new Date();
+
+        return !(atMorningShift($time_out) || atAfternoonShift($time_out) ||  atOvertime($time_out) || atEndOfDay($time_out) || atAfternoonTimeIn($time_in, $time_out));
     }
 
     function isMorningShift($time_in, $time_out) {
