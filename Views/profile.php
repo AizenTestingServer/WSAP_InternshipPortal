@@ -705,12 +705,12 @@
                                         <div class="col-lg-3 col-md-6 col-sm-6 user_input my-1">
                                             <label class="mb-2" for="renderedHours">Rendered Hours</label>
                                             <input type="number" name="renderedHours" class="form-control fw-bold"
-                                                value="<?= $value["rendered_hours"]; ?>" disabled>
+                                                value="<?= $value["rendered_hours"]; ?>" step="any" disabled>
                                         </div>
                                         <div class="col-lg-3 col-md-6 col-sm-6 user_input my-1">
                                             <label class="mb-2" for="targetRenderingHours">Target Rendering Hours</label>
                                             <input type="number" name="targetRenderingHours" class="form-control fw-bold"
-                                                value="<?= $value["target_rendering_hours"]; ?>" disabled>
+                                                value="<?= $value["target_rendering_hours"]; ?>" step="1" disabled>
                                         </div>
                                     </div>
                                 </div>

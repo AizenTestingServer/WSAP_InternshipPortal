@@ -322,7 +322,7 @@
                                                                         } else {
                                                                             echo "No Brand";
                                                                         } ?></h6>
-                                                                    <input type="text" name="intern_role_id" class="form-control text-center d-none mt-2"
+                                                                    <input type="text" name="intern_role_id" class="form-control text-center d-none"
                                                                         value="<?= $row["intern_role_id"] ?>" readonly>
                                                                 </div>
                                                             </div>

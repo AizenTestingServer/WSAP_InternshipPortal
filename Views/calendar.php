@@ -29,6 +29,9 @@
     intern_wsap_information.id = intern_accounts.id
     ORDER BY last_name");
 
+    $db_attendance = new Database();
+    $db_attendance->query("SELECT * FROM attendance ORDER BY id DESC");
+
     require_once "../Templates/header_view.php";
     setTitle("Calendar");
 ?>
@@ -143,6 +146,15 @@
                                 while ($row_interns = $db_interns->fetch()) {
                                     if (isActiveIntern($row_interns["onboard_date"], $row_interns["offboard_date"], $row["att_date"])) {
                                         $active_interns++;
+                                    } else {
+                                        $db_attendance->execute();
+                                        while ($row_attendance = $db_attendance->fetch()) {
+                                            if ($row_attendance["intern_id"] == $row_interns["id"] &&
+                                                $row_attendance["att_date"] == $row["att_date"]) {
+                                                    $active_interns++;
+                                                    break;
+                                                }
+                                        }
                                     }
                                 }
 

@@ -780,11 +780,11 @@
                                                                 echo $_SESSION["rendered_hours"];
                                                             } else {
                                                                 echo $value["rendered_hours"];;
-                                                            } ?>"> <?php
+                                                            } ?>" step="any"> <?php
                                                     } else { ?>
                                                         <label class="mb-2" for="renderedHours">Rendered Hours</label>
                                                         <input type="number" name="renderedHours" class="form-control fw-bold"
-                                                            value="<?= $value["rendered_hours"]; ?>" readonly> <?php
+                                                            value="<?= $value["rendered_hours"]; ?>" step="any" readonly> <?php
                                                     } ?>
                                                 </div>
                                                 <div class="col-lg-3 col-md-6 col-sm-6 user_input my-1"> <?php
@@ -797,11 +797,11 @@
                                                                 echo $_SESSION["target_rendering_hours"];
                                                             } else {
                                                                 echo $value["target_rendering_hours"];
-                                                            } ?>"> <?php
+                                                            } ?>" step="1"> <?php
                                                     } else { ?>
                                                         <label class="mb-2" for="targetRenderingHours">Target Rendering Hours</label>
                                                         <input type="number" name="targetRenderingHours" class="form-control fw-bold"
-                                                            value="<?= $value["target_rendering_hours"]; ?>" readonly> <?php
+                                                            value="<?= $value["target_rendering_hours"]; ?>" step="1" readonly> <?php
                                                     } ?>
                                                 </div>
                                             </div>
@@ -1171,9 +1171,9 @@
                                                                         } else {
                                                                             echo "No Brand";
                                                                         } ?></h6>
-                                                                    <input type="text" name="intern_role_id" class="form-control text-center d-none mt-2"
+                                                                    <input type="text" name="intern_role_id" class="form-control text-center d-none"
                                                                         value="<?= $row["intern_role_id"] ?>" readonly>
-                                                                    <input type="text" name="role_name" class="form-control text-center d-none mt-2"
+                                                                    <input type="text" name="role_name" class="form-control text-center d-none"
                                                                         value="<?= $row["role_name"] ?>" readonly>
                                                                 </div>
                                                             </div>

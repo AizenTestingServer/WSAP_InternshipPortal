@@ -437,7 +437,7 @@
                                         <label for="progress" class="form-label">Progress</label>
                                         <div class="row align-items-center range-inputs">
                                             <div class="col-sm-12 col-md-3">
-                                                <input type="number" class="form-control" min="0" max="100"
+                                                <input type="number" class="form-control" min="0" max="100" step="1"
                                                     id="progressInput" name="progress">
                                             </div>
                                             <div class="col-sm-12 col-md-9">
@@ -637,7 +637,7 @@
                                                         <label for="progress" class="form-label">Progress</label>
                                                         <div class="row align-items-center range-inputs">
                                                             <div class="col-sm-12 col-md-3">
-                                                                <input type="number" class="form-control" min="0" max="100"
+                                                                <input type="number" class="form-control" min="0" max="100" step="1"
                                                                     id="progressInput" name="progress" value=<?= $row["progress"] ?>>
                                                             </div>
                                                             <div class="col-sm-12 col-md-9">

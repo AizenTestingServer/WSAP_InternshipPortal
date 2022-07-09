@@ -218,14 +218,31 @@
                 if ($rendered_hours >= $wsap_info["target_rendering_hours"]) {
                     $offboard_date = date("Y-m-d", strtotime($date->getDate()));
 
-                    $offboard_date_value = array(
+                    $offboard = array(
                         $offboard_date,
+                        2,
                         $_SESSION["intern_id"]
                     );
     
-                    $db->query("UPDATE intern_wsap_information SET offboard_date=:offboard_date
+                    $db->query("UPDATE intern_wsap_information
+                    SET offboard_date=:offboard_date, status=:status
                     WHERE id=:intern_id");
-                    $db->setOffboardDate($offboard_date_value);
+                    $db->setOffboard($offboard);
+                    $db->execute();
+                    $db->closeStmt();
+                } else {
+                    $offboard_date = null;
+    
+                    $offboard = array(
+                        $offboard_date,
+                        1,
+                        $_SESSION["intern_id"]
+                    );
+    
+                    $db->query("UPDATE intern_wsap_information
+                    SET offboard_date=:offboard_date, status=:status
+                    WHERE id=:intern_id");
+                    $db->setOffboard($offboard);
                     $db->execute();
                     $db->closeStmt();
                 }

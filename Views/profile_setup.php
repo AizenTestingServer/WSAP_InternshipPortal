@@ -468,7 +468,7 @@
                                             </label>
                                             <input type="number" name="targetRenderingHours" class="form-control"
                                                 value="<?php if (isset($_SESSION["target_rendering_hours"])) {
-                                                    echo $_SESSION["target_rendering_hours"]; } ?>">
+                                                    echo $_SESSION["target_rendering_hours"]; } ?>" step="1">
                                         </div>
                                     </div>
                                 </div>

@@ -498,9 +498,9 @@
                                                         </h5>
                                                         <h6 class="fs-f mb-0"><?= $row["name"] ?></h6>
                                                         <h6 class="fs-d fw-bold"><?= $row["intern_id"] ?></h6>
-                                                        <input type="text" name="intern_id" class="form-control text-center d-none mt-2"
+                                                        <input type="text" name="intern_id" class="form-control text-center d-none"
                                                             value="<?= $row["intern_id"] ?>" readonly>
-                                                        <input type="text" name="fullName" class="form-control text-center d-none mt-2"
+                                                        <input type="text" name="fullName" class="form-control text-center d-none"
                                                             value="<?= $row["last_name"].", ".$row["first_name"] ?>" readonly>
                                                     </div>
                                                 </div>

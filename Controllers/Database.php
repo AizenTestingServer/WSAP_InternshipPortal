@@ -156,9 +156,10 @@ class Database {
         $this->stmt->bindValue(":intern_id", $computed_rendered_hours[1]);
     }
 
-    function setOffboardDate($offboard_date_value) {
-        $this->stmt->bindValue(":offboard_date", $offboard_date_value[0]);
-        $this->stmt->bindValue(":intern_id", $offboard_date_value[1]);
+    function setOffboard($offboard) {
+        $this->stmt->bindValue(":offboard_date", $offboard[0]);
+        $this->stmt->bindValue(":status", $offboard[1]);
+        $this->stmt->bindValue(":intern_id", $offboard[2]);
     }
 
     function uploadImage($upload_image) {
