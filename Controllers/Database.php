@@ -228,6 +228,11 @@ class Database {
         $this->stmt->bindValue(":intern_id", $wsap_info[3]);
     }
 
+    function setWSAPInfo4($wsap_info) {
+        $this->stmt->bindValue(":offboard_date", $wsap_info[0]);
+        $this->stmt->bindValue(":intern_id", $wsap_info[1]);
+    }
+
     function insertEducationalInfo($educational_info) {
         $this->stmt->bindValue(":intern_id", $educational_info[0]);
         $this->stmt->bindValue(":university", $educational_info[1]);

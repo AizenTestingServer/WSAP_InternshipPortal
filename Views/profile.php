@@ -414,11 +414,17 @@
                                             <div class="p-2">
                                                 <img src="<?= $images["image_path"] ?>" class="image"
                                                     onerror="this.src='../Assets/img/profile_imgs/no_image_found.jpeg';">
-                                                <p class="my-2" style="height: 20px; overflow: hidden;"><?= $images["image_name"] ?></p> <?php
+                                                <div class="w-100 d-flex justify-content-center">
+                                                    <p class="my-2" style="max-width: 200px; height: 20px; overflow: hidden;"
+                                                        data-bs-toggle="tooltip" data-bs-placement="top"
+                                                        title="<?= $images["image_name"] ?>">
+                                                        <?= $images["image_name"] ?>
+                                                    </p>
+                                                </div> <?php
                                                 if ($value["image"] == $images["image_path"]) { ?>
                                                     <a class="btn btn-sm btn-secondary w-75 disabled">Current Profile Photo</a> <?php
                                                 } else { ?>
-                                                    <a href="set_profile_photo.php?intern_id=<?= strtoupper($_SESSION["intern_id"]) ?>&image_id=<?= $images["id"] ?>"
+                                                    <a href="set_profile_photo.php?intern_id=<?= strtoupper($_GET["intern_id"]) ?>&image_id=<?= $images["id"] ?>"
                                                     class="btn btn-sm btn-indigo w-75">Set as Profile Photo</a> <?php
                                                 } ?>
                                             </div> <?php
@@ -1129,6 +1135,9 @@
 </div>
 
 <script>
+    const tooltipTriggerList = document.querySelectorAll('[data-bs-toggle="tooltip"]');
+    const tooltipList = [...tooltipTriggerList].map(tooltipTriggerEl => new bootstrap.Tooltip(tooltipTriggerEl));
+
     var loadFile = function (event) {
         var output = document.getElementById("output");
         output.src = URL.createObjectURL(event.target.files[0]);

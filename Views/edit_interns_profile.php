@@ -226,6 +226,20 @@
                 $db->setWSAPInfo2($wsap_info);
                 $db->execute();
                 $db->closeStmt();
+
+                if ($rendered_hours >= $target_rendering_hours) {
+                    $offboard_date = date("Y-m-d", $date->getDateValue());
+                } else {
+                    $offboard_date = null;
+                }
+                
+                $wsap_info = array($offboard_date, $_GET["intern_id"]);
+        
+                $db->query("UPDATE intern_wsap_information SET offboard_date=:offboard_date
+                WHERE id=:intern_id");
+                $db->setWSAPInfo4($wsap_info);
+                $db->execute();
+                $db->closeStmt();
                         
                 $log_value = $admin_info["last_name"].", ".$admin_info["first_name"].
                     " (".$admin_info["name"].") updated the WSAP information of ".$value["last_name"].", ".$value["first_name"].".";
@@ -444,7 +458,13 @@
                                                     <div class="p-2">
                                                         <img src="<?= $images["image_path"] ?>" class="image"
                                                             onerror="this.src='../Assets/img/profile_imgs/no_image_found.jpeg';">
-                                                        <p class="my-2" style="height: 20px; overflow: hidden;"><?= $images["image_name"] ?></p> <?php
+                                                        <div class="w-100 d-flex justify-content-center">
+                                                            <p class="my-2" style="max-width: 200px; height: 20px; overflow: hidden;"
+                                                                data-bs-toggle="tooltip" data-bs-placement="top"
+                                                                title="<?= $images["image_name"] ?>">
+                                                                <?= $images["image_name"] ?>
+                                                            </p>
+                                                        </div> <?php
                                                         if ($value["image"] == $images["image_path"]) { ?>
                                                             <a class="btn btn-sm btn-secondary w-75 disabled">Current Profile Photo</a> <?php
                                                         } else { ?>
@@ -1540,6 +1560,9 @@
 </div>
 
 <script>
+    const tooltipTriggerList = document.querySelectorAll('[data-bs-toggle="tooltip"]');
+    const tooltipList = [...tooltipTriggerList].map(tooltipTriggerEl => new bootstrap.Tooltip(tooltipTriggerEl));
+    
     var loadFile = function (event) {
         var output = document.getElementById("output");
         output.src = URL.createObjectURL(event.target.files[0]);

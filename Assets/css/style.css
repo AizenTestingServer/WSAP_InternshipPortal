@@ -93,9 +93,8 @@ body {
     border-radius: 50%;
 }
 
-/* scrollbar */
-::-webkit-scrollbar {
-    display: none;
+textarea {
+    overflow: hidden;
 }
 
 /* absolute-posiitons */
