@@ -220,9 +220,10 @@ class Database {
         $this->stmt->bindValue(":dept_id", $wsap_info[0]);
         $this->stmt->bindValue(":status", $wsap_info[1]);
         $this->stmt->bindValue(":onboard_date", $wsap_info[2]);
-        $this->stmt->bindValue(":rendered_hours", $wsap_info[3]);
-        $this->stmt->bindValue(":target_rendering_hours", $wsap_info[4]);
-        $this->stmt->bindValue(":intern_id", $wsap_info[5]);
+        $this->stmt->bindValue(":offboard_date", $wsap_info[3]);
+        $this->stmt->bindValue(":rendered_hours", $wsap_info[4]);
+        $this->stmt->bindValue(":target_rendering_hours", $wsap_info[5]);
+        $this->stmt->bindValue(":intern_id", $wsap_info[6]);
     }
 
     function setWSAPInfo3($wsap_info) {

@@ -112,7 +112,7 @@
                                 <div class="input-group-append">
                                     <a class="btn btn-smoke border-dark" href="calendar.php">Select Date</a>
                                 </div>
-                            </div>                        
+                            </div>
                         </div>
 
                         <div class="w-100 d-md-flex d-sm-inline-block">

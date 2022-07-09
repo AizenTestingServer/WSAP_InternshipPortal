@@ -201,12 +201,14 @@
         $dept_id = $_POST["department"];
         $status = $_POST["status"];
         $onboard_date = $_POST["onboardDate"];
+        $offboard_date = $_POST["offboardDate"];
         $rendered_hours = $_POST["renderedHours"];
         $target_rendering_hours = $_POST["targetRenderingHours"];
 
         $_SESSION["dept_id"] = $dept_id;
         $_SESSION["status"] = $status;
         $_SESSION["onboard_date"] = $onboard_date;
+        $_SESSION["offboard_date"] = $offboard_date;
         $_SESSION["rendered_hours"] = $rendered_hours;
         $_SESSION["target_rendering_hours"] = $target_rendering_hours;
         
@@ -215,21 +217,22 @@
                 $wsap_info = array($dept_id,
                 $status,
                 $onboard_date,
+                $offboard_date,
                 $rendered_hours,
                 $target_rendering_hours,
                 $_GET["intern_id"]);
         
                 $db->query("UPDATE intern_wsap_information
-                SET department_id=:dept_id, status=:status, onboard_date=:onboard_date,
+                SET department_id=:dept_id, status=:status, onboard_date=:onboard_date, offboard_date=:offboard_date,
                 target_rendering_hours=:target_rendering_hours, rendered_hours=:rendered_hours
                 WHERE id=:intern_id");
                 $db->setWSAPInfo2($wsap_info);
                 $db->execute();
                 $db->closeStmt();
 
-                if ($rendered_hours >= $target_rendering_hours) {
+                if ($rendered_hours >= $target_rendering_hours && empty($offboard_date)) {
                     $offboard_date = date("Y-m-d", $date->getDateValue());
-                } else {
+                } else if ($rendered_hours < $target_rendering_hours) {
                     $offboard_date = null;
                 }
                 
@@ -258,6 +261,7 @@
                 unset($_SESSION["dept_id"]);
                 unset($_SESSION["status"]);
                 unset($_SESSION["onboard_date"]);
+                unset($_SESSION["offboard_date"]);
                 unset($_SESSION["rendered_hours"]);
                 unset($_SESSION["target_rendering_hours"]);
             } else {
@@ -760,10 +764,10 @@
                                                         echo date("F j, Y", strtotime($date->getDate()." + ".$rendering_days." days")); ?>"
                                                         disabled> <?php
                                                     } else { ?>
-                                                        <label class="mb-2" for="offboardDate">Offboard Date</label>
-                                                        <input type="text" name="offboardDate" class="form-control fw-bold"
-                                                        value="<?= date("F j, Y", strtotime($value["offboard_date"])); ?>"
-                                                        disabled> <?php
+                                                        <label class="mb-2" for="offboardDate">Offboard Date
+                                                            <span class="text-danger">*</span></label>
+                                                        <input type="date" name="offboardDate" class="form-control"
+                                                        value="<?= date("Y-m-d", strtotime($value["offboard_date"])); ?>"> <?php
                                                     } ?>
                                                 </div>
                                                 <div class="col-lg-3 col-md-6 col-sm-6 user_input my-1"> <?php
@@ -865,6 +869,7 @@
                         unset($_SESSION["dept_id"]);
                         unset($_SESSION["status"]);
                         unset($_SESSION["onboard_date"]);
+                        unset($_SESSION["offboard_date"]);
                         unset($_SESSION["rendered_hours"]);
                         unset($_SESSION["target_rendering_hours"]); ?>
                     </div>
