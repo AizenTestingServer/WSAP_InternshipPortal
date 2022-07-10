@@ -385,7 +385,7 @@
                         } ?>
                 </div> <?php
                 if ($db->rowCount() == 0) { 
-                    $text .= "+ \"No Record\"\n"; ?>?>
+                    $text .= "+ \"No Record\"\n"; ?>
                     <div class="w-100 text-center my-5">
                         <h3>No Record</h3>
                     </div> <?php
