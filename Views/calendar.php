@@ -130,8 +130,12 @@
                 $records_db->execute();
 
                 while ($row = $records_db->fetch()) { ?>
-                    <a class="clickable-card" href="interns_attendance.php?date=<?= $row["att_date"] ?>"
-                    draggable="false">
+                    <a class="clickable-card" draggable="false" <?php
+                        if (!empty($_GET["destination"])) { ?>
+                            href="<?= $_GET["destination"] ?>.php?date=<?= $row["att_date"] ?>" <?php
+                        } else { ?>
+                            href="interns_attendance.php?date=<?= $row["att_date"] ?>" <?php
+                        } ?>>
                         <div class="calendar-item text-center">
                             <div class="calendar-date mt-2">
                                 <h6 class="text-dark fw-bold"><?= date("Y", strtotime($row["att_date"])) ?></h6>

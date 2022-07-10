@@ -107,7 +107,7 @@
                         
                     <div class="col-12 d-xl-flex d-lg-inline-block">
                         <div class="mb-2">
-                            <a class="btn btn-secondary me-2" href="interns_attendance.php">
+                            <a class="btn btn-secondary me-2" href="interns_attendance.php?date=<?= $selected_date ?>">
                                 <i class="fa-solid fa-arrow-left me-2"></i>Back to Interns' Attendance
                             </a>
                         </div>
@@ -117,7 +117,7 @@
                                 <div class="input-group">
                                     <input type="text" class="form-control" value="<?= $selected_date ?>" disabled>
                                     <div class="input-group-append">
-                                        <a class="btn btn-smoke border-dark" href="calendar.php">Select Date</a>
+                                        <a class="btn btn-smoke border-dark" href="calendar.php?destination=absent_interns">Select Date</a>
                                     </div>
                                 </div>
                             </div>
