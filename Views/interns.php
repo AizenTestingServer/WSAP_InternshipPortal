@@ -650,8 +650,8 @@
                         <a class="clickable-card" href="profile.php?intern_id=<?= $row["intern_id"] ?>"
                             draggable="false"> <?php
                     } ?>
-                            <div class="intern text-center">
-                                <div class="top">
+                            <div class="h-100 intern text-center position-relative pb-5">
+                                <div class="top" style="height: 100px;">
                                     <img class="img-intern mx-auto" src="<?php {
                                         if ($row["image"] == null || strlen($row["image"]) == 0) {
                                             if ($row["gender"] == 0) {
@@ -670,7 +670,7 @@
                                     </h5>
                                     <h6 class="fs-f"><?= $row["name"] ?></h6>
                                 </div>
-                                <div class="bottom w-100 mt-3"> <?php
+                                <div class="absolute-bottom absolute-w-100 py-3 d-flex justify-content-center" style="bottom: 0;"> <?php
                                     if ($row["status"] == 0 || $row["status"] == 5) { ?>
                                         <p class="bg-warning text-dark rounded w-fit m-auto px-2 py-1 fs-d"> <?php
                                             if ($row["status"] == 0) {

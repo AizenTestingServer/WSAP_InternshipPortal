@@ -360,8 +360,8 @@
                                 $text .= "\\n\"\n";
                             } ?>
                             <a class="clickable-card" href="daily_time_record.php?intern_id=<?= $row["intern_id"] ?>" draggable="false">
-                                <div class="attendance text-center">
-                                    <div class="top">
+                                <div class="h-100 attendance text-center position-relative" style="padding-bottom: 5rem;">
+                                    <div class="top" style="height: 100px;">
                                         <img class="img-intern mx-auto" src="<?php {
                                             if ($row["image"] == null || strlen($row["image"]) == 0) {
                                                 if ($row["gender"] == 0) {
@@ -380,8 +380,8 @@
                                         </h5>
                                         <h6 class="fs-f"><?= $row["name"] ?></h6>
                                     </div>
-                                    <div class="bottom d-flex justify-content-evenly mt-3">
-                                        <div class="w-100">
+                                    <div class="absolute-bottom absolute-w-100 py-3 d-flex justify-content-center" style="bottom: 0;">
+                                        <div>
                                             <p class="m-0 fw-bold fs-e">Time in</p>
                                             <div class="d-flex align-items-center"> <?php
                                                 if (strlen($row["time_in"]) > 0) {

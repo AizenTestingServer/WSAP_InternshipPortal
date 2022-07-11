@@ -360,8 +360,8 @@
 
                             if (isActiveIntern($row["onboard_date"], $row["offboard_date"], $selected_date)) { ?>
                                 <a class="clickable-card" href="daily_time_record.php?intern_id=<?= $row["intern_id"] ?>" draggable="false">
-                                    <div class="attendance text-center">
-                                        <div class="top">
+                                    <div class="h-100 attendance text-center position-relative pb-5">
+                                        <div class="top" style="height: 100px;">
                                             <img class="img-intern mx-auto" src="<?php {
                                                 if ($row["image"] == null || strlen($row["image"]) == 0) {
                                                     if ($row["gender"] == 0) {
@@ -380,7 +380,36 @@
                                             </h5>
                                             <h6 class="fs-f"><?= $row["name"] ?></h6>
                                         </div>
-                                        <div class="bottom d-flex justify-content-evenly mt-3">
+                                        <div class="absolute-bottom absolute-w-100 py-3 d-flex justify-content-center" style="bottom: 0;"> <?php
+                                            if ($row["status"] == 0 || $row["status"] == 5) { ?>
+                                                <p class="bg-warning text-dark rounded w-fit m-auto px-2 py-1 fs-d"> <?php
+                                                    if ($row["status"] == 0) {
+                                                        echo "Inactive";
+                                                    } else {
+                                                        echo "Suspended";
+                                                    } ?>
+                                                </p> <?php
+                                            }  else if ($row["status"] == 1 || $row["status"] == 4) { ?>
+                                                <p class="bg-success text-light rounded w-fit m-auto px-2 py-1 fs-d"> <?php
+                                                    if ($row["status"] == 1) {
+                                                        echo "Active";
+                                                    } else {
+                                                        echo "Extended";
+                                                    } ?>
+                                                </p> <?php
+                                            }   else if ($row["status"] == 2) { ?>
+                                                <p class="bg-secondary text-light rounded w-fit m-auto px-2 py-1 fs-d">
+                                                    Offboarded
+                                                </p> <?php
+                                            }   else if ($row["status"] == 4) { ?>
+                                                <p class="bg-dark text-light rounded w-fit m-auto px-2 py-1 fs-d">
+                                                    Withdrawn
+                                                </p> <?php
+                                            }   else if ($row["status"] == 6) { ?>
+                                                <p class="bg-danger text-light rounded w-fit m-auto px-2 py-1">
+                                                    Terminated
+                                                </p> <?php
+                                            } ?>
                                         </div>
                                     </div>
                                 </a> <?php

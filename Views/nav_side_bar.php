@@ -66,39 +66,27 @@
                                 <li><a href="interns_attendance.php">Interns' Attendance</a></li>
                                 <li><a href="calendar.php?month=<?= $date->getMonthName() ?>&year=<?= $date->getYear() ?>">Calendar</a></li>
                                 <li><a href="daily_time_record.php">Interns' DTR</a></li>
+                                <li><a href="offboarding_forecast.php">Offboarding Forecast</a></li>
                             </ul>
                         </li> <?php
                     } else { ?>
-                        <li>
+                        <li class="dropdown-toggler">
                             <a <?php
                             if ($target_active == "attendance") { ?>
                                 class="active" <?php
                             } else { ?>
-                                class="inactive"
-                                href="attendance.php" <?php
+                                class="inactive" <?php
                             } ?>>
                                 <div class="icon-container">
                                     <i class="fa-solid fa-clock fa-2x"></i>
                                 </div> Attendance
                             </a>
+                            <ul class="dropdown-list text-start">
+                                <li><a href="attendance.php">My Attendance</a></li>
+                                <li><a href="offboarding_forecast.php">Offboarding Forecast</a></li>
+                            </ul>
                         </li> <?php
                     } ?>
-                    <li class="dropdown-toggler">
-                        <a <?php
-                        if ($target_active == "tasks") { ?>
-                            class="active" <?php
-                        } else { ?>
-                            class="inactive" <?php
-                        } ?>>
-                            <div class="icon-container">
-                                <i class="fa-solid fa-tasks fa-2x"></i>
-                            </div> Tasks
-                        </a>
-                        <ul class="dropdown-list text-start">
-                            <li><a href="tasks.php">My Tasks</a></li>
-                            <li><a href="interns_tasks.php">Interns' Tasks</a></li>
-                        </ul>
-                    </li>
                     <li class="dropdown-toggler">
                         <a <?php
                         if ($target_active == "interns") { ?>

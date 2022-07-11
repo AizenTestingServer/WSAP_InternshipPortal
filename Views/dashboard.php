@@ -121,6 +121,21 @@
         $remind_time_out = isTimeOutEnabled($lts_att["time_in"], $lts_att["time_out"]);
     }
 
+    $db->query("SELECT * FROM intern_wsap_information WHERE status=1");
+    $db->execute();
+
+    $offboarding_interns = 0;
+    while ($row = $db->fetch()) {
+        $rendering_days = round(($row["target_rendering_hours"]-$row["rendered_hours"])/8);
+        $estimated_weekends = ceil(($rendering_days/5) * 2);
+        $rendering_days += $estimated_weekends + 1;
+        $est_offboard_date = strtotime($date->getDate()." + ".$rendering_days." days");
+
+        if ($est_offboard_date >= strtotime("monday") && $est_offboard_date <= strtotime("sunday")) {
+            $offboarding_interns++;
+        }
+    }
+
     if (isset($_POST["addNew"])) {
         $title = fullTrim($_POST["title"]);
         $start_date = $_POST["start_date"];
@@ -209,7 +224,7 @@
                         unset($_SESSION["setup_success"]);
                     ?>
                 </div> <?php
-            } ?>
+            } $bg_color_class = array("bg-primary", "bg-secondary", "bg-red-palette", "bg-success", "bg-orange"); ?>
 
             <div class="summary">
                 <a class="clickable-card" href="attendance.php" draggable="false">
@@ -225,7 +240,29 @@
                                 </div>
                             </div>
                             <div class="right">
-                                <i class="fa-solid fa-clock bg-primary text-light circle"></i>
+                                <i class="fa-solid fa-clock <?= $bg_color_class[0] ?> text-light circle"></i>
+                            </div>
+                        </div>
+                        <div class="bottom">
+
+                        </div>
+                    </div>
+                </a>
+
+                <a class="clickable-card" href="attendance.php" draggable="false">
+                    <div class="summary-boxes">
+                        <div class="top">
+                            <div class="left">
+                                <div class="subheader my-2">
+                                    Hours Left
+                                </div>
+                                <div class="summary-total">
+                                    <h3><?= $intern_wsap_info["target_rendering_hours"] -
+                                        $intern_wsap_info["rendered_hours"] ?></h3>
+                                </div>
+                            </div>
+                            <div class="right">
+                                <i class="fa-solid fa-clock <?= $bg_color_class[1] ?> text-light circle"></i>
                             </div>
                         </div>
                         <div class="bottom">
@@ -246,7 +283,7 @@
                                 </div>
                             </div>
                             <div class="right">
-                                <i class="fa-solid fa-clock bg-secondary text-light circle"></i>
+                                <i class="fa-solid fa-clock <?= $bg_color_class[2] ?> text-light circle"></i>
                             </div>
                         </div>
                         <div class="bottom">
@@ -273,7 +310,7 @@
                                 </div>
                             </div>
                             <div class="right">
-                                <i class="fa-solid fa-calendar bg-success text-light circle"></i>
+                                <i class="fa-solid fa-calendar <?= $bg_color_class[3] ?> text-light circle"></i>
                             </div>
                         </div>
                         <div class="bottom">
@@ -295,7 +332,7 @@
                                 </div>
                             </div>
                             <div class="right">
-                                <i class="fa-solid fa-calendar bg-red-palette text-light circle"></i>
+                                <i class="fa-solid fa-calendar <?= $bg_color_class[4] ?> text-light circle"></i>
                             </div>
                         </div>
                         <div class="bottom">
@@ -329,28 +366,7 @@
                                 </div>
                             </div>
                             <div class="right">
-                                <i class="fa-solid fa-graduation-cap bg-primary text-light circle"></i>
-                            </div>
-                        </div>
-                        <div class="bottom">
-
-                        </div>
-                    </div>
-                </a>
-
-                <a class="clickable-card" href="brands.php" draggable="false">
-                    <div class="summary-boxes">
-                        <div class="top">
-                            <div class="left">
-                                <div class="subheader my-2">
-                                    Total Websites
-                                </div>
-                                <div class="summary-total">
-                                    <h3><?= $brand_count ?></h3>
-                                </div>
-                            </div>
-                            <div class="right">
-                                <i class="fa-solid fa-globe bg-secondary text-light circle"></i>
+                                <i class="fa-solid fa-graduation-cap <?= $bg_color_class[0] ?> text-light circle"></i>
                             </div>
                         </div>
                         <div class="bottom">
@@ -371,7 +387,7 @@
                                 </div>
                             </div>
                             <div class="right">
-                                <i class="fa-solid fa-user-group bg-success text-light circle"></i>
+                                <i class="fa-solid fa-user-group <?= $bg_color_class[1] ?> text-light circle"></i>
                             </div>
                         </div>
                         <div class="bottom">
@@ -392,7 +408,49 @@
                                 </div>
                             </div>
                             <div class="right">
-                                <i class="fa-solid fa-user-tie bg-red-palette text-light circle"></i>
+                                <i class="fa-solid fa-user-tie <?= $bg_color_class[2] ?> text-light circle"></i>
+                            </div>
+                        </div>
+                        <div class="bottom">
+
+                        </div>
+                    </div>
+                </a>
+
+                <a class="clickable-card" href="offboarding_forecast.php" draggable="false">
+                    <div class="summary-boxes">
+                        <div class="top">
+                            <div class="left">
+                                <div class="subheader my-2">
+                                    Offboarding Interns this Week
+                                </div>
+                                <div class="summary-total">
+                                    <h3><?= $offboarding_interns ?></h3>
+                                </div>
+                            </div>
+                            <div class="right">
+                                <i class="fa-solid fa-graduation-cap <?= $bg_color_class[3] ?> text-light circle"></i>
+                            </div>
+                        </div>
+                        <div class="bottom">
+
+                        </div>
+                    </div>
+                </a>
+
+                <a class="clickable-card" href="brands.php" draggable="false">
+                    <div class="summary-boxes">
+                        <div class="top">
+                            <div class="left">
+                                <div class="subheader my-2">
+                                    Total Websites
+                                </div>
+                                <div class="summary-total">
+                                    <h3><?= $brand_count ?></h3>
+                                </div>
+                            </div>
+                            <div class="right">
+                                <i class="fa-solid fa-globe <?= $bg_color_class[4] ?> text-light circle"></i>
                             </div>
                         </div>
                         <div class="bottom">
@@ -472,11 +530,11 @@
                     <div class="d-lg-flex d-sm-inline-block justify-content-between align-items-center mb-2">
                         <div class="d-flex align-items-center mb-2">
                             <h4 class="fw-bold m-0 me-2">Tasks and Reminders</h4>
-                            <a class="btn btn-secondary btn-sm" href="tasks.php">
+                            <a class="btn btn-secondary btn-sm d-none" href="tasks.php">
                                 Show All<i class="fa-solid fa-arrow-right ms-2"></i>
                             </a>
                         </div>
-                        <div>
+                        <div class="d-none">
                             <button class="btn btn-primary mb-2" data-bs-toggle="modal" 
                                 data-bs-target="#addNewModal">
                                 <i class="fa-solid fa-plus me-2"></i>Add New

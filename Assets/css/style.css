@@ -140,6 +140,10 @@ textarea {
     background: var(--indigo);
 }
 
+.bg-orange {
+    background: var(--orange);
+}
+
 .bg-red-palette {
     background: var(--red-palette);
 }
