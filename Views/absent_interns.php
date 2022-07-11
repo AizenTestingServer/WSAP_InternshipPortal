@@ -356,32 +356,35 @@
                                 $text .= " - ".$row["name"]."\\n\"\n";
                             } else {
                                 $text .= "\\n\"\n";
-                            } ?>
-                            <a class="clickable-card" href="daily_time_record.php?intern_id=<?= $row["intern_id"] ?>" draggable="false">
-                                <div class="attendance text-center">
-                                    <div class="top">
-                                        <img class="img-intern mx-auto" src="<?php {
-                                            if ($row["image"] == null || strlen($row["image"]) == 0) {
-                                                if ($row["gender"] == 0) {
-                                                    echo "../Assets/img/profile_imgs/default_male.png";
+                            }
+
+                            if (isActiveIntern($row["onboard_date"], $row["offboard_date"], $selected_date)) { ?>
+                                <a class="clickable-card" href="daily_time_record.php?intern_id=<?= $row["intern_id"] ?>" draggable="false">
+                                    <div class="attendance text-center">
+                                        <div class="top">
+                                            <img class="img-intern mx-auto" src="<?php {
+                                                if ($row["image"] == null || strlen($row["image"]) == 0) {
+                                                    if ($row["gender"] == 0) {
+                                                        echo "../Assets/img/profile_imgs/default_male.png";
+                                                    } else {
+                                                        echo "../Assets/img/profile_imgs/default_female.png";
+                                                    }
                                                 } else {
-                                                    echo "../Assets/img/profile_imgs/default_female.png";
+                                                    echo $row["image"];
                                                 }
-                                            } else {
-                                                echo $row["image"];
-                                            }
-                                        } ?>" onerror="this.src='../Assets/img/profile_imgs/no_image_found.jpeg';">
+                                            } ?>" onerror="this.src='../Assets/img/profile_imgs/no_image_found.jpeg';">
+                                        </div>
+                                        <div class="summary-total mt-2 w-fit mx-auto">
+                                            <h5 class="mb-0 text-dark fs-regular">
+                                                <?= $row["last_name"].", ".$row["first_name"] ?>
+                                            </h5>
+                                            <h6 class="fs-f"><?= $row["name"] ?></h6>
+                                        </div>
+                                        <div class="bottom d-flex justify-content-evenly mt-3">
+                                        </div>
                                     </div>
-                                    <div class="summary-total mt-2 w-fit mx-auto">
-                                        <h5 class="mb-0 text-dark fs-regular">
-                                            <?= $row["last_name"].", ".$row["first_name"] ?>
-                                        </h5>
-                                        <h6 class="fs-f"><?= $row["name"] ?></h6>
-                                    </div>
-                                    <div class="bottom d-flex justify-content-evenly mt-3">
-                                    </div>
-                                </div>
-                            </a> <?php
+                                </a> <?php
+                            }
                         } ?>
                 </div> <?php
                 if ($db->rowCount() == 0) { 
