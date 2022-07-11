@@ -341,6 +341,8 @@
                             }
                         }
                         $db->execute();
+                        
+                        $conditions = array("AU", "AE", "MS", "AS", "OT", "OD", "L", "NTO");
 
                         $text = "\"No Time out Interns: ".$selected_date."\\n\\n\"\n";
 
@@ -379,6 +381,46 @@
                                         <h6 class="fs-f"><?= $row["name"] ?></h6>
                                     </div>
                                     <div class="bottom d-flex justify-content-evenly mt-3">
+                                        <div class="w-100">
+                                            <p class="m-0 fw-bold fs-e">Time in</p>
+                                            <div class="d-flex align-items-center"> <?php
+                                                if (strlen($row["time_in"]) > 0) {
+                                                    if ($row["time_in"] == $conditions[0]) { ?>
+                                                        <p class="bg-danger text-light rounded w-fit mx-auto fs-d px-2 py-1">
+                                                            <?= $row["time_in"] ?>
+                                                        </p> <?php
+                                                    }  else if ($row["time_in"] == $conditions[1]) { ?>
+                                                        <p class="bg-primary text-light rounded w-fit mx-auto fs-d px-2 py-1">
+                                                            <?= $row["time_in"] ?>
+                                                        </p> <?php
+                                                    }  else if (strlen($row["time_out"]) > 0 &&
+                                                        str_contains($row["time_out"], $conditions[2]) &&
+                                                        !str_contains($row["time_in"], $conditions[6])) { ?>
+                                                        <p class="bg-morning text-light rounded w-fit mx-auto fs-d px-2 py-1">
+                                                            <?= $row["time_in"] ?>
+                                                        </p> <?php
+                                                    }  else if (strlen($row["time_out"]) > 0 &&
+                                                        str_contains($row["time_out"], $conditions[3]) &&
+                                                        !str_contains($row["time_in"], $conditions[6])) { ?>
+                                                        <p class="bg-afternoon text-light rounded w-fit mx-auto fs-d px-2 py-1">
+                                                            <?= $row["time_in"] ?>
+                                                        </p> <?php
+                                                    }  else if (str_contains($row["time_in"], $conditions[4])) { ?>
+                                                        <p class="bg-dark text-light rounded w-fit mx-auto fs-d px-2 py-1">
+                                                            <?= $row["time_in"] ?>
+                                                        </p> <?php
+                                                    }  else if (str_contains($row["time_in"], $conditions[6])) { ?>
+                                                        <p class="bg-warning text-dark rounded w-fit mx-auto fs-d px-2 py-1">
+                                                            <?= $row["time_in"] ?>
+                                                        </p> <?php
+                                                    }  else { ?>
+                                                        <p class="bg-success text-light rounded w-fit mx-auto fs-d px-2 py-1">
+                                                            <?= $row["time_in"] ?>
+                                                        </p> <?php
+                                                    }
+                                                } ?>
+                                            </div>
+                                        </div>
                                     </div>
                                 </div>
                             </a> <?php

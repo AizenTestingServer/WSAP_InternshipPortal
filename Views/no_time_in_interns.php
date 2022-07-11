@@ -50,9 +50,9 @@
         }
 
         if (strlen($parameters) > 1) {
-            redirect("absent_interns.php".$parameters);
+            redirect("no_time_in_interns.php".$parameters);
         } else {
-            redirect("absent_interns.php");
+            redirect("no_time_in_interns.php");
         }
 
         exit();
@@ -60,15 +60,15 @@
 
     if (isset($_POST["reset"])) {
         if (!empty($selected_date)) {
-            redirect("absent_interns.php?date=".$selected_date);
+            redirect("no_time_in_interns.php?date=".$selected_date);
         } else {  
-            redirect("absent_interns.php");
+            redirect("no_time_in_interns.php");
         }
         exit();
     }
 
     require_once "../Templates/header_view.php";
-    setTitle("Absent Interns");
+    setTitle("No Time in Interns");
 ?>
 <div class="my-container"> 
     <?php
@@ -82,7 +82,7 @@
         
         <div class="d-flex align-items-center mb-2">
             <div>
-                <h3>Absent Interns</h3>
+                <h3>No Time in Interns</h3>
             </div>
         </div> <?php
 
@@ -151,9 +151,9 @@
                                             }
 
                                             if (strlen($parameters) > 1) { ?>
-                                                href="<?= "absent_interns.php".$parameters ?>" <?php
+                                                href="<?= "no_time_in_interns.php".$parameters ?>" <?php
                                             } else { ?>
-                                                href="<?= "absent_interns.php" ?>" <?php
+                                                href="<?= "no_time_in_interns.php" ?>" <?php
                                             } ?>> All Departments </a></li> <?php
                                         
                                         $db->query("SELECT * FROM departments ORDER BY name");
@@ -182,9 +182,9 @@
                                                 }
 
                                                 if (strlen($parameters) > 1) { ?>
-                                                    href="<?= "absent_interns.php".$parameters ?>" <?php
+                                                    href="<?= "no_time_in_interns.php".$parameters ?>" <?php
                                                 } else { ?>
-                                                    href="<?= "absent_interns.php" ?>" <?php
+                                                    href="<?= "no_time_in_interns.php" ?>" <?php
                                                 } ?>> <?= $row["name"] ?>
                                             </a></li> <?php
                                         } ?>
@@ -225,9 +225,9 @@
                                             }
 
                                             if (strlen($parameters) > 1) { ?>
-                                                href="<?= "absent_interns.php".$parameters ?>" <?php
+                                                href="<?= "no_time_in_interns.php".$parameters ?>" <?php
                                             } else { ?>
-                                                href="<?= "absent_interns.php" ?>" <?php
+                                                href="<?= "no_time_in_interns.php" ?>" <?php
                                             } ?>>Default</a></li>
                                         <li><a class="dropdown-item btn-smoke" <?php
                                             $parameters = "?";
@@ -249,9 +249,9 @@
                                             }
 
                                             if (strlen($parameters) > 1) { ?>
-                                                href="<?= "absent_interns.php".$parameters ?>" <?php
+                                                href="<?= "no_time_in_interns.php".$parameters ?>" <?php
                                             } else { ?>
-                                                href="<?= "absent_interns.php" ?>" <?php
+                                                href="<?= "no_time_in_interns.php" ?>" <?php
                                             } ?>>A-Z</a></li>
                                         <li><a class="dropdown-item btn-smoke" <?php
                                             $parameters = "?";
@@ -273,9 +273,9 @@
                                             }
 
                                             if (strlen($parameters) > 1) { ?>
-                                                href="<?= "absent_interns.php".$parameters ?>" <?php
+                                                href="<?= "no_time_in_interns.php".$parameters ?>" <?php
                                             } else { ?>
-                                                href="<?= "absent_interns.php" ?>" <?php
+                                                href="<?= "no_time_in_interns.php" ?>" <?php
                                             } ?>>Z-A</a></li>
                                     </ul>
                                 </div>
@@ -342,7 +342,7 @@
                         }
                         $db->execute();
 
-                        $text = "\"Absent Interns: ".$selected_date."\\n\\n\"\n";
+                        $text = "\"No Time in Interns: ".$selected_date."\\n\\n\"\n";
 
                         if (empty($_GET["department"])) {
                             $text .= "+ \"All Departments:\\n\"\n";

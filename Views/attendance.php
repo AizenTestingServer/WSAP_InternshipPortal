@@ -568,11 +568,15 @@
                                         <p class="bg-primary text-light rounded w-fit m-auto px-2 py-1">
                                             <?= $row["time_in"] ?>
                                         </p> <?php
-                                    }  else if (strlen($row["time_out"]) > 0 && str_contains($row["time_out"], $conditions[2])) { ?>
+                                    }  else if (strlen($row["time_out"]) > 0 &&
+                                        str_contains($row["time_out"], $conditions[2]) &&
+                                        !str_contains($row["time_in"], $conditions[6])) { ?>
                                         <p class="bg-morning text-light rounded w-fit m-auto px-2 py-1">
                                             <?= $row["time_in"] ?>
                                         </p> <?php
-                                    }  else if (strlen($row["time_out"]) > 0 && str_contains($row["time_out"], $conditions[3])) { ?>
+                                    }  else if (strlen($row["time_out"]) > 0 &&
+                                        str_contains($row["time_out"], $conditions[3]) &&
+                                        !str_contains($row["time_in"], $conditions[6])) { ?>
                                         <p class="bg-afternoon text-light rounded w-fit m-auto px-2 py-1">
                                             <?= $row["time_in"] ?>
                                         </p> <?php

@@ -334,8 +334,8 @@
                                     View No Time out<i class="fa-solid fa-arrow-right ms-2"></i>
                                 </a>
                                 <a type="button" class="btn btn-secondary"
-                                href="absent_interns.php?date=<?= $selected_date ?>">
-                                    View Absent<i class="fa-solid fa-arrow-right ms-2"></i>
+                                href="no_time_in_interns.php?date=<?= $selected_date ?>">
+                                    View No Time in<i class="fa-solid fa-arrow-right ms-2"></i>
                                 </a>
                             </div>
                         </div>
@@ -434,11 +434,15 @@
                                                         <p class="bg-primary text-light rounded w-fit mx-auto fs-d px-2 py-1">
                                                             <?= $row["time_in"] ?>
                                                         </p> <?php
-                                                    }  else if (strlen($row["time_out"]) > 0 && str_contains($row["time_out"], $conditions[2])) { ?>
+                                                    }  else if (strlen($row["time_out"]) > 0 &&
+                                                        str_contains($row["time_out"], $conditions[2]) &&
+                                                        !str_contains($row["time_in"], $conditions[6])) { ?>
                                                         <p class="bg-morning text-light rounded w-fit mx-auto fs-d px-2 py-1">
                                                             <?= $row["time_in"] ?>
                                                         </p> <?php
-                                                    }  else if (strlen($row["time_out"]) > 0 && str_contains($row["time_out"], $conditions[3])) { ?>
+                                                    }  else if (strlen($row["time_out"]) > 0 &&
+                                                        str_contains($row["time_out"], $conditions[3]) &&
+                                                        !str_contains($row["time_in"], $conditions[6])) { ?>
                                                         <p class="bg-afternoon text-light rounded w-fit mx-auto fs-d px-2 py-1">
                                                             <?= $row["time_in"] ?>
                                                         </p> <?php

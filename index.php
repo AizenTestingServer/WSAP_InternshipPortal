@@ -100,7 +100,7 @@
     }
 
     require_once "./Templates/header.php";
-    setTitle("Login");
+    setTitle("Sign in");
 ?>
 <div class="login-container">
     <div class="login-outside">
