@@ -254,7 +254,7 @@
                         <div class="top">
                             <div class="left">
                                 <div class="subheader my-2">
-                                    Hours Left
+                                    Remaining Hours
                                 </div>
                                 <div class="summary-total">
                                     <h3><?= $intern_wsap_info["target_rendering_hours"] -
@@ -422,7 +422,7 @@
                         <div class="top">
                             <div class="left">
                                 <div class="subheader my-2">
-                                    Offboarding Interns this Week
+                                    Offboarding Interns for this Week
                                 </div>
                                 <div class="summary-total">
                                     <h3><?= $offboarding_interns ?></h3>

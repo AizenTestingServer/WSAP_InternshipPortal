@@ -418,7 +418,7 @@
                                     $row_count++;
                                     
                                     if ($admin_roles_count != 0) { ?>
-                                        <a class="clickable-card" href="profile.php?intern_id=<?= $row["intern_id"] ?>"
+                                        <a class="clickable-card" href="daily_time_record.php?intern_id=<?= $row["intern_id"] ?>"
                                             draggable="false"> <?php
                                     } ?>
                                             <div class="h-100 intern text-center position-relative pb-5">
