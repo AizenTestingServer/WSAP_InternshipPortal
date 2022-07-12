@@ -127,9 +127,13 @@
     $offboarding_interns = 0;
     while ($row = $db->fetch()) {
         $rendering_days = floor(($row["target_rendering_hours"]-$row["rendered_hours"])/9);
+
+        $estimated_weekend_days = floor(($rendering_days/5) * 2);
+        $rendering_days += $estimated_weekend_days;
+
         $est_offboard_date = strtotime($date->getDate()." + ".$rendering_days." days");
 
-        if ($est_offboard_date >= strtotime("monday") && $est_offboard_date <= strtotime("sunday")) {
+        if ($est_offboard_date >= strtotime("current monday") && $est_offboard_date <= strtotime("sunday")) {
             $offboarding_interns++;
         }
     }
@@ -354,6 +358,9 @@
                                     <h5> <?php
                                     if (empty($intern_wsap_info["offboard_date"])) {
                                         $rendering_days = floor(($intern_wsap_info["target_rendering_hours"]-$intern_wsap_info["rendered_hours"])/9);
+
+                                        $estimated_weekend_days = floor(($rendering_days/5) * 2);
+                                        $rendering_days += $estimated_weekend_days;
 
                                         echo date("j M Y", strtotime($date->getDate()." + ".$rendering_days." days"));
                                     } else {

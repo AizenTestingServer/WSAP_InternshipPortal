@@ -759,6 +759,9 @@
                                                         value="<?php
                                                         $rendering_days = floor(($value["target_rendering_hours"]-$value["rendered_hours"])/9);
 
+                                                        $estimated_weekend_days = floor(($rendering_days/5) * 2);
+                                                        $rendering_days += $estimated_weekend_days;
+
                                                         echo date("F j, Y", strtotime($date->getDate()." + ".$rendering_days." days")); ?>"
                                                         disabled> <?php
                                                     } else { ?>
