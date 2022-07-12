@@ -577,6 +577,78 @@
                     }
                     $record_count = 0; ?>
                     <div class="daily_task"> <?php
+
+                        $intern_db = new Database();
+
+                        $intern_db->query("SELECT intern_personal_information.id AS intern_id, intern_personal_information.*, 
+                            intern_wsap_information.*, intern_accounts.*,  departments.*
+                            FROM intern_personal_information, intern_wsap_information, intern_accounts, departments
+                            WHERE intern_personal_information.id = intern_wsap_information.id AND
+                            intern_personal_information.id = intern_accounts.id AND
+                            intern_wsap_information.department_id = departments.id
+                            ORDER BY last_name");
+                        $intern_db->execute();
+
+                        while ($birthday_celebrant = $intern_db->fetch()) {
+                            $record_count++;
+                            if (date("m-d", strtotime($birthday_celebrant["birthdate"])) == date("m-d", strtotime($date->getDateValue()))) { ?> 
+                                <div class="task-box position-relative">
+                                    <img src="../Assets/img/emojis/confetti-ball_1f38a.png" class="position-absolute"
+                                        style="height: 32px; width: 32px; left: calc(50% + 64px); top: 20%;">
+                                    <img src="../Assets/img/emojis/confetti-ball_1f38a.png" class="position-absolute"
+                                        style="height: 32px; width: 32px; left: calc(60% + 64px); top: 25%;">
+                                    <img src="../Assets/img/emojis/partying-face_1f973.png" class="position-absolute"
+                                        style="height: 32px; width: 32px; left: calc(50% + 64px); top: 35%; transform: scaleX(-1);">
+                                    <img src="../Assets/img/emojis/partying-face_1f973.png" class="position-absolute"
+                                        style="height: 32px; width: 32px; left: calc(60% + 64px); top: 40%; transform: scaleX(-1);">
+                                    <img src="../Assets/img/emojis/party-popper_1f389.png" class="position-absolute"
+                                        style="height: 32px; width: 32px; left: calc(50% + 64px); top: 50%; transform: scaleX(-1);">
+                                    <img src="../Assets/img/emojis/party-popper_1f389.png" class="position-absolute"
+                                        style="height: 32px; width: 32px; left: calc(60% + 64px); top: 55%; transform: scaleX(-1);">
+
+                                    <img src="../Assets/img/emojis/confetti-ball_1f38a.png" class="position-absolute"
+                                        style="height: 32px; width: 32px; right: calc(50% + 64px); top: 20%;">
+                                    <img src="../Assets/img/emojis/confetti-ball_1f38a.png" class="position-absolute"
+                                        style="height: 32px; width: 32px; right: calc(60% + 64px); top:25%;">
+                                    <img src="../Assets/img/emojis/partying-face_1f973.png" class="position-absolute"
+                                        style="height: 32px; width: 32px; right: calc(50% + 64px); top: 35%;">
+                                    <img src="../Assets/img/emojis/partying-face_1f973.png" class="position-absolute"
+                                        style="height: 32px; width: 32px; right: calc(60% + 64px); top: 40%;">
+                                    <img src="../Assets/img/emojis/party-popper_1f389.png" class="position-absolute"
+                                        style="height: 32px; width: 32px; right: calc(50% + 64px); top: 50%;">
+                                    <img src="../Assets/img/emojis/party-popper_1f389.png" class="position-absolute"
+                                        style="height: 32px; width: 32px; right: calc(60% + 64px); top: 55%;">
+
+                                    <div class="task-box-status">
+                                        <h5 class="task-title fw-bold">
+                                            Birthday Celebrant
+                                        </h5>
+                                    </div>
+                                    <div class="text-center">
+                                        <div class="top">
+                                            <img class="img-intern mx-auto" src="<?php {
+                                                if ($birthday_celebrant["image"] == null || strlen($birthday_celebrant["image"]) == 0) {
+                                                    if ($birthday_celebrant["gender"] == 0) {
+                                                        echo "../Assets/img/profile_imgs/default_male.png";
+                                                    } else {
+                                                        echo "../Assets/img/profile_imgs/default_female.png";
+                                                    }
+                                                } else {
+                                                    echo $birthday_celebrant["image"];
+                                                }
+                                            } ?>" onerror="this.src='../Assets/img/profile_imgs/no_image_found.jpeg';">
+                                        </div>
+                                        <div class="summary-total mt-2 w-fit mx-auto">
+                                            <h5 class="mb-0 text-dark fs-regular">
+                                                <?= $birthday_celebrant["last_name"].", ".$birthday_celebrant["first_name"] ?>
+                                            </h5>
+                                            <h6 class="fs-f" style="color: var(--text-2);"><?= $birthday_celebrant["name"] ?></h6>
+                                        </div>
+                                    </div>
+                                </div> <?php
+                            }
+                        }
+                        
                         if (!empty($lts_att)) {
                             $att_date = $lts_att["att_date"];
                         } else {
@@ -587,9 +659,9 @@
                             $record_count++; ?>
                             <div class="task-box position-relative">
                                 <div class="task-box-status">
-                                    <h6 class="task-title fw-bold">
+                                    <h5 class="task-title fw-bold">
                                         Time in
-                                    </h6>
+                                    </h5>
                                     <div class="digi-time text-center d-flex align-items-center justify-content-center">
                                         <iframe sandbox="allow-same-origin allow-scripts allow-popups allow-forms"
                                         src="https://www.zeitverschiebung.net/clock-widget-iframe-v2?language=en&size=small&timezone=Asia%2FManila"
@@ -597,7 +669,7 @@
                                         </iframe>
                                     </div>
                                 </div>
-                                <div class="task-box-action mt-2 d-flex justify-content-end align-items-center">
+                                <div class="task-box-action d-flex justify-content-end align-items-center">
                                     <a class="btn btn-success" href="attendance.php">Time in</a>
                                 </div>
                             </div> <?php
@@ -607,9 +679,9 @@
                             $record_count++; ?>
                             <div class="task-box position-relative">
                                 <div class="task-box-status">
-                                    <h6 class="task-title fw-bold">
+                                    <h5 class="task-title fw-bold">
                                         Time out
-                                    </h6>
+                                    </h5>
                                     <div class="digi-time text-center d-flex align-items-center justify-content-center">
                                         <iframe sandbox="allow-same-origin allow-scripts allow-popups allow-forms"
                                         src="https://www.zeitverschiebung.net/clock-widget-iframe-v2?language=en&size=small&timezone=Asia%2FManila"
@@ -617,7 +689,7 @@
                                         </iframe>
                                     </div>
                                 </div>
-                                <div class="task-box-action mt-2 d-flex justify-content-end align-items-center">
+                                <div class="task-box-action d-flex justify-content-end align-items-center">
                                     <a class="btn btn-danger" href="attendance.php">Time out</a>
                                 </div>
                             </div> <?php
@@ -733,9 +805,9 @@
                                                 <div class="task-box position-relative">
                                                     <div class="task-box-status">
                                                         <div>
-                                                            <h6 class="task-title fw-bold mb-0">
+                                                            <h5 class="task-title fw-bold mb-0">
                                                                 <?= $row["title"] ?>
-                                                            </h6> <?php
+                                                            </h5> <?php
                                                             if ($row["progress"] == 100) { ?>
                                                                 <p class="bg-success text-light rounded w-fit px-2 py-1 mt-2 fs-d">
                                                                     Completed
@@ -772,9 +844,9 @@
                             <div class="task-box position-relative">
                                 <div class="task-box-status">
                                     <div>
-                                        <h6 class="task-title fw-bold mb-0">
+                                        <h5 class="task-title fw-bold mb-0">
                                             <?= $row["title"] ?>
-                                        </h6> <?php
+                                        </h5> <?php
                                         if ($row["progress"] == 100) { ?>
                                             <p class="bg-success text-light rounded w-fit px-2 py-1 mt-2 fs-d">
                                                 Completed

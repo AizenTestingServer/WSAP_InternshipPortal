@@ -195,4 +195,12 @@
         return $date->getDateTimeValue() >= $date->dat_start() &&
             $date->getDateTimeValue() < $date->dat_end();
     }
+
+    function ordinalValue($number) {
+        $ends = array('th','st','nd','rd','th','th','th','th','th','th');
+        if ((($number % 100) >= 11) && (($number%100) <= 13))
+            return $number. 'th';
+        else
+            return $number. $ends[$number % 10];
+    }
 ?>
