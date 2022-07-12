@@ -590,8 +590,8 @@
                         $intern_db->execute();
 
                         while ($birthday_celebrant = $intern_db->fetch()) {
-                            $record_count++;
-                            if (date("m-d", strtotime($birthday_celebrant["birthdate"])) == date("m-d", strtotime($date->getDateValue()))) { ?> 
+                            if (date("m-d", strtotime($birthday_celebrant["birthdate"])) == date("m-d", strtotime($date->getDateValue()))) {
+                                $record_count++; ?>
                                 <div class="task-box position-relative">
                                     <img src="../Assets/img/emojis/confetti-ball_1f38a.png" class="position-absolute"
                                         style="height: 32px; width: 32px; left: calc(50% + 64px); top: 20%;">
