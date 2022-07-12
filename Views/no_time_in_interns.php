@@ -117,7 +117,7 @@
                                 <div class="input-group">
                                     <input type="text" class="form-control" value="<?= $selected_date ?>" disabled>
                                     <div class="input-group-append">
-                                        <a class="btn btn-smoke border-dark" href="calendar.php?destination=absent_interns">Select Date</a>
+                                        <a class="btn btn-smoke border-dark" href="calendar.php?destination=no_time_in_interns">Select Date</a>
                                     </div>
                                 </div>
                             </div>
@@ -351,14 +351,13 @@
                         }
 
                         while ($row = $db->fetch()) {
-                            $text .= "+ \"".$row["last_name"].", ".$row["first_name"]." - ".$row["intern_id"];
-                            if (empty($_GET["department"])) {
-                                $text .= " - ".$row["name"]."\\n\"\n";
-                            } else {
-                                $text .= "\\n\"\n";
-                            }
-
-                            if (isActiveIntern($row["onboard_date"], $row["offboard_date"], $selected_date)) { ?>
+                            if (isActiveIntern($row["onboard_date"], $row["offboard_date"], $selected_date)) {
+                                $text .= "+ \"".$row["last_name"].", ".$row["first_name"]." - ".$row["intern_id"];
+                                if (empty($_GET["department"])) {
+                                    $text .= " - ".$row["name"]."\\n\"\n";
+                                } else {
+                                    $text .= "\\n\"\n";
+                                } ?>
                                 <a class="clickable-card" href="daily_time_record.php?intern_id=<?= $row["intern_id"] ?>" draggable="false">
                                     <div class="h-100 attendance text-center position-relative pb-5">
                                         <div class="top" style="height: 100px;">

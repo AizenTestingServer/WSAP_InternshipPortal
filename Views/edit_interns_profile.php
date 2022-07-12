@@ -758,8 +758,6 @@
                                                         <input type="text" name="offboardDate" class="form-control fw-bold"
                                                         value="<?php
                                                         $rendering_days = round(($value["target_rendering_hours"]-$value["rendered_hours"])/8);
-                                                        $estimated_weekends = ceil(($rendering_days/5) * 2);
-                                                        $rendering_days += $estimated_weekends + 1;
 
                                                         echo date("F j, Y", strtotime($date->getDate()." + ".$rendering_days." days")); ?>"
                                                         disabled> <?php

@@ -377,7 +377,7 @@
             $selected_month = $date->getMonth();
             $selected_year = $date->getYear();
             $number_of_days = cal_days_in_month(CAL_GREGORIAN, $selected_month, $selected_year);
-            $start_day = date("j", strtotime("monday"));
+            $start_day = date("j", strtotime("current monday"));
             
             $end_day = $number_of_days;
             
@@ -395,14 +395,12 @@
                 $db->execute();
                 while ($row = $db->fetch()) {
                     $rendering_days = round(($row["target_rendering_hours"]-$row["rendered_hours"])/8);
-                    $estimated_weekends = ceil(($rendering_days/5) * 2);
-                    $rendering_days += $estimated_weekends + 1;
                     $est_offboard_date = strtotime($date->getDate()." + ".$rendering_days." days");
 
                     if (date("F j, Y", $est_offboard_date) == $date->getMonthName()." ".$i.", ".$selected_year) { ?>
                         <div class="rounded shadow px-0 mt-3 mb-2">
                             <h6 class="d-block text-light px-3 pt-2 pb-2 rounded mb-0" style="background: #0D0048;">
-                                <?= $date->getMonthName()." ".$i.", ".$selected_year ?>
+                                <?= $date->getMonthName()." ".$i.", ".$selected_year." | ".date("l", strtotime($date->getMonthName()." ".$i.", ".$selected_year)) ?>
                             </h6>
                         </div>
 
@@ -410,8 +408,6 @@
                             $db->execute();
                             while ($row = $db->fetch()) {
                                 $rendering_days = round(($row["target_rendering_hours"]-$row["rendered_hours"])/8);
-                                $estimated_weekends = ceil(($rendering_days/5) * 2);
-                                $rendering_days += $estimated_weekends + 1;
                                 $est_offboard_date = strtotime($date->getDate()." + ".$rendering_days." days");
 
                                 if (date("F j, Y", $est_offboard_date) == $date->getMonthName()." ".$i.", ".$selected_year) {
