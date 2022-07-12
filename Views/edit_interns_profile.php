@@ -757,7 +757,7 @@
                                                         <label class="mb-2" for="offboardDate">Estimated Offboard Date</label>
                                                         <input type="text" name="offboardDate" class="form-control fw-bold"
                                                         value="<?php
-                                                        $rendering_days = round(($value["target_rendering_hours"]-$value["rendered_hours"])/8);
+                                                        $rendering_days = floor(($value["target_rendering_hours"]-$value["rendered_hours"])/9);
 
                                                         echo date("F j, Y", strtotime($date->getDate()." + ".$rendering_days." days")); ?>"
                                                         disabled> <?php

@@ -126,7 +126,7 @@
 
     $offboarding_interns = 0;
     while ($row = $db->fetch()) {
-        $rendering_days = round(($row["target_rendering_hours"]-$row["rendered_hours"])/8);
+        $rendering_days = floor(($row["target_rendering_hours"]-$row["rendered_hours"])/9);
         $est_offboard_date = strtotime($date->getDate()." + ".$rendering_days." days");
 
         if ($est_offboard_date >= strtotime("monday") && $est_offboard_date <= strtotime("sunday")) {
@@ -353,7 +353,7 @@
                                 <div class="summary-total">
                                     <h5> <?php
                                     if (empty($intern_wsap_info["offboard_date"])) {
-                                        $rendering_days = round(($intern_wsap_info["target_rendering_hours"]-$intern_wsap_info["rendered_hours"])/8);
+                                        $rendering_days = floor(($intern_wsap_info["target_rendering_hours"]-$intern_wsap_info["rendered_hours"])/9);
 
                                         echo date("j M Y", strtotime($date->getDate()." + ".$rendering_days." days"));
                                     } else {

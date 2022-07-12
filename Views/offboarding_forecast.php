@@ -394,7 +394,7 @@
             for ($i = $start_day; $i <= $end_day; $i++) {
                 $db->execute();
                 while ($row = $db->fetch()) {
-                    $rendering_days = round(($row["target_rendering_hours"]-$row["rendered_hours"])/8);
+                    $rendering_days = floor(($row["target_rendering_hours"]-$row["rendered_hours"])/9);
                     $est_offboard_date = strtotime($date->getDate()." + ".$rendering_days." days");
 
                     if (date("F j, Y", $est_offboard_date) == $date->getMonthName()." ".$i.", ".$selected_year) { ?>
@@ -407,7 +407,7 @@
                         <div class="interns"> <?php
                             $db->execute();
                             while ($row = $db->fetch()) {
-                                $rendering_days = round(($row["target_rendering_hours"]-$row["rendered_hours"])/8);
+                                $rendering_days = floor(($row["target_rendering_hours"]-$row["rendered_hours"])/9);
                                 $est_offboard_date = strtotime($date->getDate()." + ".$rendering_days." days");
 
                                 if (date("F j, Y", $est_offboard_date) == $date->getMonthName()." ".$i.", ".$selected_year) {
