@@ -70,7 +70,7 @@
     }
 
     if (isset($_POST["generatePDF"])) {
-        $_SESSION["print"] = true;
+        $_SESSION["pdf"] = true;
         redirect($url);
         exit();
     }
@@ -81,7 +81,7 @@
 
 <div class="my-container"> <?php
     if ($admin_roles_count != 0 || $_GET["intern_id"] == $_SESSION["intern_id"]) { ?>
-        <div class="p-3">
+        <div class="w-100 p-3">
             <div class="d-flex align-items-center mb-3"> <?php
                 if (false) {
                     if ($_GET["intern_id"] == strtoupper($_SESSION["intern_id"])) { ?>
@@ -409,10 +409,10 @@
     } ?>
 </div>
 <script> <?php 
-    if (isset($_SESSION["print"])) { ?>
+    if (isset($_SESSION["pdf"])) { ?>
         const dtr = document.getElementById("dtr-document");
         html2pdf().from(dtr, null, "<?= $intern_info["last_name"].", ".$intern_info["first_name"]."'s Daily Time Record" ?>").save(); <?php
-        unset($_SESSION["print"]);
+        unset($_SESSION["pdf"]);
     } ?>
 </script>
 <?php

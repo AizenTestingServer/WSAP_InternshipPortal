@@ -816,8 +816,11 @@
                     $nto_value = $db->fetch(); ?>
                                         
                     <div class="w-fit ms-auto">
-                        <button id="exportToExcel" class="btn btn-excel mb-2">
-                            Export as Excel
+                        <a class="btn btn-excel mb-2"
+                            href="preview_excel.php?intern_id=<?= strtoupper($_GET["intern_id"]) ?>"
+                            target="window">
+                            Preview DTR as Excel
+                        </a>                            
                         </button> <?php
                         if ($nto_value["count"] == 0) { ?>
                             <a class="btn btn-pdf mb-2"
@@ -1370,12 +1373,6 @@
 <script>
     const tooltipTriggerList = document.querySelectorAll('[data-bs-toggle="tooltip"]');
     const tooltipList = [...tooltipTriggerList].map(tooltipTriggerEl => new bootstrap.Tooltip(tooltipTriggerEl));
-
-    document.getElementById("exportToExcel").addEventListener("click", function() {
-        var table2excel = new Table2Excel();
-        table2excel.export(document.getElementById("dtr"),
-            "<?= $value["last_name"].", ".$value["first_name"]."'s Daily Time Record" ?>");
-    });
 </script>
 <?php
     require_once "../Templates/footer.php";
