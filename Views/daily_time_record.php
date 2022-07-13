@@ -159,154 +159,148 @@
 
             $time_in = $selected_att["time_in"];
             $time_out = $time_out_hr.":".$time_out_min." ".$time_out_time_type;
+            
+            if (strlen($time_in) > 8) {
+                $time_in = trim(substr($time_in, 0, 8));
+            }
+            
+            $tmp_time_out = $time_out;
+            if (isMorningShift($time_in, $time_out)) {
+                $tmp_time_out =  $tmp_time_out." MS";
+            }
+            if (isAfternoonShift($time_in, $time_out)) {
+                $tmp_time_out =  $tmp_time_out." AS";
+            }
+            if (isOvertime($time_out)) {
+                $tmp_time_out =  $tmp_time_out." OT";
+            }
+            $time_out = $tmp_time_out;
+            
+            $attendance = array(
+                $time_out,
+                $selected_att["id"]
+            );
 
-            $time_out_in_schedule = isTimeOutInSchedule($time_in, $time_out);
+            $db->query("UPDATE attendance SET time_out=:time_out WHERE id=:id");
+            $db->timeOut($attendance);
+            $db->execute();
+            $db->closeStmt();
 
-            if ($time_out_in_schedule) {
-                if (strlen($time_in) > 8) {
-                    $time_in = trim(substr($time_in, 0, 8));
+            if (strlen($time_out) > 8) {
+                $time_out = trim(substr($time_out, 0, 8));
+            }
+                                
+            if (isMorningShift($time_in, $time_out) || isAfternoonShift($time_in, $time_out)) {
+                $rendered_hours = 4;
+            } else {
+                $rendered_hours = 8;
+            }
+
+            $rendered_overtime_hours = 0;
+            if (isOvertime($time_out)) {
+                $dt_time_out_start = new DateTime(date("G:i", $date->time_out_start()));
+                $dt_time_out = new DateTime(date("G:i", strtotime($time_out)));
+                $rendered_overtime_hours += $dt_time_out_start->diff($dt_time_out)->format("%h");
+                $rendered_minutes = $dt_time_out_start->diff($dt_time_out)->format("%i");
+                $rendered_overtime_hours += round($rendered_minutes/60, 1);
+
+                if ($rendered_overtime_hours > $overtime_hours["overtime_hours_left"]) {
+                    $rendered_overtime_hours = $overtime_hours["overtime_hours_left"];
                 }
+
+                $rendered_hours += $rendered_overtime_hours;
+            }
+            $computed_overtime_hours_left = $overtime_hours["overtime_hours_left"] - $rendered_overtime_hours;
                 
-                $tmp_time_out = $time_out;
-                if (isMorningShift($time_in, $time_out)) {
-                    $tmp_time_out =  $tmp_time_out." MS";
-                }
-                if (isAfternoonShift($time_in, $time_out)) {
-                    $tmp_time_out =  $tmp_time_out." AS";
-                }
-                if (isOvertime($time_out)) {
-                    $tmp_time_out =  $tmp_time_out." OT";
-                }
-                $time_out = $tmp_time_out;
-                
-                $attendance = array(
-                    $time_out,
-                    $selected_att["id"]
-                );
-    
-                $db->query("UPDATE attendance SET time_out=:time_out WHERE id=:id");
-                $db->timeOut($attendance);
-                $db->execute();
-                $db->closeStmt();
-    
-                if (strlen($time_out) > 8) {
-                    $time_out = trim(substr($time_out, 0, 8));
-                }
-                                    
-                if (isMorningShift($time_in, $time_out) || isAfternoonShift($time_in, $time_out)) {
-                    $rendered_hours = 4;
-                } else {
-                    $rendered_hours = 8;
-                }
-    
-                $rendered_overtime_hours = 0;
-                if (isOvertime($time_out)) {
-                    $dt_time_out_start = new DateTime(date("G:i", $date->time_out_start()));
-                    $dt_time_out = new DateTime(date("G:i", strtotime($time_out)));
-                    $rendered_overtime_hours += $dt_time_out_start->diff($dt_time_out)->format("%h");
-                    $rendered_minutes = $dt_time_out_start->diff($dt_time_out)->format("%i");
-                    $rendered_overtime_hours += round($rendered_minutes/60, 1);
-    
-                    if ($rendered_overtime_hours > $overtime_hours["overtime_hours_left"]) {
-                        $rendered_overtime_hours = $overtime_hours["overtime_hours_left"];
-                    }
-    
-                    $rendered_hours += $rendered_overtime_hours;
-                }
-                $computed_overtime_hours_left = $overtime_hours["overtime_hours_left"] - $rendered_overtime_hours;
-                    
-                $attendance = array(
-                    $rendered_hours,
-                    $selected_att["id"]
-                );
-    
-                $db->query("UPDATE attendance SET rendered_hours=:rendered_hours WHERE id=:id");
-                $db->setAttRenderedHours($attendance);
-                $db->execute();
-                $db->closeStmt();
-    
-                $db->query("SELECT * FROM intern_wsap_information WHERE id=:intern_id;");
-                $db->setInternId($_GET["intern_id"]);
-                $db->execute();
-                $wsap_info = $db->fetch();
-                
-                $rendered_hours += $wsap_info["rendered_hours"];
-    
-                $computed_rendered_hours = array(
-                    $rendered_hours,
+            $attendance = array(
+                $rendered_hours,
+                $selected_att["id"]
+            );
+
+            $db->query("UPDATE attendance SET rendered_hours=:rendered_hours WHERE id=:id");
+            $db->setAttRenderedHours($attendance);
+            $db->execute();
+            $db->closeStmt();
+
+            $db->query("SELECT * FROM intern_wsap_information WHERE id=:intern_id;");
+            $db->setInternId($_GET["intern_id"]);
+            $db->execute();
+            $wsap_info = $db->fetch();
+            
+            $rendered_hours += $wsap_info["rendered_hours"];
+
+            $computed_rendered_hours = array(
+                $rendered_hours,
+                $_GET["intern_id"]
+            );
+
+            $db->query("UPDATE intern_wsap_information SET rendered_hours=:rendered_hours 
+            WHERE id=:intern_id");
+            $db->updateRenderedHours($computed_rendered_hours);
+            $db->execute();
+            $db->closeStmt();
+
+            if ($rendered_hours >= $wsap_info["target_rendering_hours"]) {
+                $offboard_date = date("Y-m-d", strtotime($date->getDate()));
+
+                $offboard = array(
+                    $offboard_date,
+                    2,
                     $_GET["intern_id"]
                 );
-    
-                $db->query("UPDATE intern_wsap_information SET rendered_hours=:rendered_hours 
+
+                $db->query("UPDATE intern_wsap_information
+                SET offboard_date=:offboard_date, status=:status
                 WHERE id=:intern_id");
-                $db->updateRenderedHours($computed_rendered_hours);
+                $db->setOffboard($offboard);
                 $db->execute();
                 $db->closeStmt();
-    
-                if ($rendered_hours >= $wsap_info["target_rendering_hours"]) {
-                    $offboard_date = date("Y-m-d", strtotime($date->getDate()));
-    
-                    $offboard = array(
-                        $offboard_date,
-                        2,
-                        $_GET["intern_id"]
-                    );
-    
-                    $db->query("UPDATE intern_wsap_information
-                    SET offboard_date=:offboard_date, status=:status
-                    WHERE id=:intern_id");
-                    $db->setOffboard($offboard);
-                    $db->execute();
-                    $db->closeStmt();
-                } else {
-                    $offboard_date = null;
-    
-                    $offboard = array(
-                        $offboard_date,
-                        1,
-                        $_GET["intern_id"]
-                    );
-    
-                    $db->query("UPDATE intern_wsap_information
-                    SET offboard_date=:offboard_date, status=:status
-                    WHERE id=:intern_id");
-                    $db->setOffboard($offboard);
-                    $db->execute();
-                    $db->closeStmt();
-                }
-    
-                $computed_overtime_hours = array(
-                    $computed_overtime_hours_left,
-                    $_GET["intern_id"],
-                    $start_week_date
-                );
-    
-                $db->query("UPDATE overtime_hours SET overtime_hours_left=:overtime_hours_left 
-                WHERE intern_id=:intern_id AND start_week_date=:start_week_date");
-                $db->updateOvertimeData($computed_overtime_hours);
-                $db->execute();
-                $db->closeStmt();
-    
-                $log_value = $admin_info["last_name"].", ".$admin_info["first_name"].
-                    " (".$admin_info["name"].") set the ".$att_date." time out of ".$value["last_name"].", ".$value["first_name"].".";
-    
-                $log = array($date->getDateTime(),
-                strtoupper($_GET["intern_id"]),
-                $log_value);
-    
-                $db->query("INSERT INTO audit_logs
-                VALUES (null, :timestamp, :intern_id, :log)");
-                $db->log($log);
-                $db->execute();
-                $db->closeStmt();
-                
-                $_SESSION["edit_success"] = "Successfully setup the time out.";
-                unset($_SESSION["time_out_hr"]);
-                unset($_SESSION["time_out_min"]);
-                unset($_SESSION["time_out_time_type"]);
             } else {
-                $_SESSION["edit_failed"] = "The time out is out of schedule!";
+                $offboard_date = null;
+
+                $offboard = array(
+                    $offboard_date,
+                    1,
+                    $_GET["intern_id"]
+                );
+
+                $db->query("UPDATE intern_wsap_information
+                SET offboard_date=:offboard_date, status=:status
+                WHERE id=:intern_id");
+                $db->setOffboard($offboard);
+                $db->execute();
+                $db->closeStmt();
             }
+
+            $computed_overtime_hours = array(
+                $computed_overtime_hours_left,
+                $_GET["intern_id"],
+                $start_week_date
+            );
+
+            $db->query("UPDATE overtime_hours SET overtime_hours_left=:overtime_hours_left 
+            WHERE intern_id=:intern_id AND start_week_date=:start_week_date");
+            $db->updateOvertimeData($computed_overtime_hours);
+            $db->execute();
+            $db->closeStmt();
+
+            $log_value = $admin_info["last_name"].", ".$admin_info["first_name"].
+                " (".$admin_info["name"].") set the ".$att_date." time out of ".$value["last_name"].", ".$value["first_name"].".";
+
+            $log = array($date->getDateTime(),
+            strtoupper($_GET["intern_id"]),
+            $log_value);
+
+            $db->query("INSERT INTO audit_logs
+            VALUES (null, :timestamp, :intern_id, :log)");
+            $db->log($log);
+            $db->execute();
+            $db->closeStmt();
+            
+            $_SESSION["edit_success"] = "Successfully setup the time out.";
+            unset($_SESSION["time_out_hr"]);
+            unset($_SESSION["time_out_min"]);
+            unset($_SESSION["time_out_time_type"]);
         } else {
             $_SESSION["edit_failed"] = "Please fill-out the required fields!";
         }
@@ -322,7 +316,7 @@
 
         $_SESSION["rendered_hours"] = $new_rendered_hours;
 
-        if (!empty($prev_rendered_hours) && !empty($new_rendered_hours) && !empty($att_date)) {
+        if (!empty($prev_rendered_hours) && (!empty($new_rendered_hours) || $new_rendered_hours == 0) && !empty($att_date)) {
             $db->query("SELECT * FROM intern_wsap_information WHERE id=:intern_id;");
             $db->setInternId($_GET["intern_id"]);
             $db->execute();
@@ -434,7 +428,7 @@
         $rendered_hours = $_POST["rendered_hours"];
         $att_date = $_POST["att_date"];
 
-        if (!empty($att_id) && !empty($rendered_hours) && !empty($att_date)) {
+        if (!empty($att_id) && (!empty($rendered_hours) || $rendered_hours == 0) && !empty($att_date)) {
             $db->query("SELECT * FROM attendance WHERE id=:id");
             $db->setId($att_id);
             $db->execute();
