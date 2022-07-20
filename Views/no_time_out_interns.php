@@ -387,27 +387,27 @@
                                                         <p class="bg-danger text-light rounded w-fit mx-auto fs-d px-2 py-1">
                                                             <?= $row["time_in"] ?>
                                                         </p> <?php
-                                                    }  else if (isAE($row["time_in"])) { ?>
+                                                    } else if (isAE($row["time_in"])) { ?>
                                                         <p class="bg-primary text-light rounded w-fit mx-auto fs-d px-2 py-1">
                                                             <?= $row["time_in"] ?>
                                                         </p> <?php
-                                                    }  else if (strlen($row["time_out"]) > 0 && isMS($row["time_out"]) && !isL($row["time_in"])) { ?>
+                                                    } else if (strlen($row["time_out"]) > 0 && isMS($row["time_out"]) && !isL($row["time_in"])) { ?>
                                                         <p class="bg-morning text-light rounded w-fit mx-auto fs-d px-2 py-1">
                                                             <?= $row["time_in"] ?>
                                                         </p> <?php
-                                                    }  else if (strlen($row["time_out"]) > 0 && isAS($row["time_out"]) && !isL($row["time_in"])) { ?>
+                                                    } else if (strlen($row["time_out"]) > 0 && isAS($row["time_out"]) && !isL($row["time_in"])) { ?>
                                                         <p class="bg-afternoon text-light rounded w-fit mx-auto fs-d px-2 py-1">
                                                             <?= $row["time_in"] ?>
                                                         </p> <?php
-                                                    }  else if (isOD($row["time_in"])) { ?>
+                                                    } else if (isOD($row["time_in"])) { ?>
                                                         <p class="bg-dark text-light rounded w-fit mx-auto fs-d px-2 py-1">
                                                             <?= $row["time_in"] ?>
                                                         </p> <?php
-                                                    }  else if (isL($row["time_in"])) { ?>
+                                                    } else if (isL($row["time_in"])) { ?>
                                                         <p class="bg-warning text-dark rounded w-fit mx-auto fs-d px-2 py-1">
                                                             <?= $row["time_in"] ?>
                                                         </p> <?php
-                                                    }  else { ?>
+                                                    } else { ?>
                                                         <p class="bg-success text-light rounded w-fit mx-auto fs-d px-2 py-1">
                                                             <?= $row["time_in"] ?>
                                                         </p> <?php

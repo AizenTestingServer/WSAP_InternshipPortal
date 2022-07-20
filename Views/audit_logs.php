@@ -354,7 +354,7 @@
                     ?>
                 </div> <?php
             }?>
-            <table class="table caption-top fs-d text-center mt-2">
+            <table class="table fs-d text-center mt-2">
                 <thead>
                     <tr>
                         <th scope="col">#</th>

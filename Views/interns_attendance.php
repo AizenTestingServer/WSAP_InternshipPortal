@@ -64,7 +64,7 @@
     }
 
     if (isset($_POST["reset"])) {
-        $parameters = "?";                                
+        $parameters = "?";
         if (!empty($selected_date)) {
             if (strlen($parameters) > 1) { $parameters = $parameters."&"; }
             $parameters = $parameters."date=".$selected_date;
@@ -131,8 +131,8 @@
                         </div>
 
                         <div class="w-100 d-md-flex d-sm-inline-block">
-                            <!--DEPARTMENT DROPDOWN-->
                             <div class="w-fit d-flex my-2">
+                                <!--DEPARTMENT DROPDOWN-->
                                 <div class="dropdown align-center me-2">
                                     <button class="btn btn-light border-dark dropdown-toggle" type="button" id="dropdownMenuButton1"
                                     data-bs-toggle="dropdown" aria-expanded="false" name="department"> <?php
@@ -549,27 +549,27 @@
                                                         <p class="bg-danger text-light rounded w-fit mx-auto fs-d px-2 py-1">
                                                             <?= $row["time_in"] ?>
                                                         </p> <?php
-                                                    }  else if (isAE($row["time_in"])) { ?>
+                                                    } else if (isAE($row["time_in"])) { ?>
                                                         <p class="bg-primary text-light rounded w-fit mx-auto fs-d px-2 py-1">
                                                             <?= $row["time_in"] ?>
                                                         </p> <?php
-                                                    }  else if (strlen($row["time_out"]) > 0 && isMS($row["time_out"]) && !isL($row["time_in"])) { ?>
+                                                    } else if (strlen($row["time_out"]) > 0 && isMS($row["time_out"]) && !isL($row["time_in"])) { ?>
                                                         <p class="bg-morning text-light rounded w-fit mx-auto fs-d px-2 py-1">
                                                             <?= $row["time_in"] ?>
                                                         </p> <?php
-                                                    }  else if (strlen($row["time_out"]) > 0 && isAS($row["time_out"]) && !isL($row["time_in"])) { ?>
+                                                    } else if (strlen($row["time_out"]) > 0 && isAS($row["time_out"]) && !isL($row["time_in"])) { ?>
                                                         <p class="bg-afternoon text-light rounded w-fit mx-auto fs-d px-2 py-1">
                                                             <?= $row["time_in"] ?>
                                                         </p> <?php
-                                                    }  else if (isOD($row["time_in"])) { ?>
+                                                    } else if (isOD($row["time_in"])) { ?>
                                                         <p class="bg-dark text-light rounded w-fit mx-auto fs-d px-2 py-1">
                                                             <?= $row["time_in"] ?>
                                                         </p> <?php
-                                                    }  else if (isL($row["time_in"])) { ?>
+                                                    } else if (isL($row["time_in"])) { ?>
                                                         <p class="bg-warning text-dark rounded w-fit mx-auto fs-d px-2 py-1">
                                                             <?= $row["time_in"] ?>
                                                         </p> <?php
-                                                    }  else { ?>
+                                                    } else { ?>
                                                         <p class="bg-success text-light rounded w-fit mx-auto fs-d px-2 py-1">
                                                             <?= $row["time_in"] ?>
                                                         </p> <?php
@@ -585,31 +585,31 @@
                                                         <p class="bg-danger text-light rounded w-fit mx-auto fs-d px-2 py-1">
                                                             <?= $row["time_out"] ?>
                                                         </p> <?php
-                                                    }  else if (isAE($row["time_out"])) { ?>
+                                                    } else if (isAE($row["time_out"])) { ?>
                                                         <p class="bg-primary text-light rounded w-fit mx-auto fs-d px-2 py-1">
                                                             <?= $row["time_out"] ?>
                                                         </p> <?php
-                                                    }  else if (isOT($row["time_out"])) { ?>
+                                                    } else if (isOT($row["time_out"])) { ?>
                                                         <p class="bg-indigo text-light rounded w-fit mx-auto fs-d px-2 py-1">
                                                             <?= $row["time_out"] ?>
                                                         </p> <?php
-                                                    }  else if (isMS($row["time_out"])) { ?>
+                                                    } else if (isMS($row["time_out"])) { ?>
                                                         <p class="bg-morning text-light rounded w-fit mx-auto fs-d px-2 py-1">
                                                             <?= $row["time_out"] ?>
                                                         </p> <?php
-                                                    }  else if (isAS($row["time_out"])) { ?>
+                                                    } else if (isAS($row["time_out"])) { ?>
                                                         <p class="bg-afternoon text-light rounded w-fit mx-auto fs-d px-2 py-1">
                                                             <?= $row["time_out"] ?>
                                                         </p> <?php
-                                                    }  else if (isOD($row["time_out"])) { ?>
+                                                    } else if (isOD($row["time_out"])) { ?>
                                                         <p class="bg-dark text-light rounded w-fit mx-auto fs-d px-2 py-1">
                                                             <?= $row["time_out"] ?>
                                                         </p> <?php
-                                                    }  else if (isL($row["time_out"]) || isNTO($row["time_out"])) { ?>
+                                                    } else if (isL($row["time_out"]) || isNTO($row["time_out"])) { ?>
                                                         <p class="bg-warning text-dark rounded w-fit mx-auto fs-d px-2 py-1">
                                                             <?= $row["time_out"] ?>
                                                         </p> <?php
-                                                    }  else { ?>
+                                                    } else { ?>
                                                         <p class="bg-success text-light rounded w-fit mx-auto fs-d px-2 py-1">
                                                             <?= $row["time_out"] ?>
                                                         </p> <?php
@@ -646,47 +646,7 @@
 
                                 while ($row = $db->fetch()) {
                                     $count++; ?>
-                                    <tr> <?php
-                                        if ($row["time_out"] != "NTO") { ?>
-                                            <div class="modal fade" id="removeTimeOutModal<?= $row["id"] ?>" tabindex="-1"
-                                                aria-labelledby="removeTimeOutModalLabel" aria-hidden="true">
-                                                <div class="modal-dialog modal-dialog-centered">
-                                                    <div class="modal-content">
-                                                        <div class="modal-header">
-                                                            <div class="modal-title" id="removeTimeOutModalLabel">
-                                                                <h5>Remove Time out</h5>
-                                                            </div>
-                                                            <button class="btn btn-danger btn-sm text-light" data-bs-dismiss="modal">
-                                                                <i class="fa-solid fa-close"></i>
-                                                            </button>
-                                                        </div>
-                                                        
-                                                        <form method="post">
-                                                            <div class="modal-body">
-                                                                <div class="text-center px-5">
-                                                                    <h6 class="text-dark mb-0">
-                                                                        By removing the time out, the rendered hours on its
-                                                                        day will be deducted to the Intern's total rendered hours.<br><br>
-                                                                        Do you still want to remove the time out?
-                                                                    </h6>
-                                                                    <input type="text" name="att_id" class="form-control text-center d-none"
-                                                                                value="<?= $row["id"] ?>" readonly>
-                                                                    <input type="text" name="rendered_hours" class="form-control text-center d-none"
-                                                                                value="<?= $row["rendered_hours"] ?>" readonly>
-                                                                    <input type="text" name="att_date" class="form-control text-center d-none"
-                                                                                value="<?= $row["att_date"] ?>" readonly>
-                                                                </div>
-                                                            </div>
-
-                                                            <div class="modal-footer">
-                                                                <button type="submit" name="removeTimeOut" class="btn btn-danger">Remove Time out</button>
-                                                            </div>
-                                                        </form>
-                                                    </div>
-                                                </div>
-                                            </div> <?php
-                                        } ?>
-
+                                    <tr>
                                         <div class="modal fade" id="gpsImageModal<?= $row["id"] ?>" tabindex="-1"
                                             aria-labelledby="gpsImageModalModalLabel" aria-hidden="true">
                                             <div class="modal-dialog modal-dialog-centered modal-lg">
@@ -712,27 +672,27 @@
                                                                             <p class="bg-danger text-light rounded w-fit mx-auto fs-d px-2 py-1">
                                                                                 <?= $row["time_in"] ?>
                                                                             </p> <?php
-                                                                        }  else if (isAE($row["time_in"])) { ?>
+                                                                        } else if (isAE($row["time_in"])) { ?>
                                                                             <p class="bg-primary text-light rounded w-fit mx-auto fs-d px-2 py-1">
                                                                                 <?= $row["time_in"] ?>
                                                                             </p> <?php
-                                                                        }  else if (strlen($row["time_out"]) > 0 && isMS($row["time_out"]) && !isL($row["time_in"])) { ?>
+                                                                        } else if (strlen($row["time_out"]) > 0 && isMS($row["time_out"]) && !isL($row["time_in"])) { ?>
                                                                             <p class="bg-morning text-light rounded w-fit mx-auto fs-d px-2 py-1">
                                                                                 <?= $row["time_in"] ?>
                                                                             </p> <?php
-                                                                        }  else if (strlen($row["time_out"]) > 0 && isAS($row["time_out"]) && !isL($row["time_in"])) { ?>
+                                                                        } else if (strlen($row["time_out"]) > 0 && isAS($row["time_out"]) && !isL($row["time_in"])) { ?>
                                                                             <p class="bg-afternoon text-light rounded w-fit mx-auto fs-d px-2 py-1">
                                                                                 <?= $row["time_in"] ?>
                                                                             </p> <?php
-                                                                        }  else if (isOD($row["time_in"])) { ?>
+                                                                        } else if (isOD($row["time_in"])) { ?>
                                                                             <p class="bg-dark text-light rounded w-fit mx-auto fs-d px-2 py-1">
                                                                                 <?= $row["time_in"] ?>
                                                                             </p> <?php
-                                                                        }  else if (isL($row["time_in"])) { ?>
+                                                                        } else if (isL($row["time_in"])) { ?>
                                                                             <p class="bg-warning text-dark rounded w-fit mx-auto fs-d px-2 py-1">
                                                                                 <?= $row["time_in"] ?>
                                                                             </p> <?php
-                                                                        }  else { ?>
+                                                                        } else { ?>
                                                                             <p class="bg-success text-light rounded w-fit mx-auto fs-d px-2 py-1">
                                                                                 <?= $row["time_in"] ?>
                                                                             </p> <?php
@@ -750,31 +710,31 @@
                                                                             <p class="bg-danger text-light rounded w-fit mx-auto fs-d px-2 py-1">
                                                                                 <?= $row["time_out"] ?>
                                                                             </p> <?php
-                                                                        }  else if (isAE($row["time_out"])) { ?>
+                                                                        } else if (isAE($row["time_out"])) { ?>
                                                                             <p class="bg-primary text-light rounded w-fit mx-auto fs-d px-2 py-1">
                                                                                 <?= $row["time_out"] ?>
                                                                             </p> <?php
-                                                                        }  else if (isOT($row["time_out"])) { ?>
+                                                                        } else if (isOT($row["time_out"])) { ?>
                                                                             <p class="bg-indigo text-light rounded w-fit mx-auto fs-d px-2 py-1">
                                                                                 <?= $row["time_out"] ?>
                                                                             </p> <?php
-                                                                        }  else if (isMS($row["time_out"])) { ?>
+                                                                        } else if (isMS($row["time_out"])) { ?>
                                                                             <p class="bg-morning text-light rounded w-fit mx-auto fs-d px-2 py-1">
                                                                                 <?= $row["time_out"] ?>
                                                                             </p> <?php
-                                                                        }  else if (isAS($row["time_out"])) { ?>
+                                                                        } else if (isAS($row["time_out"])) { ?>
                                                                             <p class="bg-afternoon text-light rounded w-fit mx-auto fs-d px-2 py-1">
                                                                                 <?= $row["time_out"] ?>
                                                                             </p> <?php
-                                                                        }  else if (isOD($row["time_out"])) { ?>
+                                                                        } else if (isOD($row["time_out"])) { ?>
                                                                             <p class="bg-dark text-light rounded w-fit mx-auto fs-d px-2 py-1">
                                                                                 <?= $row["time_out"] ?>
                                                                             </p> <?php
-                                                                        }  else if (isL($row["time_out"]) || isNTO($row["time_out"])) { ?>
+                                                                        } else if (isL($row["time_out"]) || isNTO($row["time_out"])) { ?>
                                                                             <p class="bg-warning text-dark rounded w-fit mx-auto fs-d px-2 py-1">
                                                                                 <?= $row["time_out"] ?>
                                                                             </p> <?php
-                                                                        }  else { ?>
+                                                                        } else { ?>
                                                                             <p class="bg-success text-light rounded w-fit mx-auto fs-d px-2 py-1">
                                                                                 <?= $row["time_out"] ?>
                                                                             </p> <?php
@@ -801,27 +761,27 @@
                                                     <p class="bg-danger text-light rounded w-fit m-auto px-2 py-1">
                                                         <?= $row["time_in"] ?>
                                                     </p> <?php
-                                                }  else if (isAE($row["time_in"])) { ?>
+                                                } else if (isAE($row["time_in"])) { ?>
                                                     <p class="bg-primary text-light rounded w-fit m-auto px-2 py-1">
                                                         <?= $row["time_in"] ?>
                                                     </p> <?php
-                                                }  else if (strlen($row["time_out"]) > 0 && isMS($row["time_out"]) && !isL($row["time_in"])) { ?>
+                                                } else if (strlen($row["time_out"]) > 0 && isMS($row["time_out"]) && !isL($row["time_in"])) { ?>
                                                     <p class="bg-morning text-light rounded w-fit m-auto px-2 py-1">
                                                         <?= $row["time_in"] ?>
                                                     </p> <?php
-                                                }  else if (strlen($row["time_out"]) > 0 && isAS($row["time_out"]) && !isL($row["time_in"])) { ?>
+                                                } else if (strlen($row["time_out"]) > 0 && isAS($row["time_out"]) && !isL($row["time_in"])) { ?>
                                                     <p class="bg-afternoon text-light rounded w-fit m-auto px-2 py-1">
                                                         <?= $row["time_in"] ?>
                                                     </p> <?php
-                                                }  else if (isOD($row["time_in"])) { ?>
+                                                } else if (isOD($row["time_in"])) { ?>
                                                     <p class="bg-dark text-light rounded w-fit m-auto px-2 py-1">
                                                         <?= $row["time_in"] ?>
                                                     </p> <?php
-                                                }  else if (isL($row["time_in"])) { ?>
+                                                } else if (isL($row["time_in"])) { ?>
                                                     <p class="bg-warning text-dark rounded w-fit m-auto px-2 py-1">
                                                         <?= $row["time_in"] ?>
                                                     </p> <?php
-                                                }  else { ?>
+                                                } else { ?>
                                                     <p class="bg-success text-light rounded w-fit m-auto px-2 py-1">
                                                         <?= $row["time_in"] ?>
                                                     </p> <?php
@@ -834,31 +794,31 @@
                                                     <p class="bg-danger text-light rounded w-fit m-auto px-2 py-1">
                                                         <?= $row["time_out"] ?>
                                                     </p> <?php
-                                                }  else if (isAE($row["time_out"])) { ?>
+                                                } else if (isAE($row["time_out"])) { ?>
                                                     <p class="bg-primary text-light rounded w-fit m-auto px-2 py-1">
                                                         <?= $row["time_out"] ?>
                                                     </p> <?php
-                                                }  else if (isOT($row["time_out"])) { ?>
+                                                } else if (isOT($row["time_out"])) { ?>
                                                     <p class="bg-indigo text-light rounded w-fit m-auto px-2 py-1">
                                                         <?= $row["time_out"] ?>
                                                     </p> <?php
-                                                }  else if (isMS($row["time_out"])) { ?>
+                                                } else if (isMS($row["time_out"])) { ?>
                                                     <p class="bg-morning text-light rounded w-fit m-auto px-2 py-1">
                                                         <?= $row["time_out"] ?>
                                                     </p> <?php
-                                                }  else if (isAS($row["time_out"])) { ?>
+                                                } else if (isAS($row["time_out"])) { ?>
                                                     <p class="bg-afternoon text-light rounded w-fit m-auto px-2 py-1">
                                                         <?= $row["time_out"] ?>
                                                     </p> <?php
-                                                }  else if (isOD($row["time_out"])) { ?>
+                                                } else if (isOD($row["time_out"])) { ?>
                                                     <p class="bg-dark text-light rounded w-fit m-auto px-2 py-1">
                                                         <?= $row["time_out"] ?>
                                                     </p> <?php
-                                                }  else if (isL($row["time_out"]) || isNTO($row["time_out"])) { ?>
+                                                } else if (isL($row["time_out"]) || isNTO($row["time_out"])) { ?>
                                                     <p class="bg-warning text-dark rounded w-fit m-auto px-2 py-1">
                                                         <?= $row["time_out"] ?>
                                                     </p> <?php
-                                                }  else { ?>
+                                                } else { ?>
                                                     <p class="bg-success text-light rounded w-fit m-auto px-2 py-1">
                                                         <?= $row["time_out"] ?>
                                                     </p> <?php

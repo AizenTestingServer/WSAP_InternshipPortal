@@ -237,8 +237,7 @@
                                     Rendered Hours
                                 </div>
                                 <div class="summary-total">
-                                    <h3><?= $intern_wsap_info["rendered_hours"]."/".
-                                    $intern_wsap_info["target_rendering_hours"] ?></h3>
+                                    <h3><?= $intern_wsap_info["rendered_hours"]."/".$intern_wsap_info["target_rendering_hours"] ?></h3>
                                 </div>
                             </div>
                             <div class="right">
@@ -259,8 +258,16 @@
                                     Remaining Hours
                                 </div>
                                 <div class="summary-total">
-                                    <h3><?= $intern_wsap_info["target_rendering_hours"] -
-                                        $intern_wsap_info["rendered_hours"] ?></h3>
+                                    <h3> <?php
+                                        $hours_left = round($intern_wsap_info["target_rendering_hours"] - $intern_wsap_info["rendered_hours"], 1);
+                                        
+                                        if ($hours_left < 0) {
+                                            $hours_left = 0;
+                                        }
+                                        
+                                        echo $hours_left;
+                                    ?>
+                                    </h3>
                                 </div>
                             </div>
                             <div class="right">

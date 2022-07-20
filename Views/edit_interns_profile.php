@@ -1118,7 +1118,7 @@
                             ?>
                         </div> <?php
                     } ?>
-                    <table class="table caption-top fs-d text-center mt-2">
+                    <table class="table fs-d text-center mt-2">
                         <thead>
                             <tr>
                                 <th scope="col">#</th>
@@ -1533,7 +1533,7 @@
                                                     echo "Suspended";
                                                 } ?>
                                             </p> <?php
-                                        }  else if ($row["status"] == 1 || $row["status"] == 4) { ?>
+                                        } else if ($row["status"] == 1 || $row["status"] == 4) { ?>
                                             <p class="bg-success text-light rounded w-fit m-auto px-2 py-1 fs-d"> <?php
                                                 if ($row["status"] == 1) {
                                                     echo "Active";
@@ -1541,15 +1541,15 @@
                                                     echo "Extended";
                                                 } ?>
                                             </p> <?php
-                                        }   else if ($row["status"] == 2) { ?>
+                                        } else if ($row["status"] == 2) { ?>
                                             <p class="bg-secondary text-light rounded w-fit m-auto px-2 py-1 fs-d">
                                             Offboarded
                                             </p> <?php
-                                        }   else if ($row["status"] == 3) { ?>
+                                        } else if ($row["status"] == 3) { ?>
                                             <p class="bg-dark text-light rounded w-fit m-auto px-2 py-1 fs-d">
                                             Withdrawn
                                             </p> <?php
-                                        }   else if ($row["status"] == 6) { ?>
+                                        } else if ($row["status"] == 6) { ?>
                                             <p class="bg-danger text-light rounded w-fit m-auto px-2 py-1">
                                                 Terminated
                                             </p> <?php
