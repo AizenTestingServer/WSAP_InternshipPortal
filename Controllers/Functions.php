@@ -45,6 +45,33 @@
         return ucwords(strtolower($string));
     }
 
+    function time_in_enabled() { ?>
+        <button type="button" class="btn btn-success" data-bs-toggle="modal" 
+        data-bs-target="#timeInModal">Time in</button> <?php
+    }  
+
+    function time_in_disabled() { ?>
+         <button type="button" class="btn btn-success" disabled>Time in</button> <?php
+    }
+
+    function time_out_enabled() { ?>
+        <button type="button" class="btn btn-smoke" data-bs-toggle="modal" 
+        data-bs-target="#timeOutModal">Time out</button> <?php
+    }
+
+    function time_out_disabled() { ?>
+        <button type="button" class="btn btn-smoke" disabled>Time out</button> <?php
+    }
+
+    function time_out_overtime_enabled() { ?>
+        <button type="button" class="btn btn-indigo" data-bs-toggle="modal" 
+        data-bs-target="#timeOutOvertimeModal">Time out (Overtime)</button> <?php
+    }
+
+    function time_out_overtime_disabled() { ?>
+        <button type="button" class="btn btn-indigo" disabled>Time out (Overtime)</button> <?php
+    }
+
     function atMorningShift($time_out) {
         $date = new Date();
 
@@ -69,16 +96,12 @@
         return $time_out >= $date->afternoon_shift_start() && $time_out < $date->time_out_start();
     }
 
-    function atOvertime($time_out) {
+    function atOvertime() {
         $date = new Date();
-
-        if (empty($time_out)) {
-            $time_out = $date->getDateTimeValue();
-        } else {
-            $time_out = strtotime($time_out);
-        }
         
-        return $time_out >= $date->time_out_end() && $time_out < $date->time_out_overtime_start();
+        $time_out = $date->getDateTimeValue();
+        
+        return $time_out >= $date->time_out_overtime_start() && $time_out < $date->time_out_overtime_end();
     }
 
     function atEndOfDay($time_out) {
@@ -90,7 +113,7 @@
             $time_out = strtotime($time_out);
         }
         
-        return $time_out >= $date->time_out_overtime_end();
+        return $time_out >= $date->late_time_out_end();
     }
 
     function atAfternoonTimeIn($time_in, $time_out) {
@@ -116,14 +139,54 @@
     function isTimeOutEnabled($time_in, $time_out) {
         $date = new Date();
 
+        if ($time_out == "NTO") {
+            $time_out = null;
+        }
+
         return !(!empty($time_out) || atMorningShift($time_out) || atAfternoonShift($time_out) ||
-            atOvertime($time_out) || atEndOfDay($time_out) || atAfternoonTimeIn($time_in, $time_out));
+            atEndOfDay($time_out) || atAfternoonTimeIn($time_in, $time_out));
     }
 
-    function isTimeOutInSchedule($time_in, $time_out) {
+    function isTimeOutOvertimeEnabled($time_out) {
         $date = new Date();
 
-        return !(atMorningShift($time_out) || atAfternoonShift($time_out) ||  atOvertime($time_out) || atEndOfDay($time_out) || atAfternoonTimeIn($time_in, $time_out));
+        if ($time_out == "NTO") {
+            $time_out = null;
+        }
+
+        return !empty($time_out) && atOvertime() && !isOT($time_out);
+    }
+
+    function isAU($time) {
+        return str_contains($time, "AU");
+    }
+
+    function isAE($time) {
+        return str_contains($time, "AE");
+    }
+
+    function isMS($time) {
+        return str_contains($time, "MS");
+    }
+
+    function isAS($time) {
+        return str_contains($time, "AS");
+    }
+
+    function isOT($time) {
+        return str_contains($time, "OT");
+    }
+
+    function isOD($time) {
+        return str_contains($time, "OD");
+    }
+
+    function isL($time) {
+        return str_contains($time, "L");
+    }
+
+    function isNTO($time) {
+        return str_contains($time, "NTO");
     }
 
     function isMorningShift($time_in, $time_out) {
@@ -136,6 +199,12 @@
         $date = new Date();
         return strtotime($time_in) >= $date->morning_shift_end() && strtotime($time_in) < $date->time_out_overtime_end() &&
             strtotime($time_out) >= $date->morning_shift_end() && strtotime($time_out) < $date->time_out_overtime_end();
+    }
+
+    function isLateTimeOut($time_out) {
+        $date = new Date();
+        return strtotime($time_out) >= $date->time_out_end() &&
+            strtotime($time_out) < $date->late_time_out_end();
     }
 
     function isOvertime($time_out) {
@@ -182,6 +251,12 @@
         $date = new Date();
         return date("g:i a", $date->time_out_start())." to ".
             date("g:i a", strtotime(date("g:i a", $date->time_out_end())." - 1 minutes"));
+    }
+
+    function lateTimeOutSchedule() {
+        $date = new Date();
+        return date("g:i a", $date->time_out_end())." to ".
+            date("g:i a", strtotime(date("g:i a", $date->late_time_out_end())." - 1 minutes"));
     }
 
     function overTimeTimeOutSchedule() {

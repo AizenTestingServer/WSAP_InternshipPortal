@@ -48,6 +48,11 @@
             if (strlen($parameters) > 1) { $parameters = $parameters."&"; }
             $parameters = $parameters."date=".$selected_date;
         }
+                                                
+        if (!empty($_GET["view"])) {
+            if (strlen($parameters) > 1) { $parameters = $parameters."&"; }
+            $parameters = $parameters."view=".$_GET["view"];
+        }
 
         if (strlen($parameters) > 1) {
             redirect("interns_attendance.php".$parameters);
@@ -59,9 +64,20 @@
     }
 
     if (isset($_POST["reset"])) {
+        $parameters = "?";                                
         if (!empty($selected_date)) {
-            redirect("interns_attendance.php?date=".$selected_date);
-        } else {  
+            if (strlen($parameters) > 1) { $parameters = $parameters."&"; }
+            $parameters = $parameters."date=".$selected_date;
+        }
+                                                
+        if (!empty($_GET["view"])) {
+            if (strlen($parameters) > 1) { $parameters = $parameters."&"; }
+            $parameters = $parameters."view=".$_GET["view"];
+        }
+
+        if (strlen($parameters) > 1) {
+            redirect("interns_attendance.php".$parameters);
+        } else {
             redirect("interns_attendance.php");
         }
         exit();
@@ -104,18 +120,18 @@
                         </div>
                     </form>
                         
-                    <!--DEPARTMENT DROPDOWN-->
                     <div class="col-12 d-lg-flex d-md-inline-block">
                         <div class="w-lg-fit w-md-100 d-flex align-items-center my-2 me-lg-2 me-md-0">
-                            <div class="input-group">
+                            <div class="input-group mb-auto">
                                 <input type="text" class="form-control" value="<?= $selected_date ?>" disabled>
                                 <div class="input-group-append">
-                                    <a class="btn btn-smoke border-dark" href="calendar.php">Select Date</a>
+                                    <a class="btn btn-smoke" href="calendar.php">Select Date</a>
                                 </div>
                             </div>
                         </div>
 
                         <div class="w-100 d-md-flex d-sm-inline-block">
+                            <!--DEPARTMENT DROPDOWN-->
                             <div class="w-fit d-flex my-2">
                                 <div class="dropdown align-center me-2">
                                     <button class="btn btn-light border-dark dropdown-toggle" type="button" id="dropdownMenuButton1"
@@ -141,6 +157,11 @@
                                             if (!empty($selected_date)) {
                                                 if (strlen($parameters) > 1) { $parameters = $parameters."&"; }
                                                 $parameters = $parameters."date=".$selected_date;
+                                            }
+                                                
+                                            if (!empty($_GET["view"])) {
+                                                if (strlen($parameters) > 1) { $parameters = $parameters."&"; }
+                                                $parameters = $parameters."view=".$_GET["view"];
                                             }
 
                                             if (strlen($parameters) > 1) { ?>
@@ -172,6 +193,11 @@
                                                 if (!empty($selected_date)) {
                                                     if (strlen($parameters) > 1) { $parameters = $parameters."&"; }
                                                     $parameters = $parameters."date=".$selected_date;
+                                                }
+                                                
+                                                if (!empty($_GET["view"])) {
+                                                    if (strlen($parameters) > 1) { $parameters = $parameters."&"; }
+                                                    $parameters = $parameters."view=".$_GET["view"];
                                                 }
 
                                                 if (strlen($parameters) > 1) { ?>
@@ -222,6 +248,11 @@
                                                 if (strlen($parameters) > 1) { $parameters = $parameters."&"; }
                                                 $parameters = $parameters."date=".$selected_date;
                                             }
+                                                
+                                            if (!empty($_GET["view"])) {
+                                                if (strlen($parameters) > 1) { $parameters = $parameters."&"; }
+                                                $parameters = $parameters."view=".$_GET["view"];
+                                            }
 
                                             if (strlen($parameters) > 1) { ?>
                                                 href="<?= "interns_attendance.php".$parameters ?>" <?php
@@ -245,6 +276,11 @@
                                             if (!empty($selected_date)) {
                                                 if (strlen($parameters) > 1) { $parameters = $parameters."&"; }
                                                 $parameters = $parameters."date=".$selected_date;
+                                            }
+                                                
+                                            if (!empty($_GET["view"])) {
+                                                if (strlen($parameters) > 1) { $parameters = $parameters."&"; }
+                                                $parameters = $parameters."view=".$_GET["view"];
                                             }
 
                                             if (strlen($parameters) > 1) { ?>
@@ -270,6 +306,11 @@
                                                 if (strlen($parameters) > 1) { $parameters = $parameters."&"; }
                                                 $parameters = $parameters."date=".$selected_date;
                                             }
+                                                
+                                            if (!empty($_GET["view"])) {
+                                                if (strlen($parameters) > 1) { $parameters = $parameters."&"; }
+                                                $parameters = $parameters."view=".$_GET["view"];
+                                            }
 
                                             if (strlen($parameters) > 1) { ?>
                                                 href="<?= "interns_attendance.php".$parameters ?>" <?php
@@ -293,6 +334,11 @@
                                             if (!empty($selected_date)) {
                                                 if (strlen($parameters) > 1) { $parameters = $parameters."&"; }
                                                 $parameters = $parameters."date=".$selected_date;
+                                            }
+                                                
+                                            if (!empty($_GET["view"])) {
+                                                if (strlen($parameters) > 1) { $parameters = $parameters."&"; }
+                                                $parameters = $parameters."view=".$_GET["view"];
                                             }
 
                                             if (strlen($parameters) > 1) { ?>
@@ -318,6 +364,11 @@
                                                 if (strlen($parameters) > 1) { $parameters = $parameters."&"; }
                                                 $parameters = $parameters."date=".$selected_date;
                                             }
+                                                
+                                            if (!empty($_GET["view"])) {
+                                                if (strlen($parameters) > 1) { $parameters = $parameters."&"; }
+                                                $parameters = $parameters."view=".$_GET["view"];
+                                            }
 
                                             if (strlen($parameters) > 1) { ?>
                                                 href="<?= "interns_attendance.php".$parameters ?>" <?php
@@ -327,82 +378,150 @@
                                     </ul>
                                 </div>
                             </div>
-                            
-                            <div class="w-fit ms-auto my-2">
-                                <a type="button" class="btn btn-secondary me-1"
-                                href="no_time_out_interns.php?date=<?= $selected_date ?>">
-                                    View No Time out<i class="fa-solid fa-arrow-right ms-2"></i>
-                                </a>
-                                <a type="button" class="btn btn-secondary"
-                                href="no_time_in_interns.php?date=<?= $selected_date ?>">
-                                    View No Time in<i class="fa-solid fa-arrow-right ms-2"></i>
-                                </a>
+
+                            <!--VIEW DROPDOWN-->
+                            <div class="ms-auto dropdown my-2">
+                                <button class="btn btn-light border-dark dropdown-toggle" type="button" id="dropdownMenuButton1"
+                                data-bs-toggle="dropdown" aria-expanded="false"> <?php
+                                    if (empty($_GET["view"])) {
+                                        echo "Grid";
+                                    } else {
+                                        echo "Tabular";
+                                    } ?>
+                                </button>
+                                <ul class="dropdown-menu" aria-labelledby="dropdownMenuButton1" name="sort">
+                                    <li><a class="dropdown-item btn-smoke" <?php
+                                        $parameters = "?";
+                                        if (!empty($_GET["search"])) {
+                                            $parameters = $parameters."search=".$_GET["search"];
+                                        }
+
+                                        if (!empty($_GET["department"])) {
+                                            if (strlen($parameters) > 1) { $parameters = $parameters."&"; }
+                                            $parameters = $parameters."department=".$_GET["department"];
+                                        }
+                                                
+                                        if (!empty($_GET["sort"])) {
+                                            if (strlen($parameters) > 1) { $parameters = $parameters."&"; }
+                                            $parameters = $parameters."sort=".$_GET["sort"];
+                                        }
+
+                                        if (!empty($selected_date)) {
+                                            if (strlen($parameters) > 1) { $parameters = $parameters."&"; }
+                                            $parameters = $parameters."date=".$selected_date;
+                                        }
+
+                                        if (strlen($parameters) > 1) { ?>
+                                            href="<?= "interns_attendance.php".$parameters ?>" <?php
+                                        } else { ?>
+                                            href="<?= "interns_attendance.php" ?>" <?php
+                                        } ?>>Grid</a></li>
+                                    <li><a class="dropdown-item btn-smoke" <?php
+                                        $parameters = "?";
+                                        if (!empty($_GET["search"])) {
+                                            $parameters = $parameters."search=".$_GET["search"];
+                                        }
+
+                                        if (!empty($_GET["department"])) {
+                                            if (strlen($parameters) > 1) { $parameters = $parameters."&"; }
+                                            $parameters = $parameters."department=".$_GET["department"];
+                                        }
+                                                
+                                        if (!empty($_GET["sort"])) {
+                                            if (strlen($parameters) > 1) { $parameters = $parameters."&"; }
+                                            $parameters = $parameters."sort=".$_GET["sort"];
+                                        }
+
+                                        if (!empty($selected_date)) {
+                                            if (strlen($parameters) > 1) { $parameters = $parameters."&"; }
+                                            $parameters = $parameters."date=".$selected_date;
+                                        }
+                                            
+                                        if (strlen($parameters) > 1) { $parameters = $parameters."&"; }
+                                        $parameters = $parameters."view=1";
+
+                                        if (strlen($parameters) > 1) { ?>
+                                            href="<?= "interns_attendance.php".$parameters ?>" <?php
+                                        } else { ?>
+                                            href="<?= "interns_attendance.php" ?>" <?php
+                                        } ?>>Tabular</a></li>
+                                </ul>
                             </div>
                         </div>
                     </div>
+                            
+                    <div class="w-fit ms-auto">
+                        <a type="button" class="btn btn-secondary me-1 mb-1"
+                        href="no_time_out_interns.php?date=<?= $selected_date ?>">
+                            View No Time out<i class="fa-solid fa-arrow-right ms-2"></i>
+                        </a>
+                        <a type="button" class="btn btn-secondary mb-1"
+                        href="no_time_in_interns.php?date=<?= $selected_date ?>">
+                            View No Time in<i class="fa-solid fa-arrow-right ms-2"></i>
+                        </a>
+                    </div>
                 </div>
             </div>
-            <div class="row mb-3">
-                <div class="interns-attendance"> <?php
-                        $sort = " ORDER BY intern_personal_information.last_name";
-                        if (!empty($_GET["sort"])) {
-                            switch ($_GET["sort"]) {
-                                case "1":
-                                    $sort = " ORDER BY intern_personal_information.last_name";
-                                    break;
-                                case "2":
-                                    $sort = " ORDER BY intern_personal_information.last_name DESC";
-                                    break;
-                                case "3":
-                                    $sort = " ORDER BY attendance.id DESC";
-                                    break;
-                                case "4":
-                                    $sort = " ORDER BY attendance.id";
-                                    break;
-                            }
-                        }
+            <div class="row mb-3"> <?php
+                $sort = " ORDER BY intern_personal_information.last_name";
+                if (!empty($_GET["sort"])) {
+                    switch ($_GET["sort"]) {
+                        case "1":
+                            $sort = " ORDER BY intern_personal_information.last_name";
+                            break;
+                        case "2":
+                            $sort = " ORDER BY intern_personal_information.last_name DESC";
+                            break;
+                        case "3":
+                            $sort = " ORDER BY attendance.id DESC";
+                            break;
+                        case "4":
+                            $sort = " ORDER BY attendance.id";
+                            break;
+                    }
+                }
 
-                        $conditions = " WHERE intern_personal_information.id = intern_wsap_information.id AND
-                        intern_wsap_information.department_id = departments.id AND
-                        intern_personal_information.id = attendance.intern_id AND
-                        att_date=:att_date";
-    
-                        if (!empty($_GET["search"])) {
-                            if (strlen($conditions) > 6) {
-                                $conditions = $conditions." AND";
-                            }
-                            $conditions = $conditions." (CONCAT(last_name, ' ', first_name) LIKE CONCAT( '%', :intern_name, '%') OR
-                            CONCAT(first_name, ' ', last_name) LIKE CONCAT( '%', :intern_name, '%'))";
-                        }
-                        if (!empty($_GET["department"])) {
-                            if (strlen($conditions) > 6) {
-                                $conditions = $conditions." AND";
-                            }
-                            $conditions = $conditions." departments.name=:dept_name";
-                        }
-    
-                        $query = "SELECT intern_personal_information.*, intern_wsap_information.*, departments.*, attendance.* 
-                        FROM intern_personal_information, intern_wsap_information, departments, attendance";
-    
-                        if (strlen($conditions) > 6) {
-                            $db->query($query.$conditions.$sort);
-                            $db->setAttDate($selected_date);
-        
-                            if (!empty($_GET["search"])) {
-                                $db->selectInternName($_GET["search"]);
-                            }
-                            if (!empty($_GET["department"])) {
-                                $db->selectDepartment($_GET["department"]);
-                            }
-                        }
-                        $db->execute();
-                        
-                        $conditions = array("AU", "AE", "MS", "AS", "OT", "OD", "L", "NTO");
+                $conditions = " WHERE intern_personal_information.id = intern_wsap_information.id AND
+                intern_wsap_information.department_id = departments.id AND
+                intern_personal_information.id = attendance.intern_id AND
+                att_date=:att_date";
 
+                if (!empty($_GET["search"])) {
+                    if (strlen($conditions) > 6) {
+                        $conditions = $conditions." AND";
+                    }
+                    $conditions = $conditions." (CONCAT(last_name, ' ', first_name) LIKE CONCAT( '%', :intern_name, '%') OR
+                    CONCAT(first_name, ' ', last_name) LIKE CONCAT( '%', :intern_name, '%'))";
+                }
+                if (!empty($_GET["department"])) {
+                    if (strlen($conditions) > 6) {
+                        $conditions = $conditions." AND";
+                    }
+                    $conditions = $conditions." departments.name=:dept_name";
+                }
+
+                $query = "SELECT intern_personal_information.id AS intern_id, intern_personal_information.*, intern_wsap_information.*, departments.*, attendance.* 
+                FROM intern_personal_information, intern_wsap_information, departments, attendance";
+
+                if (strlen($conditions) > 6) {
+                    $db->query($query.$conditions.$sort);
+                    $db->setAttDate($selected_date);
+
+                    if (!empty($_GET["search"])) {
+                        $db->selectInternName($_GET["search"]);
+                    }
+                    if (!empty($_GET["department"])) {
+                        $db->selectDepartment($_GET["department"]);
+                    }
+                }
+                $db->execute();
+
+                if (empty($_GET["view"])) { ?>
+                    <div class="interns-attendance"> <?php
                         while ($row = $db->fetch()) { ?>
                             <a class="clickable-card" href="daily_time_record.php?intern_id=<?= $row["intern_id"] ?>" draggable="false">
-                                <div class="attendance text-center">
-                                    <div class="top">
+                                <div class="h-100 attendance text-center position-relative" style="padding-bottom: 5rem;">
+                                    <div class="top" style="height: 100px;">
                                         <img class="img-intern mx-auto" src="<?php {
                                             if ($row["image"] == null || strlen($row["image"]) == 0) {
                                                 if ($row["gender"] == 0) {
@@ -413,7 +532,7 @@
                                             } else {
                                                 echo $row["image"];
                                             }
-                                        } ?>" onerror="this.src='../Assets/img/profile_imgs/no_image_found.jpeg';">
+                                        } ?>" onerror="this.src='../Assets/img/no_image_found.jpeg';">
                                     </div>
                                     <div class="summary-total mt-2 w-fit mx-auto">
                                         <h5 class="mb-0 text-dark fs-regular">
@@ -421,36 +540,32 @@
                                         </h5>
                                         <h6 class="fs-f"><?= $row["name"] ?></h6>
                                     </div>
-                                    <div class="bottom d-flex justify-content-evenly mt-3">
+                                    <div class="absolute-bottom absolute-w-100 py-3 d-flex justify-content-evenly" style="bottom: 0;">
                                         <div class="w-50">
                                             <p class="m-0 fw-bold fs-e">Time in</p>
                                             <div class="d-flex align-items-center"> <?php
                                                 if (strlen($row["time_in"]) > 0) {
-                                                    if ($row["time_in"] == $conditions[0]) { ?>
+                                                    if (isAU($row["time_in"])) { ?>
                                                         <p class="bg-danger text-light rounded w-fit mx-auto fs-d px-2 py-1">
                                                             <?= $row["time_in"] ?>
                                                         </p> <?php
-                                                    }  else if ($row["time_in"] == $conditions[1]) { ?>
+                                                    }  else if (isAE($row["time_in"])) { ?>
                                                         <p class="bg-primary text-light rounded w-fit mx-auto fs-d px-2 py-1">
                                                             <?= $row["time_in"] ?>
                                                         </p> <?php
-                                                    }  else if (strlen($row["time_out"]) > 0 &&
-                                                        str_contains($row["time_out"], $conditions[2]) &&
-                                                        !str_contains($row["time_in"], $conditions[6])) { ?>
+                                                    }  else if (strlen($row["time_out"]) > 0 && isMS($row["time_out"]) && !isL($row["time_in"])) { ?>
                                                         <p class="bg-morning text-light rounded w-fit mx-auto fs-d px-2 py-1">
                                                             <?= $row["time_in"] ?>
                                                         </p> <?php
-                                                    }  else if (strlen($row["time_out"]) > 0 &&
-                                                        str_contains($row["time_out"], $conditions[3]) &&
-                                                        !str_contains($row["time_in"], $conditions[6])) { ?>
+                                                    }  else if (strlen($row["time_out"]) > 0 && isAS($row["time_out"]) && !isL($row["time_in"])) { ?>
                                                         <p class="bg-afternoon text-light rounded w-fit mx-auto fs-d px-2 py-1">
                                                             <?= $row["time_in"] ?>
                                                         </p> <?php
-                                                    }  else if (str_contains($row["time_in"], $conditions[4])) { ?>
+                                                    }  else if (isOD($row["time_in"])) { ?>
                                                         <p class="bg-dark text-light rounded w-fit mx-auto fs-d px-2 py-1">
                                                             <?= $row["time_in"] ?>
                                                         </p> <?php
-                                                    }  else if (str_contains($row["time_in"], $conditions[6])) { ?>
+                                                    }  else if (isL($row["time_in"])) { ?>
                                                         <p class="bg-warning text-dark rounded w-fit mx-auto fs-d px-2 py-1">
                                                             <?= $row["time_in"] ?>
                                                         </p> <?php
@@ -466,31 +581,31 @@
                                             <p class="m-0 fw-bold fs-e">Time out</p>
                                             <div class="d-flex align-items-center"> <?php
                                                 if (strlen($row["time_out"]) > 0) {
-                                                    if ($row["time_out"] == $conditions[0]) { ?>
+                                                    if (isAU($row["time_out"])) { ?>
                                                         <p class="bg-danger text-light rounded w-fit mx-auto fs-d px-2 py-1">
                                                             <?= $row["time_out"] ?>
                                                         </p> <?php
-                                                    }  else if ($row["time_out"] == $conditions[1]) { ?>
+                                                    }  else if (isAE($row["time_out"])) { ?>
                                                         <p class="bg-primary text-light rounded w-fit mx-auto fs-d px-2 py-1">
                                                             <?= $row["time_out"] ?>
                                                         </p> <?php
-                                                    }  else if (str_contains($row["time_out"], $conditions[4])) { ?>
+                                                    }  else if (isOT($row["time_out"])) { ?>
                                                         <p class="bg-indigo text-light rounded w-fit mx-auto fs-d px-2 py-1">
                                                             <?= $row["time_out"] ?>
                                                         </p> <?php
-                                                    }  else if (str_contains($row["time_out"], $conditions[2])) { ?>
+                                                    }  else if (isMS($row["time_out"])) { ?>
                                                         <p class="bg-morning text-light rounded w-fit mx-auto fs-d px-2 py-1">
                                                             <?= $row["time_out"] ?>
                                                         </p> <?php
-                                                    }  else if (str_contains($row["time_out"], $conditions[3])) { ?>
+                                                    }  else if (isAS($row["time_out"])) { ?>
                                                         <p class="bg-afternoon text-light rounded w-fit mx-auto fs-d px-2 py-1">
                                                             <?= $row["time_out"] ?>
                                                         </p> <?php
-                                                    }  else if (str_contains($row["time_out"], $conditions[5])) { ?>
+                                                    }  else if (isOD($row["time_out"])) { ?>
                                                         <p class="bg-dark text-light rounded w-fit mx-auto fs-d px-2 py-1">
                                                             <?= $row["time_out"] ?>
                                                         </p> <?php
-                                                    }  else if ($row["time_out"] == $conditions[7]) { ?>
+                                                    }  else if (isL($row["time_out"]) || isNTO($row["time_out"])) { ?>
                                                         <p class="bg-warning text-dark rounded w-fit mx-auto fs-d px-2 py-1">
                                                             <?= $row["time_out"] ?>
                                                         </p> <?php
@@ -499,6 +614,10 @@
                                                             <?= $row["time_out"] ?>
                                                         </p> <?php
                                                     }
+                                                } else { ?>
+                                                    <p class="bg-secondary text-light rounded w-fit mx-auto fs-d px-2 py-1">
+                                                        Pending
+                                                    </p> <?php
                                                 } ?>
                                             </div>
                                         </div>
@@ -506,7 +625,278 @@
                                 </div>
                             </a> <?php
                         } ?>
-                </div> <?php
+                    </div>  <?php
+                } else { ?>
+                    <table class="table fs-d text-center">
+                        <thead>
+                            <tr>
+                                <th scope="col">#</th>
+                                <th scope="col">Name</th>
+                                <th scope="col">Department</th>
+                                <th scope="col">Time in</th>
+                                <th scope="col">Time out</th>
+                                <th scope="col">Regular Hours</th>
+                                <th scope="col">OT Hours</th>
+                                <th scope="col">Valid Rendered Hours</th>
+                            </tr>
+                        </thead>
+                        <tbody> <?php
+                            if (isset($_SESSION["intern_id"])) {
+                                $count = 0;
+
+                                while ($row = $db->fetch()) {
+                                    $count++; ?>
+                                    <tr> <?php
+                                        if ($row["time_out"] != "NTO") { ?>
+                                            <div class="modal fade" id="removeTimeOutModal<?= $row["id"] ?>" tabindex="-1"
+                                                aria-labelledby="removeTimeOutModalLabel" aria-hidden="true">
+                                                <div class="modal-dialog modal-dialog-centered">
+                                                    <div class="modal-content">
+                                                        <div class="modal-header">
+                                                            <div class="modal-title" id="removeTimeOutModalLabel">
+                                                                <h5>Remove Time out</h5>
+                                                            </div>
+                                                            <button class="btn btn-danger btn-sm text-light" data-bs-dismiss="modal">
+                                                                <i class="fa-solid fa-close"></i>
+                                                            </button>
+                                                        </div>
+                                                        
+                                                        <form method="post">
+                                                            <div class="modal-body">
+                                                                <div class="text-center px-5">
+                                                                    <h6 class="text-dark mb-0">
+                                                                        By removing the time out, the rendered hours on its
+                                                                        day will be deducted to the Intern's total rendered hours.<br><br>
+                                                                        Do you still want to remove the time out?
+                                                                    </h6>
+                                                                    <input type="text" name="att_id" class="form-control text-center d-none"
+                                                                                value="<?= $row["id"] ?>" readonly>
+                                                                    <input type="text" name="rendered_hours" class="form-control text-center d-none"
+                                                                                value="<?= $row["rendered_hours"] ?>" readonly>
+                                                                    <input type="text" name="att_date" class="form-control text-center d-none"
+                                                                                value="<?= $row["att_date"] ?>" readonly>
+                                                                </div>
+                                                            </div>
+
+                                                            <div class="modal-footer">
+                                                                <button type="submit" name="removeTimeOut" class="btn btn-danger">Remove Time out</button>
+                                                            </div>
+                                                        </form>
+                                                    </div>
+                                                </div>
+                                            </div> <?php
+                                        } ?>
+
+                                        <div class="modal fade" id="gpsImageModal<?= $row["id"] ?>" tabindex="-1"
+                                            aria-labelledby="gpsImageModalModalLabel" aria-hidden="true">
+                                            <div class="modal-dialog modal-dialog-centered modal-lg">
+                                                <div class="modal-content">
+                                                    <div class="modal-header">
+                                                        <div class="modal-title" id="gpsImageModalModalLabel">
+                                                            <h5><?= $row["last_name"].", ".$row["first_name"] ?></h5>
+                                                        </div>
+                                                        <button class="btn btn-danger btn-sm text-light" data-bs-dismiss="modal">
+                                                            <i class="fa-solid fa-close"></i>
+                                                        </button>
+                                                    </div>
+                                                    
+                                                    <div class="modal-body">
+                                                        <div class="row">
+                                                            <div class="col-sm-12 col-md-6 text-center p-1">
+                                                                <h6 class="fw-bold">TIME IN</h6>
+                                                                <img class="w-100 mb-2" src="<?=  $row["time_in_gps_image"] ?>"
+                                                                onerror="this.src='../Assets/img/no_image_found.jpeg';">
+                                                                <div class="d-flex align-items-center"> <?php
+                                                                    if (strlen($row["time_in"]) > 0) {
+                                                                        if (isAU($row["time_in"])) { ?>
+                                                                            <p class="bg-danger text-light rounded w-fit mx-auto fs-d px-2 py-1">
+                                                                                <?= $row["time_in"] ?>
+                                                                            </p> <?php
+                                                                        }  else if (isAE($row["time_in"])) { ?>
+                                                                            <p class="bg-primary text-light rounded w-fit mx-auto fs-d px-2 py-1">
+                                                                                <?= $row["time_in"] ?>
+                                                                            </p> <?php
+                                                                        }  else if (strlen($row["time_out"]) > 0 && isMS($row["time_out"]) && !isL($row["time_in"])) { ?>
+                                                                            <p class="bg-morning text-light rounded w-fit mx-auto fs-d px-2 py-1">
+                                                                                <?= $row["time_in"] ?>
+                                                                            </p> <?php
+                                                                        }  else if (strlen($row["time_out"]) > 0 && isAS($row["time_out"]) && !isL($row["time_in"])) { ?>
+                                                                            <p class="bg-afternoon text-light rounded w-fit mx-auto fs-d px-2 py-1">
+                                                                                <?= $row["time_in"] ?>
+                                                                            </p> <?php
+                                                                        }  else if (isOD($row["time_in"])) { ?>
+                                                                            <p class="bg-dark text-light rounded w-fit mx-auto fs-d px-2 py-1">
+                                                                                <?= $row["time_in"] ?>
+                                                                            </p> <?php
+                                                                        }  else if (isL($row["time_in"])) { ?>
+                                                                            <p class="bg-warning text-dark rounded w-fit mx-auto fs-d px-2 py-1">
+                                                                                <?= $row["time_in"] ?>
+                                                                            </p> <?php
+                                                                        }  else { ?>
+                                                                            <p class="bg-success text-light rounded w-fit mx-auto fs-d px-2 py-1">
+                                                                                <?= $row["time_in"] ?>
+                                                                            </p> <?php
+                                                                        }
+                                                                    } ?>
+                                                                </div>
+                                                            </div>
+                                                            <div class="col-sm-12 col-md-6 text-center p-1 mt-3 mt-md-0">
+                                                                <h6 class="fw-bold">TIME OUT</h6>
+                                                                <img class="w-100 mb-2" src="<?=  $row["time_out_gps_image"] ?>"
+                                                                onerror="this.src='../Assets/img/no_image_found.jpeg';">
+                                                                <div class="d-flex align-items-center"> <?php
+                                                                    if (strlen($row["time_out"]) > 0) {
+                                                                        if (isAU($row["time_out"])) { ?>
+                                                                            <p class="bg-danger text-light rounded w-fit mx-auto fs-d px-2 py-1">
+                                                                                <?= $row["time_out"] ?>
+                                                                            </p> <?php
+                                                                        }  else if (isAE($row["time_out"])) { ?>
+                                                                            <p class="bg-primary text-light rounded w-fit mx-auto fs-d px-2 py-1">
+                                                                                <?= $row["time_out"] ?>
+                                                                            </p> <?php
+                                                                        }  else if (isOT($row["time_out"])) { ?>
+                                                                            <p class="bg-indigo text-light rounded w-fit mx-auto fs-d px-2 py-1">
+                                                                                <?= $row["time_out"] ?>
+                                                                            </p> <?php
+                                                                        }  else if (isMS($row["time_out"])) { ?>
+                                                                            <p class="bg-morning text-light rounded w-fit mx-auto fs-d px-2 py-1">
+                                                                                <?= $row["time_out"] ?>
+                                                                            </p> <?php
+                                                                        }  else if (isAS($row["time_out"])) { ?>
+                                                                            <p class="bg-afternoon text-light rounded w-fit mx-auto fs-d px-2 py-1">
+                                                                                <?= $row["time_out"] ?>
+                                                                            </p> <?php
+                                                                        }  else if (isOD($row["time_out"])) { ?>
+                                                                            <p class="bg-dark text-light rounded w-fit mx-auto fs-d px-2 py-1">
+                                                                                <?= $row["time_out"] ?>
+                                                                            </p> <?php
+                                                                        }  else if (isL($row["time_out"]) || isNTO($row["time_out"])) { ?>
+                                                                            <p class="bg-warning text-dark rounded w-fit mx-auto fs-d px-2 py-1">
+                                                                                <?= $row["time_out"] ?>
+                                                                            </p> <?php
+                                                                        }  else { ?>
+                                                                            <p class="bg-success text-light rounded w-fit mx-auto fs-d px-2 py-1">
+                                                                                <?= $row["time_out"] ?>
+                                                                            </p> <?php
+                                                                        }
+                                                                    } else { ?>
+                                                                        <p class="bg-secondary text-light rounded w-fit mx-auto fs-d px-2 py-1">
+                                                                            Pending
+                                                                        </p> <?php
+                                                                    } ?>
+                                                                </div>
+                                                            </div>
+                                                        </div>
+                                                    </div>
+                                                </div>
+                                            </div>
+                                        </div>
+
+                                        <th scope="row"><?= $count ?></th>
+                                        <td><?= $row["last_name"].", ".$row["first_name"] ?></td>
+                                        <td><?= $row["name"] ?></td>
+                                        <td> <?php
+                                            if (strlen($row["time_in"]) > 0) {
+                                                if (isAU($row["time_in"])) { ?>
+                                                    <p class="bg-danger text-light rounded w-fit m-auto px-2 py-1">
+                                                        <?= $row["time_in"] ?>
+                                                    </p> <?php
+                                                }  else if (isAE($row["time_in"])) { ?>
+                                                    <p class="bg-primary text-light rounded w-fit m-auto px-2 py-1">
+                                                        <?= $row["time_in"] ?>
+                                                    </p> <?php
+                                                }  else if (strlen($row["time_out"]) > 0 && isMS($row["time_out"]) && !isL($row["time_in"])) { ?>
+                                                    <p class="bg-morning text-light rounded w-fit m-auto px-2 py-1">
+                                                        <?= $row["time_in"] ?>
+                                                    </p> <?php
+                                                }  else if (strlen($row["time_out"]) > 0 && isAS($row["time_out"]) && !isL($row["time_in"])) { ?>
+                                                    <p class="bg-afternoon text-light rounded w-fit m-auto px-2 py-1">
+                                                        <?= $row["time_in"] ?>
+                                                    </p> <?php
+                                                }  else if (isOD($row["time_in"])) { ?>
+                                                    <p class="bg-dark text-light rounded w-fit m-auto px-2 py-1">
+                                                        <?= $row["time_in"] ?>
+                                                    </p> <?php
+                                                }  else if (isL($row["time_in"])) { ?>
+                                                    <p class="bg-warning text-dark rounded w-fit m-auto px-2 py-1">
+                                                        <?= $row["time_in"] ?>
+                                                    </p> <?php
+                                                }  else { ?>
+                                                    <p class="bg-success text-light rounded w-fit m-auto px-2 py-1">
+                                                        <?= $row["time_in"] ?>
+                                                    </p> <?php
+                                                }
+                                            } ?>
+                                        </td>
+                                        <td> <?php
+                                            if (strlen($row["time_out"]) > 0) {
+                                                if (isAU($row["time_out"])) { ?>
+                                                    <p class="bg-danger text-light rounded w-fit m-auto px-2 py-1">
+                                                        <?= $row["time_out"] ?>
+                                                    </p> <?php
+                                                }  else if (isAE($row["time_out"])) { ?>
+                                                    <p class="bg-primary text-light rounded w-fit m-auto px-2 py-1">
+                                                        <?= $row["time_out"] ?>
+                                                    </p> <?php
+                                                }  else if (isOT($row["time_out"])) { ?>
+                                                    <p class="bg-indigo text-light rounded w-fit m-auto px-2 py-1">
+                                                        <?= $row["time_out"] ?>
+                                                    </p> <?php
+                                                }  else if (isMS($row["time_out"])) { ?>
+                                                    <p class="bg-morning text-light rounded w-fit m-auto px-2 py-1">
+                                                        <?= $row["time_out"] ?>
+                                                    </p> <?php
+                                                }  else if (isAS($row["time_out"])) { ?>
+                                                    <p class="bg-afternoon text-light rounded w-fit m-auto px-2 py-1">
+                                                        <?= $row["time_out"] ?>
+                                                    </p> <?php
+                                                }  else if (isOD($row["time_out"])) { ?>
+                                                    <p class="bg-dark text-light rounded w-fit m-auto px-2 py-1">
+                                                        <?= $row["time_out"] ?>
+                                                    </p> <?php
+                                                }  else if (isL($row["time_out"]) || isNTO($row["time_out"])) { ?>
+                                                    <p class="bg-warning text-dark rounded w-fit m-auto px-2 py-1">
+                                                        <?= $row["time_out"] ?>
+                                                    </p> <?php
+                                                }  else { ?>
+                                                    <p class="bg-success text-light rounded w-fit m-auto px-2 py-1">
+                                                        <?= $row["time_out"] ?>
+                                                    </p> <?php
+                                                }
+                                            } else { ?>
+                                                <p class="bg-secondary text-light rounded w-fit m-auto px-2 py-1">
+                                                    Pending
+                                                </p> <?php
+                                            } ?>
+                                        </td>
+                                        <td><?= $row["regular_hours"] ?></td>
+                                        <td><?= $row["ot_hours"] ?></td>
+                                        <td><?= $row["rendered_hours"] ?></td>
+                                        <td>
+                                            <div class="d-flex justify-content-center">
+                                                <div class="w-fit p-0 me-1" data-bs-toggle="tooltip" data-bs-placement="left"
+                                                    title="View GPS Image">
+                                                    <button class="btn btn-primary btn-sm"
+                                                        data-bs-toggle="modal"  data-bs-target="#gpsImageModal<?= $row["id"] ?>">
+                                                        <i class="fa-solid fa-image fs-a"></i>
+                                                    </button>
+                                                </div>
+                                                <div class="w-fit p-0 me-1" data-bs-toggle="tooltip" data-bs-placement="left"
+                                                    title="View DTR">
+                                                    <a class="btn btn-secondary btn-sm"
+                                                        href="daily_time_record.php?intern_id=<?= $row["intern_id"] ?>">
+                                                        <i class="fa-solid fa-arrow-right fs-a"></i>
+                                                    </a>
+                                                </div>
+                                            </div>
+                                        </td>
+                                    </tr> <?php
+                                }
+                            } ?>
+                        </tbody>
+                    </table> <?php
+                }
+
                 if ($db->rowCount() == 0) { ?>
                     <div class="w-100 text-center my-5">
                         <h3>No Record</h3>
@@ -518,6 +908,11 @@
         } ?>        
     </div>
 </div>
+
+<script>
+    const tooltipTriggerList = document.querySelectorAll('[data-bs-toggle="tooltip"]');
+    const tooltipList = [...tooltipTriggerList].map(tooltipTriggerEl => new bootstrap.Tooltip(tooltipTriggerEl));
+</script>
 <?php
     require_once "../Templates/footer.php";
 ?>

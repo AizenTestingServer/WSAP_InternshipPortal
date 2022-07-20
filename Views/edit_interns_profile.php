@@ -66,6 +66,8 @@
                 $allowed_exs = array("jpg", "jpeg", "png");
     
                 if (in_array($img_ex, $allowed_exs)) {
+                    $image_name = str_replace("#", "", $image_name);
+                    $image_name = $_GET["intern_id"]."_".$image_name;
                     $image_path = "../Assets/img/profile_imgs/".$image_name;
                     move_uploaded_file($tmp_name, $image_path);
       
@@ -230,9 +232,9 @@
                 $db->execute();
                 $db->closeStmt();
 
-                if ($rendered_hours >= $target_rendering_hours && empty($offboard_date)) {
+                if ($rendered_hours >= $target_rendering_hours && empty($offboard_date) && $status == 2) {
                     $offboard_date = date("Y-m-d", $date->getDateValue());
-                } else if ($rendered_hours < $target_rendering_hours) {
+                } else if ($status == 1) {
                     $offboard_date = null;
                 }
                 
@@ -411,7 +413,7 @@
                                     } else {
                                         echo $value["image"];
                                     }
-                                } ?>" onerror="this.src='../Assets/img/profile_imgs/no_image_found.jpeg';"> <?php
+                                } ?>" onerror="this.src='../Assets/img/no_image_found.jpeg';"> <?php
 
                             if (isset($_SESSION["upload_success"])) { ?>
                                 <div class="alert alert-success text-success">
@@ -434,7 +436,7 @@
                             <input class="form-control form-control-sm mx-auto" id="formFileSm" type="file" accept="image/*"
                                 onchange="loadFile(event)" name="image" style="max-width: 350px;">
             
-                                <button class="btn btn-sm btn-smoke border-dark mt-2 w-100" style="max-width: 150px;"
+                                <button class="btn btn-sm btn-smoke mt-2 w-100" style="max-width: 150px;"
                                 type="submit" name="uploadImage">Upload</button>
                         </form>
 
@@ -443,7 +445,9 @@
                                 <div class="modal-content">
                                     <div class="modal-header">
                                         <h5 class="modal-title" id="photosModalLabelLabel">Photos</h5>
-                                        <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Close"></button>
+                                        <button class="btn btn-danger btn-sm text-light" data-bs-dismiss="modal">
+                                            <i class="fa-solid fa-close"></i>
+                                        </button>
                                     </div>
 
                                     <form action="<?= htmlspecialchars($_SERVER["PHP_SELF"]);?>" method="post">
@@ -461,7 +465,7 @@
                                                 while ($images = $images_db->fetch()) { ?>
                                                     <div class="p-2">
                                                         <img src="<?= $images["image_path"] ?>" class="image"
-                                                            onerror="this.src='../Assets/img/profile_imgs/no_image_found.jpeg';">
+                                                            onerror="this.src='../Assets/img/no_image_found.jpeg';">
                                                         <div class="w-100 d-flex justify-content-center">
                                                             <p class="my-2" style="max-width: 200px; height: 20px; overflow: hidden;"
                                                                 data-bs-toggle="tooltip" data-bs-placement="top"
@@ -772,7 +776,11 @@
                                                     } ?>
                                                 </div>
                                                 <div class="col-lg-3 col-md-6 col-sm-6 user_input my-1"> <?php
-                                                    if (empty($value["offboard_date"]) && $value["status"] == 1) { ?>
+                                                    if ($value["rendered_hours"] >= $value["target_rendering_hours"] && $value["status"] == 2) { ?>
+                                                        <label class="mb-2" for="renderedHours">Rendered Hours</label>
+                                                        <input type="number" name="renderedHours" class="form-control fw-bold"
+                                                            value="<?= $value["rendered_hours"]; ?>" step="any" readonly> <?php
+                                                    } else { ?>
                                                         <label class="mb-2" for="renderedHours">Rendered Hours
                                                             <span class="text-danger">*</span></label>
                                                         <input type="number" name="renderedHours" class="form-control"
@@ -780,12 +788,8 @@
                                                             if (isset($_SESSION["rendered_hours"])) {
                                                                 echo $_SESSION["rendered_hours"];
                                                             } else {
-                                                                echo $value["rendered_hours"];;
+                                                                echo $value["rendered_hours"];
                                                             } ?>" step="any"> <?php
-                                                    } else { ?>
-                                                        <label class="mb-2" for="renderedHours">Rendered Hours</label>
-                                                        <input type="number" name="renderedHours" class="form-control fw-bold"
-                                                            value="<?= $value["rendered_hours"]; ?>" step="any" readonly> <?php
                                                     } ?>
                                                 </div>
                                                 <div class="col-lg-3 col-md-6 col-sm-6 user_input my-1"> <?php
@@ -1055,7 +1059,9 @@
                                             <div class="modal-title" id="resetPasswordModalLabel">
                                                 <h5>Reset Password</h5>
                                             </div>
-                                            <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Close"></button>
+                                            <button class="btn btn-danger btn-sm text-light" data-bs-dismiss="modal">
+                                                <i class="fa-solid fa-close"></i>
+                                            </button>
                                         </div>
                                         
                                         <form method="post">
@@ -1152,7 +1158,9 @@
                                                                 <?= $value["last_name"].", ".$value["first_name"] ?>
                                                             </h6>
                                                         </div>
-                                                        <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Close"></button>
+                                                        <button class="btn btn-danger btn-sm text-light" data-bs-dismiss="modal">
+                                                            <i class="fa-solid fa-close"></i>
+                                                        </button>
                                                     </div>
                                                     
                                                     <form method="post">
@@ -1508,7 +1516,7 @@
                                             } else {
                                                 echo $row["image"];
                                             }
-                                        } ?>" onerror="this.src='../Assets/img/profile_imgs/no_image_found.jpeg';">
+                                        } ?>" onerror="this.src='../Assets/img/no_image_found.jpeg';">
                                     </div>
                                     <div class="summary-total mt-2 w-fit mx-auto">
                                         <h5 class="mb-0 text-dark fs-regular">
@@ -1537,7 +1545,7 @@
                                             <p class="bg-secondary text-light rounded w-fit m-auto px-2 py-1 fs-d">
                                             Offboarded
                                             </p> <?php
-                                        }   else if ($row["status"] == 4) { ?>
+                                        }   else if ($row["status"] == 3) { ?>
                                             <p class="bg-dark text-light rounded w-fit m-auto px-2 py-1 fs-d">
                                             Withdrawn
                                             </p> <?php

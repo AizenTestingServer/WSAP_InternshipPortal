@@ -22,7 +22,7 @@
     
     $value = $db->fetch();
 
-    if (isset($_POST["setProfile"]) &&  isset($_FILES["image"])) {
+    if (isset($_POST["setProfile"]) && isset($_FILES["image"])) {
         $last_name = toProper(fullTrim($_POST["lastName"]));
         $first_name = toProper(fullTrim($_POST["firstName"]));
         $middle_name = toProper(fullTrim($_POST["middleName"]));
@@ -111,6 +111,8 @@
                                                 $db->execute();
                                                 $db->closeStmt();
                                                 
+                                                $image_name = str_replace("#", "", $image_name);
+                                                $image_name = $_SESSION["intern_id"]."_".$image_name;
                                                 $image_path = "../Assets/img/profile_imgs/".$image_name;
                                                 
                                                 $wsap_info = array($status,
@@ -277,7 +279,7 @@
                             } else {
                                 echo $value["image"];
                             }
-                        } ?>" onerror="this.src='../Assets/img/profile_imgs/no_image_found.jpeg';">
+                        } ?>" onerror="this.src='../Assets/img/no_image_found.jpeg';">
                     <input class="form-control form-control-sm mx-auto" id="formFileSm" type="file" accept="image/*"
                         onchange="loadFile(event)" name="image" style="max-width: 350px;">
                 </div>

@@ -117,7 +117,7 @@
                                 <div class="input-group">
                                     <input type="text" class="form-control" value="<?= $selected_date ?>" disabled>
                                     <div class="input-group-append">
-                                        <a class="btn btn-smoke border-dark" href="calendar.php?destination=no_time_in_interns">Select Date</a>
+                                        <a class="btn btn-smoke" href="calendar.php?destination=no_time_in_interns">Select Date</a>
                                     </div>
                                 </div>
                             </div>
@@ -351,7 +351,7 @@
                         }
 
                         while ($row = $db->fetch()) {
-                            if (isActiveIntern($row["onboard_date"], $row["offboard_date"], $selected_date)) {
+                            if (isActiveIntern($row["onboard_date"], $row["offboard_date"], $selected_date) && $row["status"] == 1) {
                                 $text .= "+ \"".$row["last_name"].", ".$row["first_name"]." - ".$row["intern_id"];
                                 if (empty($_GET["department"])) {
                                     $text .= " - ".$row["name"]."\\n\"\n";
@@ -371,7 +371,7 @@
                                                 } else {
                                                     echo $row["image"];
                                                 }
-                                            } ?>" onerror="this.src='../Assets/img/profile_imgs/no_image_found.jpeg';">
+                                            } ?>" onerror="this.src='../Assets/img/no_image_found.jpeg';">
                                         </div>
                                         <div class="summary-total mt-2 w-fit mx-auto">
                                             <h5 class="mb-0 text-dark fs-regular">
@@ -400,7 +400,7 @@
                                                 <p class="bg-secondary text-light rounded w-fit m-auto px-2 py-1 fs-d">
                                                     Offboarded
                                                 </p> <?php
-                                            }   else if ($row["status"] == 4) { ?>
+                                            }   else if ($row["status"] == 3) { ?>
                                                 <p class="bg-dark text-light rounded w-fit m-auto px-2 py-1 fs-d">
                                                     Withdrawn
                                                 </p> <?php

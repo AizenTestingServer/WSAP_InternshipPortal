@@ -92,9 +92,9 @@
         $time_out = $selected_att["time_out"];
 
         if ($time_out == "NTO") {
-            $time_out_hr = $date->getHour();
-            $time_out_min = $date->getMin();
-            $time_out_time_type = $date->getTimeType();
+            $time_out_hr = 5;
+            $time_out_min = 0;
+            $time_out_time_type = "pm";
         } else {
             if (strlen($time_out) > 8) {
                 $time_out = trim(substr($time_out, 0, 8));
@@ -123,6 +123,11 @@
         if (!empty($_GET["department"])) {
             if (strlen($parameters) > 1) { $parameters = $parameters."&"; }
             $parameters = $parameters."department=".$_GET["department"];
+        }
+
+        if (isset($_GET["status"])) {
+            if (strlen($parameters) > 1) { $parameters = $parameters."&"; }
+            $parameters = $parameters."status=".$_GET["status"];
         }
         
         if (!empty($_GET["sort"])) {
@@ -208,17 +213,44 @@
                     $rendered_overtime_hours = $overtime_hours["overtime_hours_left"];
                 }
 
+                if ($rendered_overtime_hours > 4) {
+                    $rendered_overtime_hours = 4;
+                }
+
                 $rendered_hours += $rendered_overtime_hours;
             }
             $computed_overtime_hours_left = $overtime_hours["overtime_hours_left"] - $rendered_overtime_hours;
+
+            $target_ot_hours_db = new Database();
+
+            $target_ot_hours_db->query("SELECT * FROM overtime_hours WHERE intern_id=:intern_id");
+            $target_ot_hours_db->setInternId($_GET["intern_id"]);
+            $target_ot_hours_db->execute();
+
+            $target_ot_hours_id = $overtime_hours["id"];
+            while ($target_ot_hours_row = $target_ot_hours_db->fetch()) {
+                $target_start_week_date = strtotime($target_ot_hours_row["start_week_date"]);
+                $target_end_week_date = strtotime($target_ot_hours_row["start_week_date"]." + 6 days");
+                $target_date = strtotime($att_date);
+
+                if ($target_date >= $target_start_week_date && $target_date <= $target_end_week_date) {
+                    $computed_overtime_hours_left = $target_ot_hours_row["overtime_hours_left"] - $rendered_overtime_hours;
+                    $target_ot_hours_id = $target_ot_hours_row["id"];
+                    break;
+                }
+            }
                 
             $attendance = array(
+                $rendered_hours - $rendered_overtime_hours,
+                $rendered_overtime_hours,
                 $rendered_hours,
                 $selected_att["id"]
             );
 
-            $db->query("UPDATE attendance SET rendered_hours=:rendered_hours WHERE id=:id");
-            $db->setAttRenderedHours($attendance);
+            $db->query("UPDATE attendance
+            SET regular_hours=:regular_hours, ot_hours=:ot_hours, rendered_hours=:rendered_hours
+            WHERE id=:id");
+            $db->setAttHours($attendance);
             $db->execute();
             $db->closeStmt();
 
@@ -274,13 +306,11 @@
 
             $computed_overtime_hours = array(
                 $computed_overtime_hours_left,
-                $_GET["intern_id"],
-                $start_week_date
+                $target_ot_hours_id
             );
 
-            $db->query("UPDATE overtime_hours SET overtime_hours_left=:overtime_hours_left 
-            WHERE intern_id=:intern_id AND start_week_date=:start_week_date");
-            $db->updateOvertimeData($computed_overtime_hours);
+            $db->query("UPDATE overtime_hours SET overtime_hours_left=:overtime_hours_left WHERE id=:id");
+            $db->updateTargetOvertimeData($computed_overtime_hours);
             $db->execute();
             $db->closeStmt();
 
@@ -316,7 +346,8 @@
 
         $_SESSION["rendered_hours"] = $new_rendered_hours;
 
-        if (!empty($prev_rendered_hours) && (!empty($new_rendered_hours) || $new_rendered_hours == 0) && !empty($att_date)) {
+        if ((!empty($prev_rendered_hours)|| $prev_rendered_hours == 0) &&
+            (!empty($new_rendered_hours) || $new_rendered_hours == 0) && !empty($att_date)) {
             $db->query("SELECT * FROM intern_wsap_information WHERE id=:intern_id;");
             $db->setInternId($_GET["intern_id"]);
             $db->execute();
@@ -440,17 +471,40 @@
                 $time_out = trim(substr($time_out, 0, 8));
             }
 
-            if (isOvertime($time_out)) {
+            if (isOvertime($time_out) && $att["ot_hours"] > 0) {
                 $dt_time_out_start = new DateTime(date("G:i", $date->time_out_start()));
                 $dt_time_out = new DateTime(date("G:i", strtotime($time_out)));
                 $ot_hours = $dt_time_out_start->diff($dt_time_out)->format("%h");
                 $rendered_minutes = $dt_time_out_start->diff($dt_time_out)->format("%i");
                 $ot_hours += round($rendered_minutes/60, 1);
 
-                $new_overtime_hours_left = $overtime_hours["overtime_hours_left"] + $ot_hours;
+                if ($ot_hours > 4) {
+                    $ot_hours = 4;
+                }
+
+                $new_overtime_hours_left = $target_ot_hours_row["overtime_hours_left"] + $ot_hours;
+
+                $target_ot_hours_db = new Database();
+
+                $target_ot_hours_db->query("SELECT * FROM overtime_hours WHERE intern_id=:intern_id");
+                $target_ot_hours_db->setInternId($_GET["intern_id"]);
+                $target_ot_hours_db->execute();
+
+                $target_ot_hours_id = $overtime_hours["id"];
+                while ($target_ot_hours_row = $target_ot_hours_db->fetch()) {
+                    $target_start_week_date = strtotime($target_ot_hours_row["start_week_date"]);
+                    $target_end_week_date = strtotime($target_ot_hours_row["start_week_date"]." + 6 days");
+                    $target_date = strtotime($att_date);
+
+                    if ($target_date >= $target_start_week_date && $target_date <= $target_end_week_date) {
+                        $new_overtime_hours_left = $target_ot_hours_row["overtime_hours_left"] + $ot_hours;
+                        $target_ot_hours_id = $target_ot_hours_row["id"];
+                        break;
+                    }
+                }
         
                 $db->query("UPDATE overtime_hours SET overtime_hours_left=:overtime_hours_left WHERE id=:id");
-                $db->setId($overtime_hours["id"]);
+                $db->setId($target_ot_hours_id);
                 $db->setOvertimeHoursLeft($new_overtime_hours_left);
                 $db->execute();
                 $db->closeStmt();
@@ -468,11 +522,15 @@
                 
             $attendance = array(
                 0,
+                0,
+                0,
                 $att_id
             );
 
-            $db->query("UPDATE attendance SET rendered_hours=:rendered_hours WHERE id=:id");
-            $db->setAttRenderedHours($attendance);
+            $db->query("UPDATE attendance
+            SET regular_hours=:regular_hours, ot_hours=:ot_hours, rendered_hours=:rendered_hours
+            WHERE id=:id");
+            $db->setAttHours($attendance);
             $db->execute();
             $db->closeStmt();
 
@@ -546,16 +604,16 @@
         <div class="aside">
             <?php include_once "profile_nav.php";
             if ($admin_roles_count != 0 && !empty($_GET["intern_id"])) { ?>
-                <div class="row rounded bg-">
-                    <div class="col-md-12 p-4">
-                        <h5 class="fs-intern fw-bold">Attendance Legend</h5>
-                        <ul class="attendance_legend">
-                            <li class="bg-morning text-light">MS - Morning Shift</li>
+                <div class="row bg-orange m-2 mt-4" style="border-radius: 18px;">
+                    <div class="col-md-12 p-1 pt-2 text-center">
+                        <h5 class="fw-bold text-light mx-4 mb-1">Attendance Legend</h5>
+                        <ul class="attendance_legend m-0">
+                            <li class="bg-morning text-light" style="border-radius: 18px 18px 0 0;">MS - Morning Shift</li>
                             <li class="bg-afternoon text-light">AS - Afteroon Shift</li>
                             <li class="bg-indigo text-light">OT - Overtime</li>
                             <li class="bg-warning">L - Late | NTO - No Time out</li>
                             <li class="bg-danger text-light">AU - Absent Unexcused</li>
-                            <li class="bg-primary text-light">AE - Absent Excused</li>
+                            <li class="bg-primary text-light" style="border-radius: 0 0 18px 18px;">AE - Absent Excused</li>
                         </ul>
                     </div>
                 </div> <?php
@@ -582,7 +640,7 @@
                                 } else {
                                     echo $value["image"];
                                 }
-                            } ?>" onerror="this.src='../Assets/img/profile_imgs/no_image_found.jpeg';">
+                            } ?>" onerror="this.src='../Assets/img/no_image_found.jpeg';">
                         </div>
                     </a>
                     <div class="w-100">
@@ -701,7 +759,7 @@
                             <form method="post">
                                 <div class="row mb-4">
                                     <div class="col-md-12 col-lg-6 user_input my-1">
-                                        <label class="mb-2" for="rendered_hours">Rendered Hours
+                                        <label class="mb-2" for="rendered_hours">Valid Rendered Hours
                                             <span class="text-danger">*</span></label>
                                         <input type="number" name="rendered_hours" class="form-control"
                                             value="<?= $selected_att["rendered_hours"] ?>" step="any">
@@ -818,14 +876,14 @@
                     <div class="w-fit ms-auto">
                         <a class="btn btn-excel mb-2"
                             href="preview_excel.php?intern_id=<?= strtoupper($_GET["intern_id"]) ?>"
-                            target="window">
+                            target="preview_excel.php?intern_id=<?= strtoupper($_GET["intern_id"]) ?>">
                             Preview DTR as Excel
                         </a>                            
                         </button> <?php
                         if ($nto_value["count"] == 0) { ?>
                             <a class="btn btn-pdf mb-2"
                                 href="preview_pdf.php?intern_id=<?= strtoupper($_GET["intern_id"]) ?>"
-                                target="window">
+                                target="preview_pdf.php?intern_id=<?= strtoupper($_GET["intern_id"]) ?>">
                                 Preview DTR as PDF
                             </a> <?php
                         } else { ?>
@@ -850,7 +908,9 @@
                             <th scope="col">Day</th>
                             <th scope="col">Time in</th>
                             <th scope="col">Time out</th>
-                            <th scope="col">Rendered Hours</th>
+                            <th scope="col">Regular Hours</th>
+                            <th scope="col">OT Hours</th>
+                            <th scope="col">Valid Rendered Hours</th>
                         </tr>
                     </thead>
                     <tbody> <?php
@@ -868,7 +928,7 @@
                             $db->execute();
 
                             $count = 0;
-                            $conditions = array("AU", "AE", "MS", "AS", "OT", "OD", "L", "NTO");
+
                             while ($row = $db->fetch()) {
                                 $count++; ?>
                                 <tr> <?php
@@ -881,7 +941,9 @@
                                                         <div class="modal-title" id="removeTimeOutModalLabel">
                                                             <h5>Remove Time out</h5>
                                                         </div>
-                                                        <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Close"></button>
+                                                        <button class="btn btn-danger btn-sm text-light" data-bs-dismiss="modal">
+                                                            <i class="fa-solid fa-close"></i>
+                                                        </button>
                                                     </div>
                                                     
                                                     <form method="post">
@@ -910,36 +972,137 @@
                                         </div> <?php
                                     } ?>
 
+                                    <div class="modal fade" id="gpsImageModal<?= $row["id"] ?>" tabindex="-1"
+                                        aria-labelledby="gpsImageModalModalLabel" aria-hidden="true">
+                                        <div class="modal-dialog modal-dialog-centered modal-lg">
+                                            <div class="modal-content">
+                                                <div class="modal-header">
+                                                    <div class="modal-title" id="gpsImageModalModalLabel">
+                                                        <h5><?= $row["att_date"]." | ".date("l", strtotime($row["att_date"])) ?></h5>
+                                                    </div>
+                                                    <button class="btn btn-danger btn-sm text-light" data-bs-dismiss="modal">
+                                                        <i class="fa-solid fa-close"></i>
+                                                    </button>
+                                                </div>
+                                                
+                                                <div class="modal-body">
+                                                    <div class="row">
+                                                        <div class="col-sm-12 col-md-6 text-center p-1">
+                                                            <h6 class="fw-bold">TIME IN</h6>
+                                                            <img class="w-100 mb-2" src="<?=  $row["time_in_gps_image"] ?>"
+                                                            onerror="this.src='../Assets/img/no_image_found.jpeg';">
+                                                            <div class="d-flex align-items-center"> <?php
+                                                                if (strlen($row["time_in"]) > 0) {
+                                                                    if (isAU($row["time_in"])) { ?>
+                                                                        <p class="bg-danger text-light rounded w-fit mx-auto fs-d px-2 py-1">
+                                                                            <?= $row["time_in"] ?>
+                                                                        </p> <?php
+                                                                    }  else if (isAE($row["time_in"])) { ?>
+                                                                        <p class="bg-primary text-light rounded w-fit mx-auto fs-d px-2 py-1">
+                                                                            <?= $row["time_in"] ?>
+                                                                        </p> <?php
+                                                                    }  else if (strlen($row["time_out"]) > 0 && isMS($row["time_out"]) && !isL($row["time_in"])) { ?>
+                                                                        <p class="bg-morning text-light rounded w-fit mx-auto fs-d px-2 py-1">
+                                                                            <?= $row["time_in"] ?>
+                                                                        </p> <?php
+                                                                    }  else if (strlen($row["time_out"]) > 0 && isAS($row["time_out"]) && !isL($row["time_in"])) { ?>
+                                                                        <p class="bg-afternoon text-light rounded w-fit mx-auto fs-d px-2 py-1">
+                                                                            <?= $row["time_in"] ?>
+                                                                        </p> <?php
+                                                                    }  else if (isOD($row["time_in"])) { ?>
+                                                                        <p class="bg-dark text-light rounded w-fit mx-auto fs-d px-2 py-1">
+                                                                            <?= $row["time_in"] ?>
+                                                                        </p> <?php
+                                                                    }  else if (isL($row["time_in"])) { ?>
+                                                                        <p class="bg-warning text-dark rounded w-fit mx-auto fs-d px-2 py-1">
+                                                                            <?= $row["time_in"] ?>
+                                                                        </p> <?php
+                                                                    }  else { ?>
+                                                                        <p class="bg-success text-light rounded w-fit mx-auto fs-d px-2 py-1">
+                                                                            <?= $row["time_in"] ?>
+                                                                        </p> <?php
+                                                                    }
+                                                                } ?>
+                                                            </div>
+                                                        </div>
+                                                        <div class="col-sm-12 col-md-6 text-center p-1 mt-3 mt-md-0">
+                                                            <h6 class="fw-bold">TIME OUT</h6>
+                                                            <img class="w-100 mb-2" src="<?=  $row["time_out_gps_image"] ?>"
+                                                            onerror="this.src='../Assets/img/no_image_found.jpeg';">
+                                                            <div class="d-flex align-items-center"> <?php
+                                                                if (strlen($row["time_out"]) > 0) {
+                                                                    if (isAU($row["time_out"])) { ?>
+                                                                        <p class="bg-danger text-light rounded w-fit mx-auto fs-d px-2 py-1">
+                                                                            <?= $row["time_out"] ?>
+                                                                        </p> <?php
+                                                                    }  else if (isAE($row["time_out"])) { ?>
+                                                                        <p class="bg-primary text-light rounded w-fit mx-auto fs-d px-2 py-1">
+                                                                            <?= $row["time_out"] ?>
+                                                                        </p> <?php
+                                                                    }  else if (isOT($row["time_out"])) { ?>
+                                                                        <p class="bg-indigo text-light rounded w-fit mx-auto fs-d px-2 py-1">
+                                                                            <?= $row["time_out"] ?>
+                                                                        </p> <?php
+                                                                    }  else if (isMS($row["time_out"])) { ?>
+                                                                        <p class="bg-morning text-light rounded w-fit mx-auto fs-d px-2 py-1">
+                                                                            <?= $row["time_out"] ?>
+                                                                        </p> <?php
+                                                                    }  else if (isAS($row["time_out"])) { ?>
+                                                                        <p class="bg-afternoon text-light rounded w-fit mx-auto fs-d px-2 py-1">
+                                                                            <?= $row["time_out"] ?>
+                                                                        </p> <?php
+                                                                    }  else if (isOD($row["time_out"])) { ?>
+                                                                        <p class="bg-dark text-light rounded w-fit mx-auto fs-d px-2 py-1">
+                                                                            <?= $row["time_out"] ?>
+                                                                        </p> <?php
+                                                                    }  else if (isL($row["time_out"]) || isNTO($row["time_out"])) { ?>
+                                                                        <p class="bg-warning text-dark rounded w-fit mx-auto fs-d px-2 py-1">
+                                                                            <?= $row["time_out"] ?>
+                                                                        </p> <?php
+                                                                    }  else { ?>
+                                                                        <p class="bg-success text-light rounded w-fit mx-auto fs-d px-2 py-1">
+                                                                            <?= $row["time_out"] ?>
+                                                                        </p> <?php
+                                                                    }
+                                                                } else { ?>
+                                                                    <p class="bg-secondary text-light rounded w-fit mx-auto fs-d px-2 py-1">
+                                                                        Pending
+                                                                    </p> <?php
+                                                                } ?>
+                                                            </div>
+                                                        </div>
+                                                    </div>
+                                                </div>
+                                            </div>
+                                        </div>
+                                    </div>
+
                                     <th scope="row"><?= $count ?></th>
                                     <td><?= $row["att_date"] ?></td>
                                     <td><?= date("l", strtotime($row["att_date"])); ?></td>
                                     <td> <?php
                                         if (strlen($row["time_in"]) > 0) {
-                                            if ($row["time_in"] == $conditions[0]) { ?>
+                                            if (isAU($row["time_in"])) { ?>
                                                 <p class="bg-danger text-light rounded w-fit m-auto px-2 py-1">
                                                     <?= $row["time_in"] ?>
                                                 </p> <?php
-                                            }  else if ($row["time_in"] == $conditions[1]) { ?>
+                                            }  else if (isAE($row["time_in"])) { ?>
                                                 <p class="bg-primary text-light rounded w-fit m-auto px-2 py-1">
                                                     <?= $row["time_in"] ?>
                                                 </p> <?php
-                                            }  else if (strlen($row["time_out"]) > 0 &&
-                                                str_contains($row["time_out"], $conditions[2]) &&
-                                                !str_contains($row["time_in"], $conditions[6])) { ?>
+                                            }  else if (strlen($row["time_out"]) > 0 && isMS($row["time_out"]) && !isL($row["time_in"])) { ?>
                                                 <p class="bg-morning text-light rounded w-fit m-auto px-2 py-1">
                                                     <?= $row["time_in"] ?>
                                                 </p> <?php
-                                            }  else if (strlen($row["time_out"]) > 0 &&
-                                                str_contains($row["time_out"], $conditions[3]) &&
-                                                !str_contains($row["time_in"], $conditions[6])) { ?>
+                                            }  else if (strlen($row["time_out"]) > 0 && isAS($row["time_out"]) && !isL($row["time_in"])) { ?>
                                                 <p class="bg-afternoon text-light rounded w-fit m-auto px-2 py-1">
                                                     <?= $row["time_in"] ?>
                                                 </p> <?php
-                                            }  else if (str_contains($row["time_in"], $conditions[4])) { ?>
+                                            }  else if (isOD($row["time_in"])) { ?>
                                                 <p class="bg-dark text-light rounded w-fit m-auto px-2 py-1">
                                                     <?= $row["time_in"] ?>
                                                 </p> <?php
-                                            }  else if (str_contains($row["time_in"], $conditions[6])) { ?>
+                                            }  else if (isL($row["time_in"])) { ?>
                                                 <p class="bg-warning text-dark rounded w-fit m-auto px-2 py-1">
                                                     <?= $row["time_in"] ?>
                                                 </p> <?php
@@ -952,31 +1115,31 @@
                                     </td>
                                     <td> <?php
                                         if (strlen($row["time_out"]) > 0) {
-                                            if ($row["time_out"] == $conditions[0]) { ?>
+                                            if (isAU($row["time_out"])) { ?>
                                                 <p class="bg-danger text-light rounded w-fit m-auto px-2 py-1">
                                                     <?= $row["time_out"] ?>
                                                 </p> <?php
-                                            }  else if ($row["time_out"] == $conditions[1]) { ?>
+                                            }  else if (isAE($row["time_out"])) { ?>
                                                 <p class="bg-primary text-light rounded w-fit m-auto px-2 py-1">
                                                     <?= $row["time_out"] ?>
                                                 </p> <?php
-                                            }  else if (str_contains($row["time_out"], $conditions[4])) { ?>
+                                            }  else if (isOT($row["time_out"])) { ?>
                                                 <p class="bg-indigo text-light rounded w-fit m-auto px-2 py-1">
                                                     <?= $row["time_out"] ?>
                                                 </p> <?php
-                                            }  else if (str_contains($row["time_out"], $conditions[2])) { ?>
+                                            }  else if (isMS($row["time_out"])) { ?>
                                                 <p class="bg-morning text-light rounded w-fit m-auto px-2 py-1">
                                                     <?= $row["time_out"] ?>
                                                 </p> <?php
-                                            }  else if (str_contains($row["time_out"], $conditions[3])) { ?>
+                                            }  else if (isAS($row["time_out"])) { ?>
                                                 <p class="bg-afternoon text-light rounded w-fit m-auto px-2 py-1">
                                                     <?= $row["time_out"] ?>
                                                 </p> <?php
-                                            }  else if (str_contains($row["time_out"], $conditions[5])) { ?>
+                                            }  else if (isOD($row["time_out"])) { ?>
                                                 <p class="bg-dark text-light rounded w-fit m-auto px-2 py-1">
                                                     <?= $row["time_out"] ?>
                                                 </p> <?php
-                                            }  else if ($row["time_out"] == $conditions[7]) { ?>
+                                            }  else if (isL($row["time_out"]) || isNTO($row["time_out"])) { ?>
                                                 <p class="bg-warning text-dark rounded w-fit m-auto px-2 py-1">
                                                     <?= $row["time_out"] ?>
                                                 </p> <?php
@@ -985,11 +1148,24 @@
                                                     <?= $row["time_out"] ?>
                                                 </p> <?php
                                             }
+                                        } else { ?>
+                                            <p class="bg-secondary text-light rounded w-fit m-auto px-2 py-1">
+                                                Pending
+                                            </p> <?php
                                         } ?>
                                     </td>
+                                    <td><?= $row["regular_hours"] ?></td>
+                                    <td><?= $row["ot_hours"] ?></td>
                                     <td><?= $row["rendered_hours"] ?></td>
                                     <td>
-                                        <div class="d-flex justify-content-center"> <?php
+                                        <div class="d-flex justify-content-center">
+                                            <div class="w-fit p-0 me-1" data-bs-toggle="tooltip" data-bs-placement="left"
+                                                title="View GPS Image">
+                                                <button class="btn btn-primary btn-sm"
+                                                    data-bs-toggle="modal"  data-bs-target="#gpsImageModal<?= $row["id"] ?>">
+                                                    <i class="fa-solid fa-image fs-a"></i>
+                                                </button>
+                                            </div> <?php
                                             if ($row["time_out"] == "NTO") {  ?>
                                                 <div class="w-fit p-0 me-1" data-bs-toggle="tooltip" data-bs-placement="left"
                                                     title="Edit Time out"> <?php
@@ -1008,7 +1184,7 @@
                                             } else if (!empty($row["time_out"])) { ?>
                                                 <div class="w-fit p-0 d-flex">
                                                     <div class="w-fit p-0 me-1" data-bs-toggle="tooltip" data-bs-placement="left"
-                                                        title="Edit Rendered Hours"> <?php
+                                                        title="Edit Valid Rendered Hours"> <?php
                                                             if (!empty($_GET["id"]) && $_GET["id"] != $row["id"] ||
                                                                 !empty($_GET["edit"]) && $_GET["edit"] != "rendered_hours" || empty($_GET["id"])) { ?>
                                                                 <a class="btn btn-secondary btn-sm"
@@ -1080,6 +1256,11 @@
                                             if (!empty($_GET["search"])) {
                                                 $parameters = $parameters."search=".$_GET["search"];
                                             }
+
+                                            if (isset($_GET["status"])) {
+                                                if (strlen($parameters) > 1) { $parameters = $parameters."&"; }
+                                                $parameters = $parameters."status=".$_GET["status"];
+                                            }
                                             
                                             if (!empty($_GET["sort"])) {
                                                 if (strlen($parameters) > 1) { $parameters = $parameters."&"; }
@@ -1106,6 +1287,11 @@
                                                     if (strlen($parameters) > 1) { $parameters = $parameters."&"; }
                                                     $parameters = $parameters."department=".$row["name"];
                                                 }
+
+                                                if (isset($_GET["status"])) {
+                                                    if (strlen($parameters) > 1) { $parameters = $parameters."&"; }
+                                                    $parameters = $parameters."status=".$_GET["status"];
+                                                }
                                                 
                                                 if (!empty($_GET["sort"])) {
                                                     if (strlen($parameters) > 1) { $parameters = $parameters."&"; }
@@ -1119,6 +1305,230 @@
                                                 } ?>> <?= $row["name"] ?>
                                                 </a></li> <?php
                                             } ?>
+                                        </ul>
+                                    </div>
+                                    <!--STATUS DROPDOWN-->
+                                    <div class="dropdown me-2">
+                                        <button class="btn btn-light border-dark dropdown-toggle" type="button" id="dropdownMenuButton1"
+                                        data-bs-toggle="dropdown" aria-expanded="false"> <?php
+                                            if (isset($_GET["status"])) {
+                                                switch ($_GET["status"]) {
+                                                    case "0":
+                                                        echo "Inactive";
+                                                        break;
+                                                    case "1":
+                                                        echo "Active";
+                                                        break;
+                                                    case "2":
+                                                        echo "Offboarded";
+                                                        break;
+                                                    case "3":
+                                                        echo "Withdrawn";
+                                                        break;
+                                                    case "4":
+                                                        echo "Extended";
+                                                        break;
+                                                    case "5":
+                                                        echo "Suspended";
+                                                        break;
+                                                    case "6":
+                                                        echo "Terminated";
+                                                        break;
+                                                }
+                                            } else {
+                                                echo "All Status";
+                                            } ?>
+                                        </button>
+                                        <ul class="dropdown-menu me-2z" aria-labelledby="dropdownMenuButton1" name="sort">
+                                            <li><a class="dropdown-item btn-smoke" <?php
+                                                $parameters = "?";
+                                                if (!empty($_GET["search"])) {
+                                                    $parameters = $parameters."search=".$_GET["search"];
+                                                }
+
+                                                if (!empty($_GET["department"])) {
+                                                    if (strlen($parameters) > 1) { $parameters = $parameters."&"; }
+                                                    $parameters = $parameters."department=".$_GET["department"];
+                                                }
+                                                        
+                                                if (!empty($_GET["sort"])) {
+                                                    if (strlen($parameters) > 1) { $parameters = $parameters."&"; }
+                                                    $parameters = $parameters."sort=".$_GET["sort"];
+                                                }
+
+                                                if (strlen($parameters) > 1) { ?>
+                                                    href="<?= "daily_time_record.php".$parameters ?>" <?php
+                                                } else { ?>
+                                                    href="<?= "daily_time_record.php" ?>" <?php
+                                                } ?>>All Status</a></li>
+                                            <li><a class="dropdown-item btn-smoke" <?php
+                                            $parameters = "?";
+                                                if (!empty($_GET["search"])) {
+                                                    $parameters = $parameters."search=".$_GET["search"];
+                                                }
+
+                                                if (!empty($_GET["department"])) {
+                                                    if (strlen($parameters) > 1) { $parameters = $parameters."&"; }
+                                                    $parameters = $parameters."department=".$_GET["department"];
+                                                }
+
+                                                if (strlen($parameters) > 1) { $parameters = $parameters."&"; }
+                                                $parameters = $parameters."status=0";
+                                                        
+                                                if (!empty($_GET["sort"])) {
+                                                    if (strlen($parameters) > 1) { $parameters = $parameters."&"; }
+                                                    $parameters = $parameters."sort=".$_GET["sort"];
+                                                }
+
+                                                if (strlen($parameters) > 1) { ?>
+                                                    href="<?= "daily_time_record.php".$parameters ?>" <?php
+                                                } else { ?>
+                                                    href="<?= "daily_time_record.php" ?>" <?php
+                                                } ?>>Inactive</a></li>
+                                            <li><a class="dropdown-item btn-smoke" <?php
+                                            $parameters = "?";
+                                                if (!empty($_GET["search"])) {
+                                                    $parameters = $parameters."search=".$_GET["search"];
+                                                }
+
+                                                if (!empty($_GET["department"])) {
+                                                    if (strlen($parameters) > 1) { $parameters = $parameters."&"; }
+                                                    $parameters = $parameters."department=".$_GET["department"];
+                                                }
+
+                                                if (strlen($parameters) > 1) { $parameters = $parameters."&"; }
+                                                $parameters = $parameters."status=1";
+                                                        
+                                                if (!empty($_GET["sort"])) {
+                                                    if (strlen($parameters) > 1) { $parameters = $parameters."&"; }
+                                                    $parameters = $parameters."sort=".$_GET["sort"];
+                                                }
+
+                                                if (strlen($parameters) > 1) { ?>
+                                                    href="<?= "daily_time_record.php".$parameters ?>" <?php
+                                                } else { ?>
+                                                    href="<?= "daily_time_record.php" ?>" <?php
+                                                } ?>>Active</a></li>
+                                            <li><a class="dropdown-item btn-smoke" <?php
+                                                $parameters = "?";
+                                                if (!empty($_GET["search"])) {
+                                                    $parameters = $parameters."search=".$_GET["search"];
+                                                }
+
+                                                if (!empty($_GET["department"])) {
+                                                    if (strlen($parameters) > 1) { $parameters = $parameters."&"; }
+                                                    $parameters = $parameters."department=".$_GET["department"];
+                                                }
+
+                                                if (strlen($parameters) > 1) { $parameters = $parameters."&"; }
+                                                $parameters = $parameters."status=2";
+                                                        
+                                                if (!empty($_GET["sort"])) {
+                                                    if (strlen($parameters) > 1) { $parameters = $parameters."&"; }
+                                                    $parameters = $parameters."sort=".$_GET["sort"];
+                                                }
+
+                                                if (strlen($parameters) > 1) { ?>
+                                                    href="<?= "daily_time_record.php".$parameters ?>" <?php
+                                                } else { ?>
+                                                    href="<?= "daily_time_record.php" ?>" <?php
+                                                } ?>>Offboarded</a></li>
+                                            <li><a class="dropdown-item btn-smoke" <?php
+                                                $parameters = "?";
+                                                if (!empty($_GET["search"])) {
+                                                    $parameters = $parameters."search=".$_GET["search"];
+                                                }
+
+                                                if (!empty($_GET["department"])) {
+                                                    if (strlen($parameters) > 1) { $parameters = $parameters."&"; }
+                                                    $parameters = $parameters."department=".$_GET["department"];
+                                                }
+
+                                                if (strlen($parameters) > 1) { $parameters = $parameters."&"; }
+                                                $parameters = $parameters."status=3";
+                                                        
+                                                if (!empty($_GET["sort"])) {
+                                                    if (strlen($parameters) > 1) { $parameters = $parameters."&"; }
+                                                    $parameters = $parameters."sort=".$_GET["sort"];
+                                                }
+
+                                                if (strlen($parameters) > 1) { ?>
+                                                    href="<?= "daily_time_record.php".$parameters ?>" <?php
+                                                } else { ?>
+                                                    href="<?= "daily_time_record.php" ?>" <?php
+                                                } ?>>Withdrawn</a></li>
+                                            <li><a class="dropdown-item btn-smoke" <?php
+                                                $parameters = "?";
+                                                if (!empty($_GET["search"])) {
+                                                    $parameters = $parameters."search=".$_GET["search"];
+                                                }
+
+                                                if (!empty($_GET["department"])) {
+                                                    if (strlen($parameters) > 1) { $parameters = $parameters."&"; }
+                                                    $parameters = $parameters."department=".$_GET["department"];
+                                                }
+
+                                                if (strlen($parameters) > 1) { $parameters = $parameters."&"; }
+                                                $parameters = $parameters."status=4";
+                                                        
+                                                if (!empty($_GET["sort"])) {
+                                                    if (strlen($parameters) > 1) { $parameters = $parameters."&"; }
+                                                    $parameters = $parameters."sort=".$_GET["sort"];
+                                                }
+
+                                                if (strlen($parameters) > 1) { ?>
+                                                    href="<?= "daily_time_record.php".$parameters ?>" <?php
+                                                } else { ?>
+                                                    href="<?= "daily_time_record.php" ?>" <?php
+                                                } ?>>Extended</a></li>
+                                            <li><a class="dropdown-item btn-smoke" <?php
+                                                $parameters = "?";
+                                                if (!empty($_GET["search"])) {
+                                                    $parameters = $parameters."search=".$_GET["search"];
+                                                }
+
+                                                if (!empty($_GET["department"])) {
+                                                    if (strlen($parameters) > 1) { $parameters = $parameters."&"; }
+                                                    $parameters = $parameters."department=".$_GET["department"];
+                                                }
+
+                                                if (strlen($parameters) > 1) { $parameters = $parameters."&"; }
+                                                $parameters = $parameters."status=5";
+                                                        
+                                                if (!empty($_GET["sort"])) {
+                                                    if (strlen($parameters) > 1) { $parameters = $parameters."&"; }
+                                                    $parameters = $parameters."sort=".$_GET["sort"];
+                                                }
+
+                                                if (strlen($parameters) > 1) { ?>
+                                                    href="<?= "daily_time_record.php".$parameters ?>" <?php
+                                                } else { ?>
+                                                    href="<?= "daily_time_record.php" ?>" <?php
+                                                } ?>>Suspended</a></li>
+                                            <li><a class="dropdown-item btn-smoke" <?php
+                                                $parameters = "?";
+                                                if (!empty($_GET["search"])) {
+                                                    $parameters = $parameters."search=".$_GET["search"];
+                                                }
+
+                                                if (!empty($_GET["department"])) {
+                                                    if (strlen($parameters) > 1) { $parameters = $parameters."&"; }
+                                                    $parameters = $parameters."department=".$_GET["department"];
+                                                }
+
+                                                if (strlen($parameters) > 1) { $parameters = $parameters."&"; }
+                                                $parameters = $parameters."status=6";
+                                                        
+                                                if (!empty($_GET["sort"])) {
+                                                    if (strlen($parameters) > 1) { $parameters = $parameters."&"; }
+                                                    $parameters = $parameters."sort=".$_GET["sort"];
+                                                }
+
+                                                if (strlen($parameters) > 1) { ?>
+                                                    href="<?= "daily_time_record.php".$parameters ?>" <?php
+                                                } else { ?>
+                                                    href="<?= "daily_time_record.php" ?>" <?php
+                                                } ?>>Terminated</a></li>
                                         </ul>
                                     </div>
                                     <!--SORTING DROPDOWN-->
@@ -1156,6 +1566,11 @@
                                                     $parameters = $parameters."department=".$_GET["department"];
                                                 }
 
+                                                if (isset($_GET["status"])) {
+                                                    if (strlen($parameters) > 1) { $parameters = $parameters."&"; }
+                                                    $parameters = $parameters."status=".$_GET["status"];
+                                                }
+
                                                 if (strlen($parameters) > 1) { ?>
                                                     href="<?= "daily_time_record.php".$parameters ?>" <?php
                                                 } else { ?>
@@ -1170,6 +1585,11 @@
                                                 if (!empty($_GET["department"])) {
                                                     if (strlen($parameters) > 1) { $parameters = $parameters."&"; }
                                                     $parameters = $parameters."department=".$_GET["department"];
+                                                }
+
+                                                if (isset($_GET["status"])) {
+                                                    if (strlen($parameters) > 1) { $parameters = $parameters."&"; }
+                                                    $parameters = $parameters."status=".$_GET["status"];
                                                 }
 
                                                 if (strlen($parameters) > 1) { $parameters = $parameters."&"; }
@@ -1190,6 +1610,11 @@
                                                     if (strlen($parameters) > 1) { $parameters = $parameters."&"; }
                                                     $parameters = $parameters."department=".$_GET["department"];
                                                 }
+
+                                                if (isset($_GET["status"])) {
+                                                    if (strlen($parameters) > 1) { $parameters = $parameters."&"; }
+                                                    $parameters = $parameters."status=".$_GET["status"];
+                                                }
                                                 
                                                 if (strlen($parameters) > 1) { $parameters = $parameters."&"; }
                                                 $parameters = $parameters."sort=2";
@@ -1209,6 +1634,11 @@
                                                     if (strlen($parameters) > 1) { $parameters = $parameters."&"; }
                                                     $parameters = $parameters."department=".$_GET["department"];
                                                 }
+
+                                                if (isset($_GET["status"])) {
+                                                    if (strlen($parameters) > 1) { $parameters = $parameters."&"; }
+                                                    $parameters = $parameters."status=".$_GET["status"];
+                                                }
                                                 
                                                 if (strlen($parameters) > 1) { $parameters = $parameters."&"; }
                                                 $parameters = $parameters."sort=3";
@@ -1227,6 +1657,11 @@
                                                 if (!empty($_GET["department"])) {
                                                     if (strlen($parameters) > 1) { $parameters = $parameters."&"; }
                                                     $parameters = $parameters."department=".$_GET["department"];
+                                                }
+
+                                                if (isset($_GET["status"])) {
+                                                    if (strlen($parameters) > 1) { $parameters = $parameters."&"; }
+                                                    $parameters = $parameters."status=".$_GET["status"];
                                                 }
                                                 
                                                 if (strlen($parameters) > 1) { $parameters = $parameters."&"; }
@@ -1282,6 +1717,12 @@
                             }
                             $conditions = $conditions." departments.name=:dept_name";
                         }
+                        if (isset($_GET["status"])) {
+                            if (strlen($conditions) > 6) {
+                                $conditions = $conditions." AND";
+                            }
+                            $conditions = $conditions." intern_wsap_information.status=:status";
+                        }
 
                         $query = "SELECT intern_personal_information.id AS intern_id, intern_personal_information.*, 
                         intern_wsap_information.*, intern_accounts.*,  departments.*
@@ -1295,6 +1736,9 @@
                             }
                             if (!empty($_GET["department"])) {
                                 $db->selectDepartment($_GET["department"]);
+                            }
+                            if (isset($_GET["status"])) {
+                                $db->selectStatus($_GET["status"]);
                             }
                         }
                         $db->execute();
@@ -1314,7 +1758,7 @@
                                             } else {
                                                 echo $row["image"];
                                             }
-                                        } ?>" onerror="this.src='../Assets/img/profile_imgs/no_image_found.jpeg';">
+                                        } ?>" onerror="this.src='../Assets/img/no_image_found.jpeg';">
                                     </div>
                                     <div class="summary-total mt-2 w-fit mx-auto">
                                         <h5 class="mb-0 text-dark fs-regular">
@@ -1343,7 +1787,7 @@
                                             <p class="bg-secondary text-light rounded w-fit m-auto px-2 py-1 fs-d">
                                             Offboarded
                                             </p> <?php
-                                        }   else if ($row["status"] == 4) { ?>
+                                        }   else if ($row["status"] == 3) { ?>
                                             <p class="bg-dark text-light rounded w-fit m-auto px-2 py-1 fs-d">
                                             Withdrawn
                                             </p> <?php
@@ -1359,7 +1803,7 @@
                     </div>
                      <?php
                     if ($db->rowCount() == 0) { ?>
-                        <div class="att-no-record text-center my-5">
+                        <div class="w-100 text-center my-5">
                             <h3>No Record</h3>
                         </div> <?php
                     } ?>

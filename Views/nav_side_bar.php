@@ -17,7 +17,7 @@
         <div class="side-nav border-end p-1 vh-100 position-fixed">
             <div class="d-flex align-items-center flex-column">
                 <img class="img-responsive" src="../Assets/img/brand_logo/WSAP.png" alt=""
-                    onerror="this.src='../Assets/img/profile_imgs/no_image_found.jpeg';">
+                    onerror="this.src='../Assets/img/no_image_found.jpeg';">
                 <span class="fw-bold">WSAP IP</span>
             </div>
             <div class="navs py-4 d-flex justify-content-center align-items-center">

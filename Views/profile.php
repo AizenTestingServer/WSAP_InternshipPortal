@@ -61,6 +61,8 @@
                 $allowed_exs = array("jpg", "jpeg", "png");
     
                 if (in_array($img_ex, $allowed_exs)) {
+                    $image_name = str_replace("#", "", $image_name);
+                    $image_name = $_SESSION["intern_id"]."_".$image_name;
                     $image_path = "../Assets/img/profile_imgs/".$image_name;
                     move_uploaded_file($tmp_name, $image_path);
       
@@ -353,7 +355,7 @@
                             } else {
                                 echo $value["image"];
                             }
-                        } ?>" onerror="this.src='../Assets/img/profile_imgs/no_image_found.jpeg';"> <?php
+                        } ?>" onerror="this.src='../Assets/img/no_image_found.jpeg';"> <?php
 
                     if (isset($_SESSION["upload_success"])) { ?>
                         <div class="alert alert-success text-success">
@@ -385,7 +387,7 @@
                         <input class="form-control form-control-sm mx-auto" id="formFileSm" type="file" accept="image/*"
                             onchange="loadFile(event)" name="image" style="max-width: 350px;">
         
-                        <button class="btn btn-sm btn-smoke border-dark mt-2 w-100" style="max-width: 150px;"
+                        <button class="btn btn-sm btn-smoke mt-2 w-100" style="max-width: 150px;"
                             type="submit" name="uploadImage">Upload</button> <?php
                     } ?>
                 </form>
@@ -395,7 +397,9 @@
                         <div class="modal-content">
                             <div class="modal-header">
                                 <h5 class="modal-title" id="myPhotosModalLabel">My Photos</h5>
-                                <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Close"></button>
+                                <button class="btn btn-danger btn-sm text-light" data-bs-dismiss="modal">
+                                    <i class="fa-solid fa-close"></i>
+                                </button>
                             </div>
 
                             <form action="<?= htmlspecialchars($_SERVER["PHP_SELF"]);?>" method="post">
@@ -413,7 +417,7 @@
                                         while ($images = $images_db->fetch()) { ?>
                                             <div class="p-2">
                                                 <img src="<?= $images["image_path"] ?>" class="image"
-                                                    onerror="this.src='../Assets/img/profile_imgs/no_image_found.jpeg';">
+                                                    onerror="this.src='../Assets/img/no_image_found.jpeg';">
                                                 <div class="w-100 d-flex justify-content-center">
                                                     <p class="my-2" style="max-width: 200px; height: 20px; overflow: hidden;"
                                                         data-bs-toggle="tooltip" data-bs-placement="top"

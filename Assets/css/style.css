@@ -24,6 +24,26 @@
     --excel-hover: #004823;
 }
 
+/* width */
+::-webkit-scrollbar {
+    width: 10px;
+  }
+  
+/* Track */
+::-webkit-scrollbar-track {
+background: #f1f1f1;
+}
+
+/* Handle */
+::-webkit-scrollbar-thumb {
+background: var(--indigo);
+}
+
+/* Handle on hover */
+::-webkit-scrollbar-thumb:hover {
+background: var(--indigo-hover);
+}
+
 body {
     font-family: "Montserrat", sans-serif;
     overflow-x: hidden;
@@ -183,7 +203,7 @@ textarea {
     --bs-btn-border-color: var(--text-custom-dark);
     --bs-btn-hover-color: var(--text-custom-dark);
     --bs-btn-hover-bg: var(--white-smoke);
-    --bs-btn-hover-border-color: var(--white-smoke);
+    --bs-btn-hover-border-color: var(--text-custom-dark);
     --bs-btn-focus-shadow-rgb: 177, 177, 177;
     --bs-btn-active-color: var(--text-custom-dark);
     --bs-btn-active-bg: var(--white-smoke);
@@ -1017,7 +1037,7 @@ a.dt-button {
 
 @media (max-width: 900px) {
     #time-in-time-out-layout {
-        margin-top: 440px;
+        margin-top: 480px;
         width: 100%;
     }
 

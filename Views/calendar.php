@@ -148,7 +148,7 @@
 
                                 $active_interns = 0;
                                 while ($row_interns = $db_interns->fetch()) {
-                                    if (isActiveIntern($row_interns["onboard_date"], $row_interns["offboard_date"], $row["att_date"])) {
+                                    if (isActiveIntern($row_interns["onboard_date"], $row_interns["offboard_date"], $row["att_date"])  && $row_interns["status"] == 1) {
                                         $active_interns++;
                                     } else {
                                         $db_attendance->execute();

@@ -41,16 +41,16 @@
                         <h5 class="mb-0"><?= $row["abbreviation"] ?></h5>
                         <p class="fs-a"><?= $row["name"] ?></p>
                         <div class="position-absolute bottom-0">
-                            <a href="<?= $row["fb_link"] ?>" target="window"><i class="fa-brands fa-facebook"></i></a>
-                            <a href="<?= $row["insta_link"] ?>" target="window"><i class="fa-brands fa-instagram"></i></a>
-                            <a href="<?= $row["twitter_link"] ?>" target="window"><i class="fa-brands fa-twitter"></i></a>
-                            <a href="<?= $row["web_link"] ?>" target="window"><i class="fa-solid fa-globe"></i></a>
+                            <a href="<?= $row["fb_link"] ?>" target="<?= $row["fb_link"] ?>"><i class="fa-brands fa-facebook"></i></a>
+                            <a href="<?= $row["insta_link"] ?>" target="<?= $row["insta_link"] ?>"><i class="fa-brands fa-instagram"></i></a>
+                            <a href="<?= $row["twitter_link"] ?>" target="<?= $row["twitter_link"] ?>"><i class="fa-brands fa-twitter"></i></a>
+                            <a href="<?= $row["web_link"] ?>" target="<?= $row["web_link"] ?>"><i class="fa-solid fa-globe"></i></a>
                         </div>
                     </div>
                     <div class="logo">
-                        <a href="<?= $row["web_link"] ?>" target="window">
+                        <a href="<?= $row["web_link"] ?>" target="<?= $row["web_link"] ?>">
                             <img class="img-fluid" src="<?= $row["image"] ?>" alt=""
-                                onerror="this.src='../Assets/img/profile_imgs/no_image_found.jpeg';">
+                                onerror="this.src='../Assets/img/no_image_found.jpeg';">
                         </a>
                     </div>
                 </div> <?php

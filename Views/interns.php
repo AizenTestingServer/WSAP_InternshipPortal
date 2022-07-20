@@ -112,6 +112,11 @@
             if (strlen($parameters) > 1) { $parameters = $parameters."&"; }
             $parameters = $parameters."department=".$_GET["department"];
         }
+
+        if (isset($_GET["status"])) {
+            if (strlen($parameters) > 1) { $parameters = $parameters."&"; }
+            $parameters = $parameters."status=".$_GET["status"];
+        }
         
         if (!empty($_GET["sort"])) {
             if (strlen($parameters) > 1) { $parameters = $parameters."&"; }
@@ -188,6 +193,11 @@
                                     if (!empty($_GET["search"])) {
                                         $parameters = $parameters."search=".$_GET["search"];
                                     }
+
+                                    if (isset($_GET["status"])) {
+                                        if (strlen($parameters) > 1) { $parameters = $parameters."&"; }
+                                        $parameters = $parameters."status=".$_GET["status"];
+                                    }
                                     
                                     if (!empty($_GET["sort"])) {
                                         if (strlen($parameters) > 1) { $parameters = $parameters."&"; }
@@ -214,6 +224,11 @@
                                             if (strlen($parameters) > 1) { $parameters = $parameters."&"; }
                                             $parameters = $parameters."department=".$row["name"];
                                         }
+
+                                        if (isset($_GET["status"])) {
+                                            if (strlen($parameters) > 1) { $parameters = $parameters."&"; }
+                                            $parameters = $parameters."status=".$_GET["status"];
+                                        }
                                         
                                         if (!empty($_GET["sort"])) {
                                             if (strlen($parameters) > 1) { $parameters = $parameters."&"; }
@@ -227,6 +242,230 @@
                                         } ?>> <?= $row["name"] ?>
                                         </a></li> <?php
                                     } ?>
+                                </ul>
+                            </div>
+                            <!--STATUS DROPDOWN-->
+                            <div class="dropdown me-2">
+                                <button class="btn btn-light border-dark dropdown-toggle" type="button" id="dropdownMenuButton1"
+                                data-bs-toggle="dropdown" aria-expanded="false"> <?php
+                                    if (isset($_GET["status"])) {
+                                        switch ($_GET["status"]) {
+                                            case "0":
+                                                echo "Inactive";
+                                                break;
+                                            case "1":
+                                                echo "Active";
+                                                break;
+                                            case "2":
+                                                echo "Offboarded";
+                                                break;
+                                            case "3":
+                                                echo "Withdrawn";
+                                                break;
+                                            case "4":
+                                                echo "Extended";
+                                                break;
+                                            case "5":
+                                                echo "Suspended";
+                                                break;
+                                            case "6":
+                                                echo "Terminated";
+                                                break;
+                                        }
+                                    } else {
+                                        echo "All Status";
+                                    } ?>
+                                </button>
+                                <ul class="dropdown-menu me-2z" aria-labelledby="dropdownMenuButton1" name="sort">
+                                    <li><a class="dropdown-item btn-smoke" <?php
+                                        $parameters = "?";
+                                        if (!empty($_GET["search"])) {
+                                            $parameters = $parameters."search=".$_GET["search"];
+                                        }
+
+                                        if (!empty($_GET["department"])) {
+                                            if (strlen($parameters) > 1) { $parameters = $parameters."&"; }
+                                            $parameters = $parameters."department=".$_GET["department"];
+                                        }
+                                                
+                                        if (!empty($_GET["sort"])) {
+                                            if (strlen($parameters) > 1) { $parameters = $parameters."&"; }
+                                            $parameters = $parameters."sort=".$_GET["sort"];
+                                        }
+
+                                        if (strlen($parameters) > 1) { ?>
+                                            href="<?= "interns.php".$parameters ?>" <?php
+                                        } else { ?>
+                                            href="<?= "interns.php" ?>" <?php
+                                        } ?>>All Status</a></li>
+                                    <li><a class="dropdown-item btn-smoke" <?php
+                                    $parameters = "?";
+                                        if (!empty($_GET["search"])) {
+                                            $parameters = $parameters."search=".$_GET["search"];
+                                        }
+
+                                        if (!empty($_GET["department"])) {
+                                            if (strlen($parameters) > 1) { $parameters = $parameters."&"; }
+                                            $parameters = $parameters."department=".$_GET["department"];
+                                        }
+
+                                        if (strlen($parameters) > 1) { $parameters = $parameters."&"; }
+                                        $parameters = $parameters."status=0";
+                                                
+                                        if (!empty($_GET["sort"])) {
+                                            if (strlen($parameters) > 1) { $parameters = $parameters."&"; }
+                                            $parameters = $parameters."sort=".$_GET["sort"];
+                                        }
+
+                                        if (strlen($parameters) > 1) { ?>
+                                            href="<?= "interns.php".$parameters ?>" <?php
+                                        } else { ?>
+                                            href="<?= "interns.php" ?>" <?php
+                                        } ?>>Inactive</a></li>
+                                    <li><a class="dropdown-item btn-smoke" <?php
+                                    $parameters = "?";
+                                        if (!empty($_GET["search"])) {
+                                            $parameters = $parameters."search=".$_GET["search"];
+                                        }
+
+                                        if (!empty($_GET["department"])) {
+                                            if (strlen($parameters) > 1) { $parameters = $parameters."&"; }
+                                            $parameters = $parameters."department=".$_GET["department"];
+                                        }
+
+                                        if (strlen($parameters) > 1) { $parameters = $parameters."&"; }
+                                        $parameters = $parameters."status=1";
+                                                
+                                        if (!empty($_GET["sort"])) {
+                                            if (strlen($parameters) > 1) { $parameters = $parameters."&"; }
+                                            $parameters = $parameters."sort=".$_GET["sort"];
+                                        }
+
+                                        if (strlen($parameters) > 1) { ?>
+                                            href="<?= "interns.php".$parameters ?>" <?php
+                                        } else { ?>
+                                            href="<?= "interns.php" ?>" <?php
+                                        } ?>>Active</a></li>
+                                    <li><a class="dropdown-item btn-smoke" <?php
+                                        $parameters = "?";
+                                        if (!empty($_GET["search"])) {
+                                            $parameters = $parameters."search=".$_GET["search"];
+                                        }
+
+                                        if (!empty($_GET["department"])) {
+                                            if (strlen($parameters) > 1) { $parameters = $parameters."&"; }
+                                            $parameters = $parameters."department=".$_GET["department"];
+                                        }
+
+                                        if (strlen($parameters) > 1) { $parameters = $parameters."&"; }
+                                        $parameters = $parameters."status=2";
+                                                
+                                        if (!empty($_GET["sort"])) {
+                                            if (strlen($parameters) > 1) { $parameters = $parameters."&"; }
+                                            $parameters = $parameters."sort=".$_GET["sort"];
+                                        }
+
+                                        if (strlen($parameters) > 1) { ?>
+                                            href="<?= "interns.php".$parameters ?>" <?php
+                                        } else { ?>
+                                            href="<?= "interns.php" ?>" <?php
+                                        } ?>>Offboarded</a></li>
+                                    <li><a class="dropdown-item btn-smoke" <?php
+                                        $parameters = "?";
+                                        if (!empty($_GET["search"])) {
+                                            $parameters = $parameters."search=".$_GET["search"];
+                                        }
+
+                                        if (!empty($_GET["department"])) {
+                                            if (strlen($parameters) > 1) { $parameters = $parameters."&"; }
+                                            $parameters = $parameters."department=".$_GET["department"];
+                                        }
+
+                                        if (strlen($parameters) > 1) { $parameters = $parameters."&"; }
+                                        $parameters = $parameters."status=3";
+                                                
+                                        if (!empty($_GET["sort"])) {
+                                            if (strlen($parameters) > 1) { $parameters = $parameters."&"; }
+                                            $parameters = $parameters."sort=".$_GET["sort"];
+                                        }
+
+                                        if (strlen($parameters) > 1) { ?>
+                                            href="<?= "interns.php".$parameters ?>" <?php
+                                        } else { ?>
+                                            href="<?= "interns.php" ?>" <?php
+                                        } ?>>Withdrawn</a></li>
+                                    <li><a class="dropdown-item btn-smoke" <?php
+                                        $parameters = "?";
+                                        if (!empty($_GET["search"])) {
+                                            $parameters = $parameters."search=".$_GET["search"];
+                                        }
+
+                                        if (!empty($_GET["department"])) {
+                                            if (strlen($parameters) > 1) { $parameters = $parameters."&"; }
+                                            $parameters = $parameters."department=".$_GET["department"];
+                                        }
+
+                                        if (strlen($parameters) > 1) { $parameters = $parameters."&"; }
+                                        $parameters = $parameters."status=4";
+                                                
+                                        if (!empty($_GET["sort"])) {
+                                            if (strlen($parameters) > 1) { $parameters = $parameters."&"; }
+                                            $parameters = $parameters."sort=".$_GET["sort"];
+                                        }
+
+                                        if (strlen($parameters) > 1) { ?>
+                                            href="<?= "interns.php".$parameters ?>" <?php
+                                        } else { ?>
+                                            href="<?= "interns.php" ?>" <?php
+                                        } ?>>Extended</a></li>
+                                    <li><a class="dropdown-item btn-smoke" <?php
+                                        $parameters = "?";
+                                        if (!empty($_GET["search"])) {
+                                            $parameters = $parameters."search=".$_GET["search"];
+                                        }
+
+                                        if (!empty($_GET["department"])) {
+                                            if (strlen($parameters) > 1) { $parameters = $parameters."&"; }
+                                            $parameters = $parameters."department=".$_GET["department"];
+                                        }
+
+                                        if (strlen($parameters) > 1) { $parameters = $parameters."&"; }
+                                        $parameters = $parameters."status=5";
+                                                
+                                        if (!empty($_GET["sort"])) {
+                                            if (strlen($parameters) > 1) { $parameters = $parameters."&"; }
+                                            $parameters = $parameters."sort=".$_GET["sort"];
+                                        }
+
+                                        if (strlen($parameters) > 1) { ?>
+                                            href="<?= "interns.php".$parameters ?>" <?php
+                                        } else { ?>
+                                            href="<?= "interns.php" ?>" <?php
+                                        } ?>>Suspended</a></li>
+                                    <li><a class="dropdown-item btn-smoke" <?php
+                                        $parameters = "?";
+                                        if (!empty($_GET["search"])) {
+                                            $parameters = $parameters."search=".$_GET["search"];
+                                        }
+
+                                        if (!empty($_GET["department"])) {
+                                            if (strlen($parameters) > 1) { $parameters = $parameters."&"; }
+                                            $parameters = $parameters."department=".$_GET["department"];
+                                        }
+
+                                        if (strlen($parameters) > 1) { $parameters = $parameters."&"; }
+                                        $parameters = $parameters."status=6";
+                                                
+                                        if (!empty($_GET["sort"])) {
+                                            if (strlen($parameters) > 1) { $parameters = $parameters."&"; }
+                                            $parameters = $parameters."sort=".$_GET["sort"];
+                                        }
+
+                                        if (strlen($parameters) > 1) { ?>
+                                            href="<?= "interns.php".$parameters ?>" <?php
+                                        } else { ?>
+                                            href="<?= "interns.php" ?>" <?php
+                                        } ?>>Terminated</a></li>
                                 </ul>
                             </div>
                             <!--SORTING DROPDOWN-->
@@ -250,7 +489,7 @@
                                                 echo "Newest Intern";
                                                 break;
                                         }
-                                    }?>
+                                    } ?>
                                 </button>
                                 <ul class="dropdown-menu me-2z" aria-labelledby="dropdownMenuButton1" name="sort">
                                     <li><a class="dropdown-item btn-smoke" <?php
@@ -262,6 +501,11 @@
                                         if (!empty($_GET["department"])) {
                                             if (strlen($parameters) > 1) { $parameters = $parameters."&"; }
                                             $parameters = $parameters."department=".$_GET["department"];
+                                        }
+
+                                        if (isset($_GET["status"])) {
+                                            if (strlen($parameters) > 1) { $parameters = $parameters."&"; }
+                                            $parameters = $parameters."status=".$_GET["status"];
                                         }
 
                                         if (strlen($parameters) > 1) { ?>
@@ -278,6 +522,11 @@
                                         if (!empty($_GET["department"])) {
                                             if (strlen($parameters) > 1) { $parameters = $parameters."&"; }
                                             $parameters = $parameters."department=".$_GET["department"];
+                                        }
+
+                                        if (isset($_GET["status"])) {
+                                            if (strlen($parameters) > 1) { $parameters = $parameters."&"; }
+                                            $parameters = $parameters."status=".$_GET["status"];
                                         }
 
                                         if (strlen($parameters) > 1) { $parameters = $parameters."&"; }
@@ -298,6 +547,11 @@
                                             if (strlen($parameters) > 1) { $parameters = $parameters."&"; }
                                             $parameters = $parameters."department=".$_GET["department"];
                                         }
+
+                                        if (isset($_GET["status"])) {
+                                            if (strlen($parameters) > 1) { $parameters = $parameters."&"; }
+                                            $parameters = $parameters."status=".$_GET["status"];
+                                        }
                                         
                                         if (strlen($parameters) > 1) { $parameters = $parameters."&"; }
                                         $parameters = $parameters."sort=2";
@@ -316,6 +570,11 @@
                                         if (!empty($_GET["department"])) {
                                             if (strlen($parameters) > 1) { $parameters = $parameters."&"; }
                                             $parameters = $parameters."department=".$_GET["department"];
+                                        }
+
+                                        if (isset($_GET["status"])) {
+                                            if (strlen($parameters) > 1) { $parameters = $parameters."&"; }
+                                            $parameters = $parameters."status=".$_GET["status"];
                                         }
                                         
                                         if (strlen($parameters) > 1) { $parameters = $parameters."&"; }
@@ -336,6 +595,11 @@
                                             if (strlen($parameters) > 1) { $parameters = $parameters."&"; }
                                             $parameters = $parameters."department=".$_GET["department"];
                                         }
+
+                                        if (isset($_GET["status"])) {
+                                            if (strlen($parameters) > 1) { $parameters = $parameters."&"; }
+                                            $parameters = $parameters."status=".$_GET["status"];
+                                        }
                                         
                                         if (strlen($parameters) > 1) { $parameters = $parameters."&"; }
                                         $parameters = $parameters."sort=4";
@@ -354,7 +618,9 @@
                                     <div class="modal-content">
                                         <div class="modal-header">
                                             <h5 class="modal-title" id="addInternModalLabel">Add Intern</h5>
-                                            <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Close"></button>
+                                            <button class="btn btn-danger btn-sm text-light" data-bs-dismiss="modal">
+                                                <i class="fa-solid fa-close"></i>
+                                            </button>
                                         </div>
 
                                         <form action="<?= htmlspecialchars($_SERVER["PHP_SELF"]);?>" method="post">
@@ -365,7 +631,7 @@
                                                         <div class="input-group">
                                                             <input type="text" name="intern_id" class="form-control" disabled>
                                                             <div class="input-group-append">
-                                                                <button type="button" class="btn btn-smoke border-dark">Regen</button>
+                                                                <button type="button" class="btn btn-smoke">Regen</button>
                                                             </div>
                                                         </div>
                                                     </div> -->
@@ -473,6 +739,12 @@
                         }
                         $conditions = $conditions." departments.name=:dept_name";
                     }
+                    if (isset($_GET["status"])) {
+                        if (strlen($conditions) > 6) {
+                            $conditions = $conditions." AND";
+                        }
+                        $conditions = $conditions." intern_wsap_information.status=:status";
+                    }
 
                     $query = "SELECT intern_personal_information.id AS intern_id, intern_personal_information.*, intern_wsap_information.*, departments.*
                     FROM intern_personal_information, intern_wsap_information, departments";
@@ -486,6 +758,9 @@
                         if (!empty($_GET["department"])) {
                             $db->selectDepartment($_GET["department"]);
                         }
+                        if (isset($_GET["status"])) {
+                            $db->selectStatus($_GET["status"]);
+                        }
                     }
                     $db->execute();
 
@@ -498,7 +773,9 @@
                                 <div class="modal-content">
                                     <div class="modal-header">
                                         <h5 class="modal-title" id="removeAccountModalLabel">Remove Account</h5>
-                                        <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Close"></button>
+                                        <button class="btn btn-danger btn-sm text-light" data-bs-dismiss="modal">
+                                            <i class="fa-solid fa-close"></i>
+                                        </button>
                                     </div>
                                     
                                     <form action="<?= htmlspecialchars($_SERVER["PHP_SELF"]);?>" method="post">
@@ -511,7 +788,7 @@
                                                         } else {
                                                             echo "../Assets/img/profile_imgs/default_female.png";
                                                         }
-                                                    } ?>" onerror="this.src='../Assets/img/profile_imgs/no_image_found.jpeg';">
+                                                    } ?>" onerror="this.src='../Assets/img/no_image_found.jpeg';">
                                                 </div>
                                                 <div class="summary-total mt-2 w-fit mx-auto">
                                                     <h5 class="text-dark fs-regular mb-0">
@@ -558,7 +835,7 @@
                                             echo "../Assets/img/profile_imgs/default_male.png";
                                         } else {
                                             echo "../Assets/img/profile_imgs/default_female.png";
-                                        } ?>" onerror="this.src='../Assets/img/profile_imgs/no_image_found.jpeg';">
+                                        } ?>" onerror="this.src='../Assets/img/no_image_found.jpeg';">
                                 </div>
                                 <div class="summary-total mt-2 w-fit mx-auto">
                                     <h5 class="mb-0 text-dark fs-regular">
@@ -628,6 +905,12 @@
                     }
                     $conditions = $conditions." departments.name=:dept_name";
                 }
+                if (isset($_GET["status"])) {
+                    if (strlen($conditions) > 6) {
+                        $conditions = $conditions." AND";
+                    }
+                    $conditions = $conditions." intern_wsap_information.status=:status";
+                }
 
                 $query = "SELECT intern_personal_information.id AS intern_id, intern_personal_information.*, 
                 intern_wsap_information.*, intern_accounts.*,  departments.*
@@ -641,6 +924,9 @@
                     }
                     if (!empty($_GET["department"])) {
                         $db->selectDepartment($_GET["department"]);
+                    }
+                    if (isset($_GET["status"])) {
+                        $db->selectStatus($_GET["status"]);
                     }
                 }
                 $db->execute();
@@ -662,7 +948,7 @@
                                         } else {
                                             echo $row["image"];
                                         }
-                                    } ?>" onerror="this.src='../Assets/img/profile_imgs/no_image_found.jpeg';">
+                                    } ?>" onerror="this.src='../Assets/img/no_image_found.jpeg';">
                                 </div>
                                 <div class="summary-total mt-2 w-fit mx-auto">
                                     <h5 class="mb-0 text-dark fs-regular">
@@ -691,7 +977,7 @@
                                         <p class="bg-secondary text-light rounded w-fit m-auto px-2 py-1 fs-d">
                                             Offboarded
                                         </p> <?php
-                                    }   else if ($row["status"] == 4) { ?>
+                                    }   else if ($row["status"] == 3) { ?>
                                         <p class="bg-dark text-light rounded w-fit m-auto px-2 py-1 fs-d">
                                             Withdrawn
                                         </p> <?php

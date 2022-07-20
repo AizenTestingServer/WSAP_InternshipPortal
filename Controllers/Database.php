@@ -106,6 +106,11 @@ class Database {
         $this->stmt->bindValue(":start_week_date", $overtime_data[2]);
     }
 
+    function updateTargetOvertimeData($overtime_data) {
+        $this->stmt->bindValue(":overtime_hours_left", $overtime_data[0]);
+        $this->stmt->bindValue(":id", $overtime_data[1]);
+    }
+
     function setOvertimeHoursLeft($new_overtime_hours_left) {
         $this->stmt->bindValue(":overtime_hours_left", $new_overtime_hours_left);
     }
@@ -115,7 +120,11 @@ class Database {
         $this->stmt->bindValue(":att_date", $attendance[1]);
         $this->stmt->bindValue(":time_in", $attendance[2]);
         $this->stmt->bindValue(":time_out", $attendance[3]);
-        $this->stmt->bindValue(":rendered_hours", $attendance[4]);
+        $this->stmt->bindValue(":regular_hours", $attendance[4]);
+        $this->stmt->bindValue(":ot_hours", $attendance[5]);
+        $this->stmt->bindValue(":rendered_hours", $attendance[6]);
+        $this->stmt->bindValue(":time_in_gps_image", $attendance[7]);
+        $this->stmt->bindValue(":time_out_gps_image", $attendance[8]);
     }
 
     function timeOut($attendance) {
@@ -123,9 +132,26 @@ class Database {
         $this->stmt->bindValue(":id", $attendance[1]);
     }
 
+    function setTimeOutGPSImage($attendance) {
+        $this->stmt->bindValue(":time_out_gps_image", $attendance[0]);
+        $this->stmt->bindValue(":id", $attendance[1]);
+    }
+
     function setAttRenderedHours($attendance) {
         $this->stmt->bindValue(":rendered_hours", $attendance[0]);
         $this->stmt->bindValue(":id", $attendance[1]);
+    }
+
+    function setOTHours($attendance) {
+        $this->stmt->bindValue(":ot_hours", $attendance[0]);
+        $this->stmt->bindValue(":id", $attendance[1]);
+    }
+
+    function setAttHours($attendance) {
+        $this->stmt->bindValue(":regular_hours", $attendance[0]);
+        $this->stmt->bindValue(":ot_hours", $attendance[1]);
+        $this->stmt->bindValue(":rendered_hours", $attendance[2]);
+        $this->stmt->bindValue(":id", $attendance[3]);
     }
 
     function selectInternIdAndTimeOut($value) {
@@ -274,6 +300,10 @@ class Database {
 
     function selectDepartment($dept_name) {
         $this->stmt->bindValue(":dept_name", $dept_name);
+    }
+
+    function selectStatus($status) {
+        $this->stmt->bindValue(":status", $status);
     }
 
     function selectRoleName($role_name) {

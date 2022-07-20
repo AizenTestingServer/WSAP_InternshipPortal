@@ -156,7 +156,9 @@
                     <div class="modal-content">
                         <div class="modal-header">
                             <h5 class="modal-title" id="addInternModalLabel">Add Intern</h5>
-                            <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Close"></button>
+                            <button class="btn btn-danger btn-sm text-light" data-bs-dismiss="modal">
+                                <i class="fa-solid fa-close"></i>
+                            </button>
                         </div>
 
                         <form action="<?= htmlspecialchars($_SERVER["PHP_SELF"]);?>" method="post">
@@ -167,7 +169,7 @@
                                         <div class="input-group">
                                             <input type="text" name="intern_id" class="form-control" disabled>
                                             <div class="input-group-append">
-                                                <button type="button" class="btn btn-smoke border-dark">Regen</button>
+                                                <button type="button" class="btn btn-smoke">Regen</button>
                                             </div>
                                         </div>
                                     </div> -->
@@ -477,7 +479,9 @@
                                     <div class="modal-content">
                                         <div class="modal-header">
                                             <h5 class="modal-title" id="removeAccountModalLabel">Remove Account</h5>
-                                            <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Close"></button>
+                                            <button class="btn btn-danger btn-sm text-light" data-bs-dismiss="modal">
+                                                <i class="fa-solid fa-close"></i>
+                                            </button>
                                         </div>
                                         
                                         <form action="<?= htmlspecialchars($_SERVER["PHP_SELF"]);?>" method="post">
@@ -490,7 +494,7 @@
                                                             } else {
                                                                 echo "../Assets/img/profile_imgs/default_female.png";
                                                             }
-                                                        } ?>" onerror="this.src='../Assets/img/profile_imgs/no_image_found.jpeg';">
+                                                        } ?>" onerror="this.src='../Assets/img/no_image_found.jpeg';">
                                                     </div>
                                                     <div class="summary-total mt-2 w-fit mx-auto">
                                                         <h5 class="text-dark fs-regular mb-0">
@@ -522,7 +526,7 @@
                                                 echo "../Assets/img/profile_imgs/default_male.png";
                                             } else {
                                                 echo "../Assets/img/profile_imgs/default_female.png";
-                                            } ?>" onerror="this.src='../Assets/img/profile_imgs/no_image_found.jpeg';">
+                                            } ?>" onerror="this.src='../Assets/img/no_image_found.jpeg';">
                                     </div>
                                     <div class="summary-total mt-2 w-fit mx-auto">
                                         <h5 class="mb-0 text-dark fs-regular">

@@ -255,6 +255,9 @@
                                             $att_year = date("Y", strtotime($att["att_date"]));
 
                                             if ($att_day == $i && $att_month == $selected_month && $att_year == $selected_year) {
+                                                $rendered_hours = $att["regular_hours"];
+                                                $ot_hours = $att["rendered_hours"] - $att["regular_hours"];
+
                                                 $time_in_am = $att["time_in"];
                                                 $time_out_pm = $att["time_out"];
 
@@ -267,20 +270,6 @@
                                                     }                                    
                                                     if (strlen($time_out_pm) > 8) {
                                                         $time_out_pm = trim(substr($time_out_pm, 0, 8));
-                                                    }
-
-                                                    if (isMorningShift($time_in_am, $time_out_pm) || isAfternoonShift($time_in_am, $time_out_pm)) {
-                                                        $rendered_hours = 4;
-                                                    } else {
-                                                        $rendered_hours = 8;
-                                                    }
-
-                                                    if (isOvertime($time_out_pm)) {
-                                                        $dt_time_out_start = new DateTime(date("G:i", $date->time_out_start()));
-                                                        $dt_time_out = new DateTime(date("G:i", strtotime($time_out_pm)));
-                                                        $ot_hours += $dt_time_out_start->diff($dt_time_out)->format("%h");
-                                                        $rendered_minutes = $dt_time_out_start->diff($dt_time_out)->format("%i");
-                                                        $ot_hours += round($rendered_minutes/60, 1);
                                                     }
                                                 }
                                                 
@@ -317,8 +306,7 @@
                                                 if (empty($time_in_am) && empty($time_in_pm) && empty($time_out_am) && empty($time_out_pm)) {
                                                     $rendered_hours = "";
                                                     $ot_hours = "";
-                                                }
-                                                ?>
+                                                } ?>
 
                                                 <td><?= $time_in_am ?></td>
                                                 <td><?= $time_out_am ?></td>

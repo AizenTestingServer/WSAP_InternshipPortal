@@ -468,7 +468,9 @@
                     <div class="modal-content">
                         <div class="modal-header">
                             <h5 class="modal-title" id="addNewModalLabel">Add</h5>
-                            <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Close"></button>
+                            <button class="btn btn-danger btn-sm text-light" data-bs-dismiss="modal">
+                                <i class="fa-solid fa-close"></i>
+                            </button>
                         </div>
 
                         <form action="<?= htmlspecialchars($_SERVER["PHP_SELF"]);?>" method="post">
@@ -547,7 +549,7 @@
                                     disabled <?php
                                 } ?>>Submit Completed
                             </button>
-                            <button class="btn btn-smoke border-dark mb-2" <?php
+                            <button class="btn btn-smoke mb-2" <?php
                                 if ($tasks_count == 0 || !isDATEnabled()) { ?>
                                     disabled <?php
                                 } ?>>
@@ -636,7 +638,7 @@
                                                 } else {
                                                     echo $birthday_celebrant["image"];
                                                 }
-                                            } ?>" onerror="this.src='../Assets/img/profile_imgs/no_image_found.jpeg';">
+                                            } ?>" onerror="this.src='../Assets/img/no_image_found.jpeg';">
                                         </div>
                                         <div class="summary-total mt-2 w-fit mx-auto">
                                             <h5 class="mb-0 text-dark fs-regular">
@@ -690,7 +692,7 @@
                                     </div>
                                 </div>
                                 <div class="task-box-action d-flex justify-content-end align-items-center">
-                                    <a class="btn btn-danger" href="attendance.php">Time out</a>
+                                    <a class="btn btn-smoke" href="attendance.php">Time out</a>
                                 </div>
                             </div> <?php
                         }
@@ -738,7 +740,9 @@
                                     <div class="modal-content">
                                         <div class="modal-header">
                                             <h5 class="modal-title" id="editModalLabel<?= $row["id"] ?>">Update</h5>
-                                            <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Close"></button>
+                                            <button class="btn btn-danger btn-sm text-light" data-bs-dismiss="modal">
+                                                <i class="fa-solid fa-close"></i>
+                                            </button>
                                         </div>
 
                                         <form action="<?= htmlspecialchars($_SERVER["PHP_SELF"]);?>" method="post">
@@ -796,7 +800,9 @@
                                     <div class="modal-content">
                                         <div class="modal-header">
                                             <h5 class="modal-title" id="removeTaskModalLabel">Remove Task</h5>
-                                            <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Close"></button>
+                                            <button class="btn btn-danger btn-sm text-light" data-bs-dismiss="modal">
+                                                <i class="fa-solid fa-close"></i>
+                                            </button>
                                         </div>
                                         
                                         <form action="<?= htmlspecialchars($_SERVER["PHP_SELF"]);?>" method="post">

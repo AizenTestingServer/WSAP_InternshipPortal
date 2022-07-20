@@ -117,7 +117,7 @@
                                 <div class="input-group">
                                     <input type="text" class="form-control" value="<?= $selected_date ?>" disabled>
                                     <div class="input-group-append">
-                                        <a class="btn btn-smoke border-dark" href="calendar.php?destination=no_time_out_interns">Select Date</a>
+                                        <a class="btn btn-smoke" href="calendar.php?destination=no_time_out_interns">Select Date</a>
                                     </div>
                                 </div>
                             </div>
@@ -341,8 +341,6 @@
                             }
                         }
                         $db->execute();
-                        
-                        $conditions = array("AU", "AE", "MS", "AS", "OT", "OD", "L", "NTO");
 
                         $text = "\"No Time out Interns: ".$selected_date."\\n\\n\"\n";
 
@@ -372,7 +370,7 @@
                                             } else {
                                                 echo $row["image"];
                                             }
-                                        } ?>" onerror="this.src='../Assets/img/profile_imgs/no_image_found.jpeg';">
+                                        } ?>" onerror="this.src='../Assets/img/no_image_found.jpeg';">
                                     </div>
                                     <div class="summary-total mt-2 w-fit mx-auto">
                                         <h5 class="mb-0 text-dark fs-regular">
@@ -385,31 +383,27 @@
                                             <p class="m-0 fw-bold fs-e">Time in</p>
                                             <div class="d-flex align-items-center"> <?php
                                                 if (strlen($row["time_in"]) > 0) {
-                                                    if ($row["time_in"] == $conditions[0]) { ?>
+                                                    if (isAU($row["time_in"])) { ?>
                                                         <p class="bg-danger text-light rounded w-fit mx-auto fs-d px-2 py-1">
                                                             <?= $row["time_in"] ?>
                                                         </p> <?php
-                                                    }  else if ($row["time_in"] == $conditions[1]) { ?>
+                                                    }  else if (isAE($row["time_in"])) { ?>
                                                         <p class="bg-primary text-light rounded w-fit mx-auto fs-d px-2 py-1">
                                                             <?= $row["time_in"] ?>
                                                         </p> <?php
-                                                    }  else if (strlen($row["time_out"]) > 0 &&
-                                                        str_contains($row["time_out"], $conditions[2]) &&
-                                                        !str_contains($row["time_in"], $conditions[6])) { ?>
+                                                    }  else if (strlen($row["time_out"]) > 0 && isMS($row["time_out"]) && !isL($row["time_in"])) { ?>
                                                         <p class="bg-morning text-light rounded w-fit mx-auto fs-d px-2 py-1">
                                                             <?= $row["time_in"] ?>
                                                         </p> <?php
-                                                    }  else if (strlen($row["time_out"]) > 0 &&
-                                                        str_contains($row["time_out"], $conditions[3]) &&
-                                                        !str_contains($row["time_in"], $conditions[6])) { ?>
+                                                    }  else if (strlen($row["time_out"]) > 0 && isAS($row["time_out"]) && !isL($row["time_in"])) { ?>
                                                         <p class="bg-afternoon text-light rounded w-fit mx-auto fs-d px-2 py-1">
                                                             <?= $row["time_in"] ?>
                                                         </p> <?php
-                                                    }  else if (str_contains($row["time_in"], $conditions[4])) { ?>
+                                                    }  else if (isOD($row["time_in"])) { ?>
                                                         <p class="bg-dark text-light rounded w-fit mx-auto fs-d px-2 py-1">
                                                             <?= $row["time_in"] ?>
                                                         </p> <?php
-                                                    }  else if (str_contains($row["time_in"], $conditions[6])) { ?>
+                                                    }  else if (isL($row["time_in"])) { ?>
                                                         <p class="bg-warning text-dark rounded w-fit mx-auto fs-d px-2 py-1">
                                                             <?= $row["time_in"] ?>
                                                         </p> <?php
