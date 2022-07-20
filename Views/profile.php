@@ -28,6 +28,11 @@
         exit();
     }
 
+    $db->query("SELECT * FROM attendance WHERE intern_id=:intern_id ORDER BY id DESC LIMIT 1;");
+    $db->setInternId($_SESSION["intern_id"]);
+    $db->execute();
+    $lts_att = $db->fetch();
+
     $db->query("SELECT intern_wsap_information.*, intern_personal_information.*, intern_educational_information.*, intern_accounts.*
     FROM intern_wsap_information, intern_personal_information, intern_educational_information, intern_accounts
     WHERE intern_wsap_information.id=:intern_id AND
@@ -697,6 +702,10 @@
 
                                                 $estimated_weekend_days = floor(($rendering_days/5) * 2);
                                                 $rendering_days += $estimated_weekend_days;
+
+                                                if (!empty($lts_att) && $lts_att["att_date"] == $date->getDate() && !empty($lts_att["time_out"])) {
+                                                    $rendering_days += 1;
+                                                }
 
                                                 echo date("F j, Y", strtotime($date->getDate()." + ".$rendering_days." days")); ?>"
                                                 disabled> <?php

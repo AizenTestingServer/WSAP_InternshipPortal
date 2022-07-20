@@ -390,14 +390,31 @@
                 $end_day = $start_day + $min_days;
             }
 
+            $att_db = new Database();
+        
+            $att_db->query("SELECT * FROM attendance ORDER BY id DESC;");
+
             $row_count = 0;
             for ($i = $start_day; $i <= $end_day; $i++) {
                 $db->execute();
                 while ($row = $db->fetch()) {
+                    $att_db->execute();
+            
+                    while ($att_row = $att_db->fetch()) {
+                        if ($row["intern_id"] == $att_row["intern_id"]) {
+                            $row_lts_att = $att_row;
+                            break;
+                        }
+                    }
+
                     $rendering_days = floor(($row["target_rendering_hours"]-$row["rendered_hours"])/9);
 
                     $estimated_weekend_days = floor(($rendering_days/5) * 2);
                     $rendering_days += $estimated_weekend_days;
+
+                    if (!empty($row_lts_att) && $row_lts_att["att_date"] == $date->getDate() && !empty($row_lts_att["time_out"])) {
+                        $rendering_days += 1;
+                    }
 
                     $est_offboard_date = strtotime($date->getDate()." + ".$rendering_days." days");
 
@@ -412,10 +429,23 @@
                             <div class="interns"> <?php
                                 $db->execute();
                                 while ($row = $db->fetch()) {
+                                    $att_db->execute();
+                            
+                                    while ($att_row = $att_db->fetch()) {
+                                        if ($row["intern_id"] == $att_row["intern_id"]) {
+                                            $row_lts_att = $att_row;
+                                            break;
+                                        }
+                                    }
+
                                     $rendering_days = floor(($row["target_rendering_hours"]-$row["rendered_hours"])/9);
 
                                     $estimated_weekend_days = floor(($rendering_days/5) * 2);
                                     $rendering_days += $estimated_weekend_days;
+
+                                    if (!empty($row_lts_att) && $row_lts_att["att_date"] == $date->getDate() && !empty($row_lts_att["time_out"])) {
+                                        $rendering_days += 1;
+                                    }
 
                                     $est_offboard_date = strtotime($date->getDate()." + ".$rendering_days." days");
 

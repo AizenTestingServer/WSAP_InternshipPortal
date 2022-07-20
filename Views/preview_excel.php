@@ -70,6 +70,11 @@
         exit();
     }
 
+    $db->query("SELECT * FROM attendance WHERE intern_id=:intern_id ORDER BY id DESC LIMIT 1;");
+    $db->setInternId($_GET["intern_id"]);
+    $db->execute();
+    $lts_att = $db->fetch();
+
     if (isset($_POST["exportToExcel"])) {
         $_SESSION["excel"] = true;
         redirect($url);
@@ -224,6 +229,10 @@
 
                                                     $estimated_weekend_days = floor(($rendering_days/5) * 2);
                                                     $rendering_days += $estimated_weekend_days;
+
+                                                    if (!empty($lts_att) && $lts_att["att_date"] == $date->getDate() && !empty($lts_att["time_out"])) {
+                                                        $rendering_days += 1;
+                                                    }
 
                                                     echo date("F j, Y", strtotime($date->getDate()." + ".$rendering_days." days"));
                                                 } else {

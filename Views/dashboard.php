@@ -121,15 +121,32 @@
         $remind_time_out = isTimeOutEnabled($lts_att["time_in"], $lts_att["time_out"]);
     }
 
+    $att_db = new Database();
+
+    $att_db->query("SELECT * FROM attendance ORDER BY id DESC;");
+
     $db->query("SELECT * FROM intern_wsap_information WHERE status=1");
     $db->execute();
 
     $offboarding_interns = 0;
     while ($row = $db->fetch()) {
+        $att_db->execute();
+
+        while ($att_row = $att_db->fetch()) {
+            if ($row["id"] == $att_row["intern_id"]) {
+                $row_lts_att = $att_row;
+                break;
+            }
+        }
+
         $rendering_days = floor(($row["target_rendering_hours"]-$row["rendered_hours"])/9);
 
         $estimated_weekend_days = floor(($rendering_days/5) * 2);
         $rendering_days += $estimated_weekend_days;
+
+        if (!empty($row_lts_att) && $row_lts_att["att_date"] == $date->getDate() && !empty($row_lts_att["time_out"])) {
+            $rendering_days += 1;
+        }
 
         $est_offboard_date = strtotime($date->getDate()." + ".$rendering_days." days");
 
@@ -348,7 +365,13 @@
 
                         </div>
                     </div>
-                </a>
+                </a> <?php
+                
+                if (!empty($lts_att)) {
+                    $att_date = $lts_att["att_date"];
+                } else {
+                    $att_date = "";
+                } ?>
 
                 <a class="clickable-card" href="profile.php" draggable="false">
                     <div class="summary-boxes">
@@ -368,6 +391,10 @@
 
                                         $estimated_weekend_days = floor(($rendering_days/5) * 2);
                                         $rendering_days += $estimated_weekend_days;
+
+                                        if (!empty($lts_att) && $lts_att["att_date"] == $date->getDate() && !empty($lts_att["time_out"])) {
+                                            $rendering_days += 1;
+                                        }
 
                                         echo date("j M Y", strtotime($date->getDate()." + ".$rendering_days." days"));
                                     } else {
@@ -656,12 +683,6 @@
                                     </div>
                                 </div> <?php
                             }
-                        }
-                        
-                        if (!empty($lts_att)) {
-                            $att_date = $lts_att["att_date"];
-                        } else {
-                            $att_date = "";
                         }
 
                         if (isTimeInEnabled($att_date) && $intern_wsap_info["status"] == 1 && $i_am_active) {
