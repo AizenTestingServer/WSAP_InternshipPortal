@@ -106,7 +106,7 @@
                                         echo "All Departments";
                                     } else {
                                         echo $_GET["department"];
-                                    }?>
+                                    } ?>
                                 </button>
                                 <ul class="dropdown-menu" aria-labelledby="dropdownMenuButton1">
                                     <li><a class="dropdown-item btn-smoke" <?php
@@ -410,7 +410,7 @@
                                                 echo "Newest Intern";
                                                 break;
                                         }
-                                    }?>
+                                    } ?>
                                 </button>
                                 <ul class="dropdown-menu me-2z" aria-labelledby="dropdownMenuButton1" name="sort">
                                     <li><a class="dropdown-item btn-smoke" <?php

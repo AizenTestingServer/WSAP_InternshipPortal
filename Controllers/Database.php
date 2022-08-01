@@ -83,36 +83,15 @@ class Database {
         $this->stmt->bindValue(":att_date", $date);
     }
 
-    function setMonthYear($month_year) {
-        $this->stmt->bindValue(":month", $month_year[0]);
-        $this->stmt->bindValue(":year", $month_year[1]);
+    function setYearMonth($year_month) {
+        $this->stmt->bindValue(":year", $year_month[0]);
+        $this->stmt->bindValue(":month", $year_month[1]);
     }
 
     function setDate($date_value) {
         $this->stmt->bindValue(":day", $date_value[0]);
         $this->stmt->bindValue(":month", $date_value[1]);
         $this->stmt->bindValue(":year", $date_value[2]);
-    }
-
-    function setOvertimeData($overtime_data) {
-        $this->stmt->bindValue(":intern_id", $overtime_data[0]);
-        $this->stmt->bindValue(":start_week_date", $overtime_data[1]);
-        $this->stmt->bindValue(":overtime_hours_left", $overtime_data[2]);
-    }
-
-    function updateOvertimeData($overtime_data) {
-        $this->stmt->bindValue(":overtime_hours_left", $overtime_data[0]);
-        $this->stmt->bindValue(":intern_id", $overtime_data[1]);
-        $this->stmt->bindValue(":start_week_date", $overtime_data[2]);
-    }
-
-    function updateTargetOvertimeData($overtime_data) {
-        $this->stmt->bindValue(":overtime_hours_left", $overtime_data[0]);
-        $this->stmt->bindValue(":id", $overtime_data[1]);
-    }
-
-    function setOvertimeHoursLeft($new_overtime_hours_left) {
-        $this->stmt->bindValue(":overtime_hours_left", $new_overtime_hours_left);
     }
 
     function timeIn($attendance) {
@@ -326,19 +305,17 @@ class Database {
         $this->stmt->bindValue(":role_name", $roles[0]);
         $this->stmt->bindValue(":brand_id", $roles[1]);
         $this->stmt->bindValue(":dept_id", $roles[2]);
-        $this->stmt->bindValue(":max_overtime_hours", $roles[3]);
-        $this->stmt->bindValue(":admin", $roles[4]);
-        $this->stmt->bindValue(":level", $roles[5]);
+        $this->stmt->bindValue(":admin", $roles[3]);
+        $this->stmt->bindValue(":level", $roles[4]);
     }
 
     function updateRole($roles) {
         $this->stmt->bindValue(":role_name", $roles[0]);
         $this->stmt->bindValue(":brand_id", $roles[1]);
         $this->stmt->bindValue(":dept_id", $roles[2]);
-        $this->stmt->bindValue(":max_overtime_hours", $roles[3]);
-        $this->stmt->bindValue(":admin", $roles[4]);
-        $this->stmt->bindValue(":level", $roles[5]);
-        $this->stmt->bindValue(":role_id", $roles[6]);
+        $this->stmt->bindValue(":admin", $roles[3]);
+        $this->stmt->bindValue(":level", $roles[4]);
+        $this->stmt->bindValue(":role_id", $roles[5]);
     }
 
     function assignRole($intern_roles) {

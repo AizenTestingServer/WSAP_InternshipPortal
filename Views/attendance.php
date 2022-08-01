@@ -21,69 +21,15 @@
 
     $intern_wsap_info = $db->fetch();
 
-    $i_am_active = isActiveIntern($intern_wsap_info["onboard_date"], $intern_wsap_info["offboard_date"], $date->getDate());
-
-    $db->query("SELECT roles.*
-    FROM roles
-    WHERE max_overtime_hours=(SELECT MAX(roles.max_overtime_hours)
-    FROM roles, intern_roles
-    WHERE roles.id = intern_roles.role_id AND
-    intern_roles.intern_id=:intern_id) AND
-    EXISTS (SELECT * FROM intern_roles
-    WHERE roles.id = intern_roles.role_id AND
-    intern_roles.intern_id=:intern_id)
-    ORDER BY admin_level DESC LIMIT 1");
-    $db->setInternId($_SESSION["intern_id"]);
-    $db->execute();
-
-    $max_overtime_hours = $db->fetch();
-
-    if ($db->rowCount() != 0) {
-        $overtime_hours_left = $max_overtime_hours["max_overtime_hours"];
-    } else {
-        $overtime_hours_left = 10;
-    }
-
-    $db->query("SELECT * FROM overtime_hours WHERE intern_id=:intern_id ORDER BY id DESC LIMIT 1");
-    $db->setInternId($_SESSION["intern_id"]);
-    $db->execute();
-
-    $overtime_hours = $db->fetch();
-
-    $day = "friday";
-	
-	if (strtotime("today") < strtotime($day)) {
-	  $start_week_date = date("F j, Y", strtotime("last ".$day));
-	} else {
-	  $start_week_date = date("F j, Y", strtotime($day));
-	}
-
-    if ($db->rowCount() == 0 || $overtime_hours["start_week_date"] != $start_week_date) {
-        $overtime_data = array(
-            strtoupper($_SESSION["intern_id"]),
-            $start_week_date,
-            $overtime_hours_left
-        );
-
-        $db->query("INSERT INTO overtime_hours VALUES (null, :intern_id, :start_week_date, :overtime_hours_left)");
-        $db->setOvertimeData($overtime_data);
-        $db->execute();
-        $db->closeStmt();
-
-        $db->query("SELECT * FROM overtime_hours WHERE intern_id=:intern_id ORDER BY id DESC LIMIT 1");
-        $db->setInternId($_SESSION["intern_id"]);
-        $db->execute();
-    
-        $overtime_hours = $db->fetch();
-    }
+    $i_am_active = isActiveIntern($intern_wsap_info["onboard_date"], $intern_wsap_info["offboard_date"], $date->getNumericDate());
 
     if (isset($_SESSION["intern_id"])) {
-        $db->query("SELECT * FROM attendance WHERE intern_id=:intern_id ORDER BY id DESC LIMIT 1;");
+        $db->query("SELECT * FROM attendance WHERE intern_id=:intern_id ORDER BY att_date DESC, id DESC LIMIT 1;");
         $db->setInternId($_SESSION["intern_id"]);
         $db->execute();
         $lts_att = $db->fetch();
 
-        if (!empty($lts_att) && $date->getDate() != $lts_att["att_date"]) {
+        if (!empty($lts_att) && $date->getNumericDate() != $lts_att["att_date"]) {
             if (empty($lts_att["time_out"])) {
                 $attendance = array(
                     "NTO",
@@ -138,7 +84,7 @@
                             $image_name
                         );
 
-                        if ($date->getDateTimeValue() > $date->morning_briefing() && $date->getDateTimeValue() < $date->morning_shift_end()) {
+                        if (isLateTimeIn($date->getTime())) {
                             $time_in = $date->getTime()." L";
                         } else {
                             $time_in = $date->getTime();
@@ -146,7 +92,7 @@
             
                         $attendance = array(
                             strtoupper($_SESSION["intern_id"]),
-                            $date->getDate(),
+                            $date->getNumericDate(),
                             $time_in,
                             null,
                             0,
@@ -287,7 +233,7 @@
                             $db->closeStmt();
 
                             if ($rendered_hours >= $wsap_info["target_rendering_hours"]) {
-                                $offboard_date = date("Y-m-d", strtotime($date->getDate()));
+                                $offboard_date = $date->getNumericDate();
 
                                 $offboard = array(
                                     $offboard_date,
@@ -317,12 +263,6 @@
                                 $db->execute();
                                 $db->closeStmt();
                             }
-
-                            $computed_overtime_hours = array(
-                                $computed_overtime_hours_left,
-                                $_SESSION["intern_id"],
-                                $start_week_date
-                            );
                         }
                     } else {
                         $_SESSION["error"] = "The file must be an image!";
@@ -377,16 +317,10 @@
                     $rendered_minutes = $dt_time_out_start->diff($dt_time_out)->format("%i");
                     $rendered_overtime_hours += round($rendered_minutes/60, 1);
 
-                    if ($rendered_overtime_hours > $overtime_hours["overtime_hours_left"]) {
-                        $rendered_overtime_hours = $overtime_hours["overtime_hours_left"];
-                    }
-
                     if ($rendered_overtime_hours > 4) {
                         $rendered_overtime_hours = 4;
                     }
                 }
-                
-                $computed_overtime_hours_left = $overtime_hours["overtime_hours_left"] - $rendered_overtime_hours;
                 
                 $attendance = array(
                     $rendered_overtime_hours,
@@ -395,18 +329,6 @@
 
                 $db->query("UPDATE attendance SET ot_hours=:ot_hours WHERE id=:id");
                 $db->setOTHours($attendance);
-                $db->execute();
-                $db->closeStmt();
-
-                $computed_overtime_hours = array(
-                    $computed_overtime_hours_left,
-                    $_SESSION["intern_id"],
-                    $start_week_date
-                );
-    
-                $db->query("UPDATE overtime_hours SET overtime_hours_left=:overtime_hours_left 
-                WHERE intern_id=:intern_id AND start_week_date=:start_week_date");
-                $db->updateOvertimeData($computed_overtime_hours);
                 $db->execute();
                 $db->closeStmt();
             }
@@ -514,23 +436,6 @@
                 <div class="w-fit my-2 ms-2">
                     <p class="text-danger fw-bold">Only an active intern can time in and time out.</p>
                 </div> <?php
-            } else { ?>
-                <div class="w-fit my-2 ms-2">
-                    <h6 class="<?php
-                        if ($overtime_hours["overtime_hours_left"] == $overtime_hours_left) {
-                            ?> text-success <?php
-                        } else if ($overtime_hours["overtime_hours_left"] == 0 ||
-                            $overtime_hours["overtime_hours_left"]  > $overtime_hours_left) {
-                            ?> text-danger <?php
-                        } else {
-                            ?> text-primary <?php
-                        }
-                    ?>">
-                        <b><?= $overtime_hours["overtime_hours_left"] ?> Overtime Hours Left</b>
-                        since <?= $overtime_hours["start_week_date"] ?>
-                        <i>(Resets every <?= ucwords($day) ?>)</i>.
-                    </h6>
-                </div> <?php
             }
             if (isset($_SESSION["error"])) { ?>
                 <div class="alert alert-danger attendance-alert text-danger my-2">
@@ -576,7 +481,6 @@
             </div>
         </div>
 
-
         <!-- Time out Modal -->
         <div class="modal fade" id="timeOutModal" tabindex="-1" aria-labelledby="timeOutModalLabel" aria-hidden="true">
             <div class="modal-dialog modal-dialog-centered">
@@ -610,7 +514,6 @@
             </div>
         </div>
 
-
         <!-- Time out (Overtime) Modal -->
         <div class="modal fade" id="timeOutOvertimeModal" tabindex="-1" aria-labelledby="timeOutOvertimeModalLabel" aria-hidden="true">
             <div class="modal-dialog modal-dialog-centered">
@@ -640,7 +543,7 @@
             </div>
         </div>
 
-        <div class="att-ctrl-buttons d-flex align-items-center mb-3">
+        <div class="att-ctrl-buttons d-flex align-items-center mt-2 mb-3">
             <div class="dropdown align-center me-2">
                 <button class="btn btn-light border-dark dropdown-toggle" type="button" id="dropdownMenuButton1"
                     data-bs-toggle="dropdown" aria-expanded="false" name="department"> <?php
@@ -744,13 +647,16 @@
                 <?php
                 if (isset($_SESSION["intern_id"])) {                
                     if (!empty($_GET["month"]) && !empty($_GET["year"])) {
-                        $month_year = array($_GET["month"], $_GET["year"]);
+                        $date_text = date("Y-m-d", strtotime($_GET["month"]." 1, ".$_GET["year"]));
+                        $year = explode("-", $date_text)[0];
+                        $month = explode("-", $date_text)[1];
+                        $year_month = array($year, $month);
                         
                         $db->query("SELECT * FROM attendance WHERE intern_id=:intern_id AND
-                        att_date LIKE CONCAT(:month, '%', :year) ORDER BY id DESC");
-                        $db->setMonthYear($month_year);
+                        att_date LIKE CONCAT(:year, '-', :month, '%') ORDER BY att_date DESC, id DESC");
+                        $db->setYearMonth($year_month);
                     } else {
-                        $db->query("SELECT * FROM attendance WHERE intern_id=:intern_id ORDER BY id DESC");
+                        $db->query("SELECT * FROM attendance WHERE intern_id=:intern_id ORDER BY att_date DESC, id DESC");
                     }
                     $db->setInternId($_SESSION["intern_id"]);
                     $db->execute();
@@ -766,7 +672,7 @@
                                     <div class="modal-content">
                                         <div class="modal-header">
                                             <div class="modal-title" id="gpsImageModalModalLabel">
-                                                <h5><?= $row["att_date"]." | ".date("l", strtotime($row["att_date"])) ?></h5>
+                                                <h5><?= date("F j, Y", strtotime($row["att_date"]))." | ".date("l", strtotime($row["att_date"])) ?></h5>
                                             </div>
                                             <button class="btn btn-danger btn-sm text-light" data-bs-dismiss="modal">
                                                 <i class="fa-solid fa-close"></i>
@@ -866,7 +772,7 @@
                             </div>
 
                             <th scope="row"><?= $count ?></th>
-                            <td><?= $row["att_date"] ?></td>
+                            <td><?= date("F j, Y", strtotime($row["att_date"])) ?></td>
                             <td><?= date("l", strtotime($row["att_date"])) ?></td>
                             <td> <?php
                                 if (strlen($row["time_in"]) > 0) {

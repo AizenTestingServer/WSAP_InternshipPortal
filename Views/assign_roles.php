@@ -106,7 +106,7 @@
             $log_value);
     
             $db->query("INSERT INTO audit_logs
-            VALUES (null, :timestamp, :intern_id, :log)");
+            VALUES (NULL, :timestamp, :intern_id, :log)");
             $db->log($log);
             $db->execute();
             $db->closeStmt();
@@ -415,7 +415,7 @@
                                             echo "All Departments";
                                         } else {
                                             echo $_GET["department"];
-                                        }?>
+                                        } ?>
                                     </button>
                                     <ul class="dropdown-menu" aria-labelledby="dropdownMenuButton1">
                                         <li><a class="dropdown-item btn-smoke" <?php
@@ -484,7 +484,7 @@
                                             echo "All Brands";
                                         } else {
                                             echo $_GET["brand"];
-                                        }?>
+                                        } ?>
                                     </button>
                                     <ul class="dropdown-menu" aria-labelledby="dropdownMenuButton1">
                                         <li><a class="dropdown-item btn-smoke" <?php
@@ -566,7 +566,7 @@
                                                     echo "Lowest Level";
                                                     break;
                                             }
-                                        }?>
+                                        } ?>
                                     </button>
                                     <ul class="dropdown-menu me-2z" aria-labelledby="dropdownMenuButton1" name="sort">
                                         <li><a class="dropdown-item btn-smoke" <?php
@@ -850,7 +850,7 @@
                                             echo "All Departments";
                                         } else {
                                             echo $_GET["department"];
-                                        }?>
+                                        } ?>
                                     </button>
                                     <ul class="dropdown-menu" aria-labelledby="dropdownMenuButton1">
                                         <li><a class="dropdown-item btn-smoke" <?php
@@ -1154,7 +1154,7 @@
                                                     echo "Newest Intern";
                                                     break;
                                             }
-                                        }?>
+                                        } ?>
                                     </button>
                                     <ul class="dropdown-menu me-2z" aria-labelledby="dropdownMenuButton1" name="sort">
                                         <li><a class="dropdown-item btn-smoke" <?php

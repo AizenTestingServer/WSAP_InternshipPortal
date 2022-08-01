@@ -170,7 +170,10 @@
                                             $selected_year = date("Y", strtotime($_GET["year"]));
                                             $number_of_days = cal_days_in_month(CAL_GREGORIAN, $selected_month, $selected_year);
 
-                                            for ($i = 1; $i <= $number_of_days; $i++) { ?>
+                                            for ($i = 1; $i <= $number_of_days; $i++) {
+                                                if (strlen($i) == 1) {
+                                                    $i = "0".$i;
+                                                } ?>
                                                 <li>
                                                     <a class="dropdown-item btn-smoke" <?php
                                                     $parameters = "?";
@@ -273,7 +276,7 @@
                                         echo "All Departments";
                                     } else {
                                         echo $_GET["department"];
-                                    }?>
+                                    } ?>
                                 </button>
                                 <ul class="dropdown-menu" aria-labelledby="dropdownMenuButton1">
                                     <li><a class="dropdown-item btn-smoke" <?php
@@ -353,7 +356,7 @@
                         unset($_SESSION["role_success"]);
                     ?>
                 </div> <?php
-            }?>
+            } ?>
             <table class="table fs-d text-center mt-2">
                 <thead>
                     <tr>

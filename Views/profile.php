@@ -703,11 +703,11 @@
                                                 $estimated_weekend_days = floor(($rendering_days/5) * 2);
                                                 $rendering_days += $estimated_weekend_days;
 
-                                                if (!empty($lts_att) && $lts_att["att_date"] == $date->getDate() && !empty($lts_att["time_out"])) {
+                                                if (!empty($lts_att) && $lts_att["att_date"] == $date->getNumericDate() && !empty($lts_att["time_out"])) {
                                                     $rendering_days += 1;
                                                 }
 
-                                                echo date("F j, Y", strtotime($date->getDate()." + ".$rendering_days." days")); ?>"
+                                                echo date("F j, Y", strtotime($date->getNumericDate()." + ".$rendering_days." days")); ?>"
                                                 disabled> <?php
                                             } else { ?>
                                                 <label class="mb-2" for="offboardDate">Offboard Date</label>

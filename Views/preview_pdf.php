@@ -172,16 +172,17 @@
                 </div> <?php
                 
                 if (!empty($_GET["month"]) && !empty($_GET["year"])) {
-                    $month_year = array($_GET["month"], $_GET["year"]);
+                    $date_text = date("Y-m-d", strtotime($_GET["month"]." 1, ".$_GET["year"]));
+                    $year = explode("-", $date_text)[0];
+                    $month = explode("-", $date_text)[1];
+                    $year_month = array($year, $month);
 
-                    $db->query("SELECT DISTINCT SUBSTRING_INDEX(att_date, ' ', 1) AS month,
-                    SUBSTRING_INDEX(att_date, ' ', -1) AS year
+                    $db->query("SELECT DISTINCT SUBSTRING_INDEX(att_date, '-', 2) AS month_year
                     FROM attendance WHERE intern_id=:intern_id AND
-                    att_date LIKE CONCAT(:month, '%', :year);");
-                    $db->setMonthYear($month_year);
+                    att_date LIKE CONCAT(:year, '-', :month, '%');");
+                    $db->setYearMonth($year_month);
                 } else {
-                    $db->query("SELECT DISTINCT SUBSTRING_INDEX(att_date, ' ', 1) AS month,
-                    SUBSTRING_INDEX(att_date, ' ', -1) AS year
+                    $db->query("SELECT DISTINCT SUBSTRING_INDEX(att_date, '-', 2) AS month_year
                     FROM attendance WHERE intern_id=:intern_id;");
                 }
                 $db->setInternId($_GET["intern_id"]);
@@ -189,7 +190,7 @@
                 
                 $att_db = new Database();
 
-                $att_db->query("SELECT * FROM attendance WHERE intern_id=:intern_id");
+                $att_db->query("SELECT * FROM attendance WHERE intern_id=:intern_id ORDER BY att_date, id DESC");
                 $att_db->setInternId($_GET["intern_id"]);
 
                 $total_rendered_hours = 0;
@@ -197,8 +198,15 @@
                 while ($row = $db->fetch()) { ?>
                     <div class="indicator-head-container my-3">
                         <ul class="list-group list-group-horizontal list-unstyled fw-bold">
-                            <li class="text-center" style="width: 100%;">
-                                <?= strtoupper($row["month"])." ".$row["year"] ?>
+                            <li class="text-center" style="width: 100%;"> <?php
+                                $selected_year = explode("-", $row["month_year"])[0];
+                                $selected_month = explode("-", $row["month_year"])[1];
+
+                                $date_text = date("F j, Y", strtotime($selected_year."-".$selected_month."-01"));
+                                $month = explode(" ", $date_text)[0];
+                                $year = explode(" ", $date_text)[2];
+
+                                echo strtoupper($month)." ".$year; ?>
                             </li>
                         </ul>
                         <p class="list-group-item text-center mb-0" style="width: 100%;">Official hours for arrival and departure</p>
@@ -225,8 +233,6 @@
                         </thead>
 
                         <tbody> <?php
-                            $selected_month = date("m", strtotime($row["month"]));
-                            $selected_year = date("Y", strtotime($row["year"]));
                             $number_of_days = cal_days_in_month(CAL_GREGORIAN, $selected_month, $selected_year);
 
                             $att_db->execute();
@@ -237,7 +243,7 @@
                             for ($i = 1; $i <= $number_of_days + 1; $i++) { 
                                 if ($i == $number_of_days + 1) { ?>
                                     <tr>
-                                        <th scope="row" colspan="5"><?= "Total in ".$row["month"] ?></th>
+                                        <th scope="row" colspan="5"><?= "Total in ".$month ?></th>
                                         <td><?= $rendered_hours_in_month ?></td>
                                         <td><?= $ot_hours_in_month ?></td>
                                     </tr> <?php

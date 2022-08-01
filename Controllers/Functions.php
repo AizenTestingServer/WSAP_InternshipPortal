@@ -131,7 +131,7 @@
 
     function isTimeInEnabled($att_date) {
         $date = new Date();
-        return $att_date != $date->getDate() && date("N", strtotime($date->getDate())) != 7 &&
+        return $att_date != $date->getNumericDate() && date("N", strtotime($date->getNumericDate())) != 7 &&
             (($date->getDateTimeValue() >= $date->time_in_start() &&  $date->getDateTimeValue() < $date->time_in_end()) ||
             ($date->getDateTimeValue() >= $date->morning_shift_end() && $date->getDateTimeValue() < $date->afternoon_shift_start()));
     }
@@ -199,6 +199,12 @@
         $date = new Date();
         return strtotime($time_in) >= $date->morning_shift_end() && strtotime($time_in) < $date->time_out_overtime_end() &&
             strtotime($time_out) >= $date->morning_shift_end() && strtotime($time_out) < $date->time_out_overtime_end();
+    }
+
+    function isLateTimeIn($time_in) {
+        $date = new Date();
+        return strtotime($time_in) > $date->morning_briefing() &&
+        strtotime($time_in) < $date->morning_shift_end();
     }
 
     function isLateTimeOut($time_out) {

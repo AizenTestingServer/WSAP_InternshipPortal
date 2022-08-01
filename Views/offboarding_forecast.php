@@ -56,7 +56,7 @@
             $log_value);
     
             $db->query("INSERT INTO audit_logs
-            VALUES (null, :timestamp, :intern_id, :log)");
+            VALUES (NULL, :timestamp, :intern_id, :log)");
             $db->log($log);
             $db->execute();
             $db->closeStmt();
@@ -89,7 +89,7 @@
             $log_value);
     
             $db->query("INSERT INTO audit_logs
-            VALUES (null, :timestamp, :intern_id, :log)");
+            VALUES (NULL, :timestamp, :intern_id, :log)");
             $db->log($log);
             $db->execute();
             $db->closeStmt();
@@ -244,7 +244,7 @@
                                                 echo "Z-A";
                                                 break;
                                         }
-                                    }?>
+                                    } ?>
                                 </button>
                                 <ul class="dropdown-menu me-2z" aria-labelledby="dropdownMenuButton1" name="sort">
                                     <li><a class="dropdown-item btn-smoke" <?php
@@ -412,11 +412,11 @@
                     $estimated_weekend_days = floor(($rendering_days/5) * 2);
                     $rendering_days += $estimated_weekend_days;
 
-                    if (!empty($row_lts_att) && $row_lts_att["att_date"] == $date->getDate() && !empty($row_lts_att["time_out"])) {
+                    if (!empty($row_lts_att) && $row_lts_att["att_date"] == $date->getNumericDate() && !empty($row_lts_att["time_out"])) {
                         $rendering_days += 1;
                     }
 
-                    $est_offboard_date = strtotime($date->getDate()." + ".$rendering_days." days");
+                    $est_offboard_date = strtotime($date->getNumericDate()." + ".$rendering_days." days");
 
                     if (date("F j, Y", $est_offboard_date) == $date->getMonthName()." ".$i.", ".$selected_year) { ?>
                         <div id="educational-info" class="row rounded shadow mt-4 pb-4 position-relative">
@@ -443,11 +443,11 @@
                                     $estimated_weekend_days = floor(($rendering_days/5) * 2);
                                     $rendering_days += $estimated_weekend_days;
 
-                                    if (!empty($row_lts_att) && $row_lts_att["att_date"] == $date->getDate() && !empty($row_lts_att["time_out"])) {
+                                    if (!empty($row_lts_att) && $row_lts_att["att_date"] == $date->getNumericDate() && !empty($row_lts_att["time_out"])) {
                                         $rendering_days += 1;
                                     }
 
-                                    $est_offboard_date = strtotime($date->getDate()." + ".$rendering_days." days");
+                                    $est_offboard_date = strtotime($date->getNumericDate()." + ".$rendering_days." days");
 
                                     if (date("F j, Y", $est_offboard_date) == $date->getMonthName()." ".$i.", ".$selected_year) {
                                         $row_count++;

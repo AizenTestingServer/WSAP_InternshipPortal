@@ -120,7 +120,7 @@
                     $log_value);
         
                     $db->query("INSERT INTO audit_logs
-                    VALUES (null, :timestamp, :intern_id, :log)");
+                    VALUES (NULL, :timestamp, :intern_id, :log)");
                     $db->log($log);
                     $db->execute();
                     $db->closeStmt();
@@ -175,7 +175,7 @@
             $log_value);
 
             $db->query("INSERT INTO audit_logs
-            VALUES (null, :timestamp, :intern_id, :log)");
+            VALUES (NULL, :timestamp, :intern_id, :log)");
             $db->log($log);
             $db->execute();
             $db->closeStmt();
@@ -259,7 +259,7 @@
                 $log_value);
     
                 $db->query("INSERT INTO audit_logs
-                VALUES (null, :timestamp, :intern_id, :log)");
+                VALUES (NULL, :timestamp, :intern_id, :log)");
                 $db->log($log);
                 $db->execute();
                 $db->closeStmt();
@@ -308,7 +308,7 @@
         $log_value);
 
         $db->query("INSERT INTO audit_logs
-        VALUES (null, :timestamp, :intern_id, :log)");
+        VALUES (NULL, :timestamp, :intern_id, :log)");
         $db->log($log);
         $db->execute();
         $db->closeStmt();
@@ -334,7 +334,7 @@
             $log_value);
     
             $db->query("INSERT INTO audit_logs
-            VALUES (null, :timestamp, :intern_id, :log)");
+            VALUES (NULL, :timestamp, :intern_id, :log)");
             $db->log($log);
             $db->execute();
             $db->closeStmt();
@@ -771,11 +771,11 @@
                                                         $estimated_weekend_days = floor(($rendering_days/5) * 2);
                                                         $rendering_days += $estimated_weekend_days;
 
-                                                        if (!empty($lts_att) && $lts_att["att_date"] == $date->getDate() && !empty($lts_att["time_out"])) {
+                                                        if (!empty($lts_att) && $lts_att["att_date"] == $date->getNumericDate() && !empty($lts_att["time_out"])) {
                                                             $rendering_days += 1;
                                                         }
 
-                                                        echo date("F j, Y", strtotime($date->getDate()." + ".$rendering_days." days")); ?>"
+                                                        echo date("F j, Y", strtotime($date->getNumericDate()." + ".$rendering_days." days")); ?>"
                                                         disabled> <?php
                                                     } else { ?>
                                                         <label class="mb-2" for="offboardDate">Offboard Date
@@ -1283,7 +1283,7 @@
                                                 echo "All Departments";
                                             } else {
                                                 echo $_GET["department"];
-                                            }?>
+                                            } ?>
                                         </button>
                                         <ul class="dropdown-menu" aria-labelledby="dropdownMenuButton1">
                                             <li><a class="dropdown-item btn-smoke" <?php
@@ -1353,7 +1353,7 @@
                                                         echo "Newest Intern";
                                                         break;
                                                 }
-                                            }?>
+                                            } ?>
                                         </button>
                                         <ul class="dropdown-menu me-2z" aria-labelledby="dropdownMenuButton1" name="sort">
                                             <li><a class="dropdown-item btn-smoke" <?php

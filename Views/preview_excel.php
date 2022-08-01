@@ -167,16 +167,17 @@
 
             <div id="dtr-document" class="dtr-container fs-d" style="padding: 1rem;"> <?php
                 if (!empty($_GET["month"]) && !empty($_GET["year"])) {
-                    $month_year = array($_GET["month"], $_GET["year"]);
+                    $date_text = date("Y-m-d", strtotime($_GET["month"]." 1, ".$_GET["year"]));
+                    $year = explode("-", $date_text)[0];
+                    $month = explode("-", $date_text)[1];
+                    $year_month = array($year, $month);
 
-                    $db->query("SELECT DISTINCT SUBSTRING_INDEX(att_date, ' ', 1) AS month,
-                    SUBSTRING_INDEX(att_date, ' ', -1) AS year
+                    $db->query("SELECT DISTINCT SUBSTRING_INDEX(att_date, '-', 2) AS month_year
                     FROM attendance WHERE intern_id=:intern_id AND
-                    att_date LIKE CONCAT(:month, '%', :year);");
-                    $db->setMonthYear($month_year);
+                    att_date LIKE CONCAT(:year, '-', :month, '%');");
+                    $db->setYearMonth($year_month);
                 } else {
-                    $db->query("SELECT DISTINCT SUBSTRING_INDEX(att_date, ' ', 1) AS month,
-                    SUBSTRING_INDEX(att_date, ' ', -1) AS year
+                    $db->query("SELECT DISTINCT SUBSTRING_INDEX(att_date, '-', 2) AS month_year
                     FROM attendance WHERE intern_id=:intern_id;");
                 }
                 $db->setInternId($_GET["intern_id"]);
@@ -184,23 +185,29 @@
                 
                 $att_db = new Database();
 
-                $att_db->query("SELECT * FROM attendance WHERE intern_id=:intern_id");
+                $att_db->query("SELECT * FROM attendance WHERE intern_id=:intern_id ORDER BY att_date, id DESC");
                 $att_db->setInternId($_GET["intern_id"]);
 
                 $total_rendered_hours = 0; ?>
                     <!--DTR BODY-->
                     <div class="fs-b">
                         <table id="dtr" class="table table-bordered text-center me-1" style="border: 1px solid black; margin-top: 21px;"> <?php            
-                            while ($row = $db->fetch()) { 
-                                $selected_month = date("m", strtotime($row["month"]));
-                                $selected_year = date("Y", strtotime($row["year"]));
+                            while ($row = $db->fetch()) {
+                                $selected_year = explode("-", $row["month_year"])[0];
+                                $selected_month = explode("-", $row["month_year"])[1];
                                 $number_of_days = cal_days_in_month(CAL_GREGORIAN, $selected_month, $selected_year);
 
                                 $rendered_hours_in_month = 0;
                                 $ot_hours_in_month = 0; ?>
                                 <thead>
                                     <tr>
-                                        <th scope="col-span row-span" class="fw-bold" colspan="14"><?= strtoupper($row["month"])." ".$row["year"] ?></th>
+                                        <th scope="col-span row-span" class="fw-bold" colspan="14"> <?php
+                                            $date_text = date("F j, Y", strtotime($selected_year."-".$selected_month."-01"));
+                                            $month = explode(" ", $date_text)[0];
+                                            $year = explode(" ", $date_text)[2];
+
+                                            echo strtoupper($month)." ".$year; ?>
+                                        </th>
                                     </tr>
                                     <tr>
                                         <th scope="col-span row-span" class="fw-bold" colspan="2">Name:</th>
@@ -230,11 +237,11 @@
                                                     $estimated_weekend_days = floor(($rendering_days/5) * 2);
                                                     $rendering_days += $estimated_weekend_days;
 
-                                                    if (!empty($lts_att) && $lts_att["att_date"] == $date->getDate() && !empty($lts_att["time_out"])) {
+                                                    if (!empty($lts_att) && $lts_att["att_date"] == $date->getNumericDate() && !empty($lts_att["time_out"])) {
                                                         $rendering_days += 1;
                                                     }
 
-                                                    echo date("F j, Y", strtotime($date->getDate()." + ".$rendering_days." days"));
+                                                    echo date("F j, Y", strtotime($date->getNumericDate()." + ".$rendering_days." days"));
                                                 } else {
                                                 echo date("F j, Y", strtotime($intern_info["offboard_date"]));
                                                 } ?>
@@ -576,7 +583,7 @@
                                     
                                     $total_rendered_hours += $rendered_hours_in_month + $ot_hours_in_month; ?>
 
-                                    <th colspan="12"><?= "Total in ".$row["month"] ?></th>
+                                    <th colspan="12"><?= "Total in ".$month ?></th>
                                     <th><?= $rendered_hours_in_month ?></th>
                                     <th><?= $ot_hours_in_month ?></th>
                                 </tbody> <?php

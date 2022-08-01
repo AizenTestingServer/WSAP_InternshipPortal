@@ -116,13 +116,16 @@
                 $records_db = new Database();
                 
                 if (!empty($_GET["month"]) && !empty($_GET["year"])) {
-                    $month_year = array($_GET["month"], $_GET["year"]);
+                    $date_text = date("Y-m-d", strtotime($_GET["month"]." 1, ".$_GET["year"]));
+                    $year = explode("-", $date_text)[0];
+                    $month = explode("-", $date_text)[1];
+                    $year_month = array($year, $month);
                     
                     $records_db->query("SELECT DISTINCT att_date
                     FROM attendance
-                    WHERE att_date LIKE CONCAT(:month, '%', :year)
+                    WHERE att_date LIKE CONCAT(:year, '-', :month, '%')
                     ORDER BY id DESC");
-                    $records_db->setMonthYear($month_year);
+                    $records_db->setYearMonth($year_month);
                 } else {
                     $records_db->query("SELECT DISTINCT att_date
                     FROM attendance ORDER BY id DESC");
@@ -148,7 +151,8 @@
 
                                 $active_interns = 0;
                                 while ($row_interns = $db_interns->fetch()) {
-                                    if (isActiveIntern($row_interns["onboard_date"], $row_interns["offboard_date"], $row["att_date"])  && $row_interns["status"] == 1) {
+                                    if (isActiveIntern($row_interns["onboard_date"], $row_interns["offboard_date"], $row["att_date"]) && 
+                                    $row_interns["status"] != 3 && $row_interns["status"] != 6) {
                                         $active_interns++;
                                     } else {
                                         $db_attendance->execute();

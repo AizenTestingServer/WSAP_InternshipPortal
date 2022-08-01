@@ -41,45 +41,6 @@
             redirect("daily_time_record.php");
             exit();
         }
-
-        $db->query("SELECT * FROM overtime_hours WHERE intern_id=:intern_id ORDER BY id DESC LIMIT 1");
-        $db->setInternId($_GET["intern_id"]);
-        $db->execute();
-    
-        $overtime_hours = $db->fetch();
-    
-        $day = "friday";
-        
-        if (strtotime("today") < strtotime($day)) {
-          $start_week_date = date("F j, Y", strtotime("last ".$day));
-        } else {
-          $start_week_date = date("F j, Y", strtotime($day));
-        }
-    
-        if ($admin_roles_count != 0) {
-            $overtime_hours_left = 15;
-        } else {
-            $overtime_hours_left = 10;
-        }
-    
-        if ($db->rowCount() == 0 || $overtime_hours["start_week_date"] != $start_week_date) {
-            $overtime_data = array(
-                strtoupper($_GET["intern_id"]),
-                $start_week_date,
-                $overtime_hours_left
-            );
-    
-            $db->query("INSERT INTO overtime_hours VALUES (null, :intern_id, :start_week_date, :overtime_hours_left)");
-            $db->setOvertimeData($overtime_data);
-            $db->execute();
-            $db->closeStmt();
-    
-            $db->query("SELECT * FROM overtime_hours WHERE intern_id=:intern_id ORDER BY id DESC LIMIT 1");
-            $db->setInternId($_GET["intern_id"]);
-            $db->execute();
-        
-            $overtime_hours = $db->fetch();
-        }
     }
 
     if (!empty($_GET["id"])) {    
@@ -224,35 +185,11 @@
                 $rendered_minutes = $dt_time_out_start->diff($dt_time_out)->format("%i");
                 $rendered_overtime_hours += round($rendered_minutes/60, 1);
 
-                if ($rendered_overtime_hours > $overtime_hours["overtime_hours_left"]) {
-                    $rendered_overtime_hours = $overtime_hours["overtime_hours_left"];
-                }
-
                 if ($rendered_overtime_hours > 4) {
                     $rendered_overtime_hours = 4;
                 }
 
                 $rendered_hours += $rendered_overtime_hours;
-            }
-            $computed_overtime_hours_left = $overtime_hours["overtime_hours_left"] - $rendered_overtime_hours;
-
-            $target_ot_hours_db = new Database();
-
-            $target_ot_hours_db->query("SELECT * FROM overtime_hours WHERE intern_id=:intern_id");
-            $target_ot_hours_db->setInternId($_GET["intern_id"]);
-            $target_ot_hours_db->execute();
-
-            $target_ot_hours_id = $overtime_hours["id"];
-            while ($target_ot_hours_row = $target_ot_hours_db->fetch()) {
-                $target_start_week_date = strtotime($target_ot_hours_row["start_week_date"]);
-                $target_end_week_date = strtotime($target_ot_hours_row["start_week_date"]." + 6 days");
-                $target_date = strtotime($att_date);
-
-                if ($target_date >= $target_start_week_date && $target_date <= $target_end_week_date) {
-                    $computed_overtime_hours_left = $target_ot_hours_row["overtime_hours_left"] - $rendered_overtime_hours;
-                    $target_ot_hours_id = $target_ot_hours_row["id"];
-                    break;
-                }
             }
                 
             $attendance = array(
@@ -288,7 +225,7 @@
             $db->closeStmt();
 
             if ($rendered_hours >= $wsap_info["target_rendering_hours"]) {
-                $offboard_date = date("Y-m-d", strtotime($date->getDate()));
+                $offboard_date = $date->getNumericDate();
 
                 $offboard = array(
                     $offboard_date,
@@ -319,35 +256,25 @@
                 $db->closeStmt();
             }
 
-            $computed_overtime_hours = array(
-                $computed_overtime_hours_left,
-                $target_ot_hours_id
-            );
-
-            $db->query("UPDATE overtime_hours SET overtime_hours_left=:overtime_hours_left WHERE id=:id");
-            $db->updateTargetOvertimeData($computed_overtime_hours);
-            $db->execute();
-            $db->closeStmt();
-
             $log_value = $admin_info["last_name"].", ".$admin_info["first_name"].
-                " (".$admin_info["name"].") set the ".$att_date." time out of ".$value["last_name"].", ".$value["first_name"].".";
+                " (".$admin_info["name"].") set the ".date("F j, Y", strtotime($att_date))." time out of ".$value["last_name"].", ".$value["first_name"].".";
 
             $log = array($date->getDateTime(),
             strtoupper($_GET["intern_id"]),
             $log_value);
 
             $db->query("INSERT INTO audit_logs
-            VALUES (null, :timestamp, :intern_id, :log)");
+            VALUES (NULL, :timestamp, :intern_id, :log)");
             $db->log($log);
             $db->execute();
             $db->closeStmt();
             
-            $_SESSION["edit_success"] = "Successfully setup the time out.";
+            $_SESSION["success"] = "Successfully set the time out.";
             unset($_SESSION["time_out_hr"]);
             unset($_SESSION["time_out_min"]);
             unset($_SESSION["time_out_time_type"]);
         } else {
-            $_SESSION["edit_failed"] = "Please fill-out the required fields!";
+            $_SESSION["failed"] = "Please fill-out the required fields!";
         }
 
         redirect("daily_time_record.php?intern_id=".$_GET["intern_id"]);
@@ -410,7 +337,7 @@
             $db->closeStmt();
 
             if ($new_rendered_hours >= $wsap_info["target_rendering_hours"]) {
-                $offboard_date = date("Y-m-d", strtotime($date->getDate()));
+                $offboard_date = $date->getNumericDate();
 
                 $offboard = array(
                     $offboard_date,
@@ -442,22 +369,22 @@
             }
 
             $log_value = $admin_info["last_name"].", ".$admin_info["first_name"].
-                " (".$admin_info["name"].") updated the ".$att_date." rendered hours of ".$value["last_name"].", ".$value["first_name"].".";
+                " (".$admin_info["name"].") updated the ".date("F j, Y", strtotime($att_date))." rendered hours of ".$value["last_name"].", ".$value["first_name"].".";
 
             $log = array($date->getDateTime(),
             strtoupper($_GET["intern_id"]),
             $log_value);
 
             $db->query("INSERT INTO audit_logs
-            VALUES (null, :timestamp, :intern_id, :log)");
+            VALUES (NULL, :timestamp, :intern_id, :log)");
             $db->log($log);
             $db->execute();
             $db->closeStmt();
             
-            $_SESSION["edit_success"] = "Successfully updated the rendered hours.";
+            $_SESSION["success"] = "Successfully updated the rendered hours.";
             unset( $_SESSION["rendered_hours"]);
         } else {
-            $_SESSION["edit_failed"] = "Please fill-out the required fields!";
+            $_SESSION["failed"] = "Please fill-out the required fields!";
         }
 
         redirect("daily_time_record.php?intern_id=".$_GET["intern_id"]);
@@ -475,56 +402,6 @@
         $att_date = $_POST["att_date"];
 
         if (!empty($att_id) && (!empty($rendered_hours) || $rendered_hours == 0) && !empty($att_date)) {
-            $db->query("SELECT * FROM attendance WHERE id=:id");
-            $db->setId($att_id);
-            $db->execute();
-            $att = $db->fetch();
-
-            $time_out = $att["time_out"];
-
-            if (strlen($time_out) > 8) {
-                $time_out = trim(substr($time_out, 0, 8));
-            }
-
-            if (isOvertime($time_out) && $att["ot_hours"] > 0) {
-                $dt_time_out_start = new DateTime(date("G:i", $date->time_out_start()));
-                $dt_time_out = new DateTime(date("G:i", strtotime($time_out)));
-                $ot_hours = $dt_time_out_start->diff($dt_time_out)->format("%h");
-                $rendered_minutes = $dt_time_out_start->diff($dt_time_out)->format("%i");
-                $ot_hours += round($rendered_minutes/60, 1);
-
-                if ($ot_hours > 4) {
-                    $ot_hours = 4;
-                }
-
-                $new_overtime_hours_left = $target_ot_hours_row["overtime_hours_left"] + $ot_hours;
-
-                $target_ot_hours_db = new Database();
-
-                $target_ot_hours_db->query("SELECT * FROM overtime_hours WHERE intern_id=:intern_id");
-                $target_ot_hours_db->setInternId($_GET["intern_id"]);
-                $target_ot_hours_db->execute();
-
-                $target_ot_hours_id = $overtime_hours["id"];
-                while ($target_ot_hours_row = $target_ot_hours_db->fetch()) {
-                    $target_start_week_date = strtotime($target_ot_hours_row["start_week_date"]);
-                    $target_end_week_date = strtotime($target_ot_hours_row["start_week_date"]." + 6 days");
-                    $target_date = strtotime($att_date);
-
-                    if ($target_date >= $target_start_week_date && $target_date <= $target_end_week_date) {
-                        $new_overtime_hours_left = $target_ot_hours_row["overtime_hours_left"] + $ot_hours;
-                        $target_ot_hours_id = $target_ot_hours_row["id"];
-                        break;
-                    }
-                }
-        
-                $db->query("UPDATE overtime_hours SET overtime_hours_left=:overtime_hours_left WHERE id=:id");
-                $db->setId($target_ot_hours_id);
-                $db->setOvertimeHoursLeft($new_overtime_hours_left);
-                $db->execute();
-                $db->closeStmt();
-            }
-
             $attendance = array(
                 "NTO",
                 $att_id
@@ -585,21 +462,263 @@
             }
                     
             $log_value = $admin_info["last_name"].", ".$admin_info["first_name"].
-                " (".$admin_info["name"].") removed the ".$att_date." time out of ".$value["last_name"].", ".$value["first_name"].".";
+                " (".$admin_info["name"].") removed the ".date("F j, Y", strtotime($att_date))." time out of ".$value["last_name"].", ".$value["first_name"].".";
     
             $log = array($date->getDateTime(),
             strtoupper($_SESSION["intern_id"]),
             $log_value);
     
             $db->query("INSERT INTO audit_logs
-            VALUES (null, :timestamp, :intern_id, :log)");
+            VALUES (NULL, :timestamp, :intern_id, :log)");
             $db->log($log);
             $db->execute();
             $db->closeStmt();
             
-            $_SESSION["edit_success"] = "Successfully removed the time out.";
+            $_SESSION["success"] = "Successfully removed the time out.";
         } else {
-            $_SESSION["edit_failed"] = "Please fill-out the required fields!";
+            $_SESSION["failed"] = "Please fill-out the required fields!";
+        }
+
+        redirect("daily_time_record.php?intern_id=".$_GET["intern_id"]);
+        exit();
+    }
+    
+    if (isset($_POST["removeAttendance"])) {
+        $att_id = $_POST["att_id"];
+        $att_date = $_POST["att_date"];
+
+        if (!empty($att_id)) {
+            $db->query("DELETE FROM attendance WHERE id=:id");
+            $db->setId($att_id);
+            $db->execute();
+            $db->closeStmt();
+                    
+            $log_value = $admin_info["last_name"].", ".$admin_info["first_name"].
+                " (".$admin_info["name"].") removed the ".date("F j, Y", strtotime($att_date))." attendance of ".$value["last_name"].", ".$value["first_name"].".";
+    
+            $log = array($date->getDateTime(),
+            strtoupper($_SESSION["intern_id"]),
+            $log_value);
+    
+            $db->query("INSERT INTO audit_logs
+            VALUES (NULL, :timestamp, :intern_id, :log)");
+            $db->log($log);
+            $db->execute();
+            $db->closeStmt();
+            
+            $_SESSION["success"] = "Successfully removed the attendance.";
+        } else {
+            $_SESSION["failed"] = "Please fill-out the required fields!";
+        }
+
+        redirect("daily_time_record.php?intern_id=".$_GET["intern_id"]);
+        exit();
+    }
+
+    if (isset($_POST["addAttendance"])) {
+        $att_date = $_POST["att_date"];
+
+        $time_in_hr = $_POST["time_in_hr"];
+        $time_in_min = $_POST["time_in_min"];
+        $time_in_time_type = $_POST["time_in_time_type"];
+
+        $time_out_hr = $_POST["time_out_hr"];
+        $time_out_min = $_POST["time_out_min"];
+        $time_out_time_type = $_POST["time_out_time_type"];
+
+        if (!empty($att_date)) {
+            $db->query("SELECT intern_id, COUNT(*) AS count
+            FROM attendance
+            WHERE att_date=:att_date AND intern_id=:intern_id
+            GROUP BY intern_id");
+            $db->setInternId($_GET["intern_id"]);
+            $db->setAttDate($att_date);
+            $db->execute();
+            $attendance_row = $db->fetch();
+
+            if ($attendance_row["count"] == 0) {
+                if (strtotime($att_date) <= strtotime($date->getNumericDate())) {
+                    $time_in = $time_in_hr.":".$time_in_min." ".$time_in_time_type;
+                    $time_out = $time_out_hr.":".$time_out_min." ".$time_out_time_type;
+                    
+                    if (strlen($time_in) > 8) {
+                        $time_in = trim(substr($time_in, 0, 8));
+                    }
+
+                    $tmp_time_in = $time_in;
+                    if (isLateTimeIn($time_in)) {
+                        $tmp_time_in = $tmp_time_in." L";
+                    }
+                    $time_in = $tmp_time_in;
+                    
+                    $tmp_time_out = $time_out;
+                    if (isMorningShift($time_in, $time_out)) {
+                        $tmp_time_out =  $tmp_time_out." MS";
+                    }
+                    if (isAfternoonShift($time_in, $time_out)) {
+                        $tmp_time_out =  $tmp_time_out." AS";
+                    }
+                    if (isOvertime($time_out)) {
+                        $tmp_time_out =  $tmp_time_out." OT";
+                    }
+                    $time_out = $tmp_time_out;
+
+                    if (strlen($time_in) > 8) {
+                        $tmp_time_in = trim(substr($time_in, 0, 8));
+                    }
+
+                    if (strlen($time_out) > 8) {
+                        $tmp_time_out = trim(substr($time_out, 0, 8));
+                    }
+                                        
+                    if (isMorningShift($tmp_time_in, $tmp_time_out) || isAfternoonShift($tmp_time_in, $tmp_time_out)) {
+                        $rendered_hours = 4;
+                    } else {
+                        $rendered_hours = 8;
+                    }
+
+                    $rendered_overtime_hours = 0;
+                    if (isOvertime($tmp_time_out)) {
+                        $dt_time_out_start = new DateTime(date("G:i", $date->time_out_start()));
+                        $dt_time_out = new DateTime(date("G:i", strtotime($tmp_time_out)));
+                        $rendered_overtime_hours += $dt_time_out_start->diff($dt_time_out)->format("%h");
+                        $rendered_minutes = $dt_time_out_start->diff($dt_time_out)->format("%i");
+                        $rendered_overtime_hours += round($rendered_minutes/60, 1);
+
+                        if ($rendered_overtime_hours > 4) {
+                            $rendered_overtime_hours = 4;
+                        }
+
+                        $rendered_hours += $rendered_overtime_hours;
+                    }
+            
+                    $attendance = array(
+                        strtoupper($_GET["intern_id"]),
+                        $att_date,
+                        $time_in,
+                        $time_out,
+                        $rendered_hours - $rendered_overtime_hours,
+                        $rendered_overtime_hours,
+                        $rendered_hours,
+                        null,
+                        null
+                    );
+                    
+                    $db->query("INSERT INTO attendance
+                    VALUES (NULL, :intern_id, :att_date, :time_in, :time_out,
+                    :regular_hours, :ot_hours, :rendered_hours,
+                    :time_in_gps_image, :time_out_gps_image);");
+                    $db->timeIn($attendance);
+                    $db->execute();
+                    $db->closeStmt();
+
+                    $log_value = $admin_info["last_name"].", ".$admin_info["first_name"].
+                    " (".$admin_info["name"].") added the ".date("F j, Y", strtotime($att_date))." attendance of ".$value["last_name"].", ".$value["first_name"].".";
+
+                    $log = array($date->getDateTime(),
+                    strtoupper($_SESSION["intern_id"]),
+                    $log_value);
+
+                    $db->query("INSERT INTO audit_logs
+                    VALUES (NULL, :timestamp, :intern_id, :log)");
+                    $db->log($log);
+                    $db->execute();
+                    $db->closeStmt();
+                    
+                    $_SESSION["success"] = "Successfully added an attendance.";
+                } else {
+                    $_SESSION["failed"] = "The attendance date must be in past or today!";
+                }
+            } else {
+                $_SESSION["failed"] = "The attendance date is already exists!";
+            }
+        } else {
+            $_SESSION["failed"] = "Please fill-out the required fields!";
+        }
+
+        redirect("daily_time_record.php?intern_id=".$_GET["intern_id"]);
+        exit();
+    }
+
+    if (isset($_POST["editStatus"])) {
+        $status = $_POST["status"];
+
+        $att_date = $_POST["att_date"];
+        $intern_id = $_GET["intern_id"];
+
+        if (isset($status)) {
+            if ($status == 0) {
+                $db->query("DELETE FROM attendance WHERE intern_id=:intern_id AND att_date=:att_date");
+                $db->setInternId($intern_id);
+                $db->setAttDate($att_date);
+                $db->execute();
+                $db->closeStmt();
+            } else {
+                if ($status == 1) {
+                    $time_in = "AE";
+                    $time_out = "AE";
+                } else if ($status == 2) {
+                    $time_in = "AU";
+                    $time_out = "AU";
+                }
+
+                $db->query("SELECT * FROM attendance WHERE intern_id=:intern_id AND att_date=:att_date");
+                $db->setInternId($intern_id);
+                $db->setAttDate($att_date);
+                $db->execute();
+                $db->closeStmt();
+
+                if ($db->rowCount() == 0) {
+                    $attendance = array(
+                        $intern_id,
+                        $att_date,
+                        $time_in,
+                        $time_out,
+                        0,
+                        0,
+                        0,
+                        null,
+                        null
+                    );
+                    
+                    $db->query("INSERT INTO attendance
+                    VALUES (NULL, :intern_id, :att_date, :time_in, :time_out,
+                    :regular_hours, :ot_hours, :rendered_hours,
+                    :time_in_gps_image, :time_out_gps_image);");
+                    $db->timeIn($attendance);
+                } else {
+                    $attendance = array(
+                        $intern_id,
+                        $att_date,
+                        $time_in,
+                        $time_out
+                    );
+
+                    $db->query("UPDATE attendance SET time_in=:time_in, time_out=:time_out
+                    WHERE intern_id=:intern_id AND att_date=:att_date");
+                    $db->setAttendance($attendance);
+                }
+
+                $db->execute();
+                $db->closeStmt();
+            }
+            
+            $log_value = $admin_info["last_name"].", ".$admin_info["first_name"].
+                " (".$admin_info["name"].") updated the ".date("F j, Y", strtotime($att_date))." attendance status of ".$value["last_name"].", ".$value["first_name"].".";
+    
+            $log = array($date->getDateTime(),
+            strtoupper($_SESSION["intern_id"]),
+            $log_value);
+    
+            $db->query("INSERT INTO audit_logs
+            VALUES (NULL, :timestamp, :intern_id, :log)");
+            $db->log($log);
+            $db->execute();
+            $db->closeStmt();
+            
+            $_SESSION["success"] = "Successfully update the attendance status.";
+        } else {
+            $_SESSION["failed"] = "Please fill-out the required fields!";
         }
 
         redirect("daily_time_record.php?intern_id=".$_GET["intern_id"]);
@@ -697,7 +816,239 @@
                             } ?>
                         </div>
                     </div>
+                </div>
+
+                <div class="w-100 d-md-flex d-md-inline-block align-items-end mb-3">
+                    <div class="d-lg-flex d-md-inline-block">
+                        <div class="my-2">
+                            <a class="btn btn-secondary me-2" href="daily_time_record.php">
+                                <i class="fa-solid fa-arrow-left me-2"></i>Back to Interns' DTR
+                            </a>
+                        </div>
+
+                        
+                        <div class="d-flex my-2">
+                            <div class="dropdown align-center me-2">
+                                <button class="btn btn-light border-dark dropdown-toggle" type="button" id="dropdownMenuButton1"
+                                    data-bs-toggle="dropdown" aria-expanded="false" name="department"> <?php
+                                    if (!empty($_GET["month"]) && !empty($_GET["year"])) {
+                                        echo "Custom";
+                                    } else {
+                                        echo "All Records";
+                                    } ?>
+                                </button>
+                                <ul class="dropdown-menu" aria-labelledby="dropdownMenuButton1">
+                                    <li>
+                                        <a class="dropdown-item btn-smoke" href="daily_time_record.php?intern_id=<?= $_GET["intern_id"] ?>">
+                                            All Records
+                                        </a>
+                                    </li>
+                                    <li>
+                                        <a class="dropdown-item btn-smoke"
+                                            href="daily_time_record.php?intern_id=<?= $_GET["intern_id"] ?>&month=<?= $date->getMonthName() ?>&year=<?= $date->getYear() ?>">
+                                            Custom
+                                        </a>
+                                    </li>
+                                </ul>
+                            </div>
+                            
+                            <button class="btn btn-primary" data-bs-toggle="modal" data-bs-target="#addAttendanceModal">
+                                Add Attendance
+                            </button>
+                            
+                            <div class="modal fade" id="addAttendanceModal" tabindex="-1" aria-labelledby="addAttendanceModalLabel" aria-hidden="true">
+                                <div class="modal-dialog modal-dialog-centered">
+                                    <div class="modal-content">
+                                        <div class="modal-header">
+                                            <h5 class="modal-title" id="addAttendanceModalLabel">Add Attendance</h5>
+                                            <button class="btn btn-danger btn-sm text-light" data-bs-dismiss="modal">
+                                                <i class="fa-solid fa-close"></i>
+                                            </button>
+                                        </div>
+
+                                        <form method="post">
+                                            <div class="modal-body">
+                                                <div class="row">
+                                                    <h6 class="text-center text-dark mb-3">
+                                                        Adding an attendance record does not automatically adds the rendered hours into
+                                                        the Intern's current rendered hours.<br><br>
+                                                        Please make sure to update the Intern's rendered hours manually in Edit Profile Page
+                                                        before removing its time out value to avoid any miscalculations or conflicts.
+                                                    </h6>
+                                                    <div class="col-12 user_input my-1">
+                                                        <label class="mb-2" for="att_date">Date</label>
+                                                        <input type="date" name="att_date" class="form-control"
+                                                        value="<?= $date->getNumericDate() ?>">
+                                                    </div>
+                                                    <div class="col-12 user_input my-1">
+                                                        <label class="mb-2" for="timeIn">Time in</label>
+                                                        <div class="row">
+                                                            <div class="col-4">
+                                                                <select class="form-select" name="time_in_hr"> <?php
+                                                                    for ($i = 1; $i <= 12; $i++) { ?>
+                                                                        <option value="<?= $i ?>" <?php
+                                                                        if ($i == 8) { ?>
+                                                                            selected <?php
+                                                                        } ?>><?= $i ?></option><?php
+                                                                    } ?>
+                                                                </select>
+                                                            </div>
+                                                            <div class="col-4">
+                                                                <select class="form-select" name="time_in_min"> <?php
+                                                                    for ($i = 0; $i < 60; $i++) {
+                                                                        if (strlen($i) == 1) {
+                                                                            $i = "0".$i;
+                                                                        } ?>
+                                                                        <option value="<?= $i ?>" <?php
+                                                                        if ($i == 0) { ?>
+                                                                            selected <?php
+                                                                        } ?>><?= $i ?></option><?php
+                                                                    } ?>
+                                                                </select>
+                                                            </div>
+                                                            <div class="col-4">
+                                                                <select class="form-select" name="time_in_time_type">
+                                                                    <option value="am" selected>AM</option>
+                                                                    <option value="pm">PM</option>
+                                                                </select>
+                                                            </div>
+                                                        </div>
+                                                    </div>
+                                                    <div class="col-12 user_input my-1">
+                                                        <label class="mb-2" for="timeOut">Time out</label>
+                                                        <div class="row">
+                                                            <div class="col-4">
+                                                                <select class="form-select" name="time_out_hr"> <?php
+                                                                    for ($i = 1; $i <= 12; $i++) { ?>
+                                                                        <option value="<?= $i ?>" <?php
+                                                                        if ($i == 5) { ?>
+                                                                            selected <?php
+                                                                        } ?>><?= $i ?></option><?php
+                                                                    } ?>
+                                                                </select>
+                                                            </div>
+                                                            <div class="col-4">
+                                                                <select class="form-select" name="time_out_min"> <?php
+                                                                    for ($i = 0; $i < 60; $i++) {
+                                                                        if (strlen($i) == 1) {
+                                                                            $i = "0".$i;
+                                                                        } ?>
+                                                                        <option value="<?= $i ?>" <?php
+                                                                        if ($i == 00) { ?>
+                                                                            selected <?php
+                                                                        } ?>><?= $i ?></option><?php
+                                                                    } ?>
+                                                                </select>
+                                                            </div>
+                                                            <div class="col-4">
+                                                                <select class="form-select" name="time_out_time_type">
+                                                                    <option value="am">AM</option>
+                                                                    <option value="pm" selected>PM</option>
+                                                                </select>
+                                                            </div>
+                                                        </div>
+                                                    </div>
+                                                </div>
+                                            </div>
+
+                                            <div class="modal-footer">
+                                                <button type="submit" name="addAttendance" class="btn btn-success">Submit</button>
+                                            </div>
+                                        </form>
+                                    </div>
+                                </div>
+                            </div>
+
+                            
+                            <?php
+                            if (!empty($_GET["month"]) && !empty($_GET["year"])) { ?>
+                                <div class="dropdown align-center me-2">
+                                    <button class="btn btn-light border-dark dropdown-toggle" type="button" id="dropdownMenuButton1"
+                                        data-bs-toggle="dropdown" aria-expanded="false" name="department">
+                                        <?= $_GET["month"] ?>
+                                    </button>
+                                    <ul class="dropdown-menu" aria-labelledby="dropdownMenuButton1"> <?php
+                                        foreach (getMonths() as $value) { ?>
+                                            <li>
+                                                <a class="dropdown-item btn-smoke"
+                                                    href="daily_time_record.php?intern_id=<?= $_GET["intern_id"] ?>&month=<?= $value ?>&year=<?= $_GET["year"] ?>">
+                                                    <?= $value ?>
+                                                </a>
+                                            </li> <?php
+                                        } ?>
+                                    </ul>
+                                </div>
+                                <div class="dropdown align-center me-2">
+                                    <button class="btn btn-light border-dark dropdown-toggle" type="button" id="dropdownMenuButton1"
+                                        data-bs-toggle="dropdown" aria-expanded="false" name="department">
+                                        <?= $_GET["year"] ?>
+                                    </button>
+                                    <ul class="dropdown-menu" aria-labelledby="dropdownMenuButton1"> <?php
+                                        for ($i = 2018; $i <= $date->getYear(); $i++) { ?>
+                                            <li>
+                                                <a class="dropdown-item btn-smoke"
+                                                    href="daily_time_record.php?intern_id=<?= $_GET["intern_id"] ?>&month=<?= $_GET["month"] ?>&year=<?= $i ?>">
+                                                    <?= $i ?>
+                                                </a>
+                                            </li> <?php
+                                        } ?>
+                                    </ul>
+                                </div> <?php
+                            } ?>
+                        </div>
+                    </div> <?php
+                    
+                    $nto_array = array($_GET["intern_id"], "NTO");
+                    $db->query("SELECT COUNT(*) as count FROM attendance
+                    WHERE intern_id=:intern_id AND time_out=:time_out");
+                    $db->selectInternIdAndTimeOut($nto_array);
+                    $db->execute();
+                    $nto_value = $db->fetch(); ?>
+                                        
+                    <div class="w-fit ms-auto">
+                        <a class="btn btn-excel mb-2"
+                            href="preview_excel.php?intern_id=<?= strtoupper($_GET["intern_id"]) ?>"
+                            target="preview_excel.php?intern_id=<?= strtoupper($_GET["intern_id"]) ?>">
+                            Preview DTR as Excel
+                        </a>                            
+                        </button> <?php
+                        if ($nto_value["count"] == 0) { ?>
+                            <a class="btn btn-pdf mb-2"
+                                href="preview_pdf.php?intern_id=<?= strtoupper($_GET["intern_id"]) ?>"
+                                target="preview_pdf.php?intern_id=<?= strtoupper($_GET["intern_id"]) ?>">
+                                Preview DTR as PDF
+                            </a> <?php
+                        } else { ?>
+                            <a class="btn btn-pdf mb-2 disabled">
+                                Preview DTR as PDF
+                            </a> <?php
+                        } ?>
+                    </div>
                 </div> <?php
+                
+                if ($nto_value["count"] != 0) { ?>
+                    <div class="w-100">
+                        <p class="text-danger w-fit ms-auto fw-bold">Please settle the NTO first.</p>
+                    </div> <?php
+                }
+
+                if (isset($_SESSION["success"])) { ?>
+                    <div class="alert alert-success text-success">
+                        <?php
+                            echo $_SESSION["success"];
+                            unset($_SESSION["success"]);
+                        ?>
+                    </div> <?php
+                }
+                
+                if (isset($_SESSION["failed"])) { ?>
+                    <div class="alert alert-danger text-danger">
+                        <?php
+                            echo $_SESSION["failed"];
+                            unset($_SESSION["failed"]);
+                        ?>
+                    </div> <?php
+                }
                         
                 if (!empty($_GET["id"]) && $selected_att["time_out"] == "NTO" &&
                     $selected_att["intern_id"] == $_GET["intern_id"] && $_GET["edit"] == "time_out") { ?>
@@ -791,128 +1142,6 @@
                             </form>
                         </div>
                     </div> <?php
-                }
-
-                if (isset($_SESSION["edit_success"])) { ?>
-                    <div class="alert alert-success text-success">
-                        <?php
-                            echo $_SESSION["edit_success"];
-                            unset($_SESSION["edit_success"]);
-                        ?>
-                    </div> <?php
-                }
-                
-                if (isset($_SESSION["edit_failed"])) { ?>
-                    <div class="alert alert-danger text-danger">
-                        <?php
-                            echo $_SESSION["edit_failed"];
-                            unset($_SESSION["edit_failed"]);
-                        ?>
-                    </div> <?php
-                } ?>
-
-                <div class="w-100 d-md-flex d-md-inline-block align-items-end mb-3">
-                    <div class="d-lg-flex d-md-inline-block">
-                        <div class="my-2">
-                            <a class="btn btn-secondary me-2" href="daily_time_record.php">
-                                <i class="fa-solid fa-arrow-left me-2"></i>Back to Interns' DTR
-                            </a>
-                        </div>
-
-                        
-                        <div class="d-flex my-2">
-                            <div class="dropdown align-center me-2">
-                                <button class="btn btn-light border-dark dropdown-toggle" type="button" id="dropdownMenuButton1"
-                                    data-bs-toggle="dropdown" aria-expanded="false" name="department"> <?php
-                                    if (!empty($_GET["month"]) && !empty($_GET["year"])) {
-                                        echo "Custom";
-                                    } else {
-                                        echo "All Records";
-                                    } ?>
-                                </button>
-                                <ul class="dropdown-menu" aria-labelledby="dropdownMenuButton1">
-                                    <li>
-                                        <a class="dropdown-item btn-smoke" href="daily_time_record.php?intern_id=<?= $_GET["intern_id"] ?>">
-                                            All Records
-                                        </a>
-                                    </li>
-                                    <li>
-                                        <a class="dropdown-item btn-smoke"
-                                            href="daily_time_record.php?intern_id=<?= $_GET["intern_id"] ?>&month=<?= $date->getMonthName() ?>&year=<?= $date->getYear() ?>">
-                                            Custom
-                                        </a>
-                                    </li>
-                                </ul>
-                            </div> <?php
-                            if (!empty($_GET["month"]) && !empty($_GET["year"])) { ?>
-                                <div class="dropdown align-center me-2">
-                                    <button class="btn btn-light border-dark dropdown-toggle" type="button" id="dropdownMenuButton1"
-                                        data-bs-toggle="dropdown" aria-expanded="false" name="department">
-                                        <?= $_GET["month"] ?>
-                                    </button>
-                                    <ul class="dropdown-menu" aria-labelledby="dropdownMenuButton1"> <?php
-                                        foreach (getMonths() as $value) { ?>
-                                            <li>
-                                                <a class="dropdown-item btn-smoke"
-                                                    href="daily_time_record.php?intern_id=<?= $_GET["intern_id"] ?>&month=<?= $value ?>&year=<?= $_GET["year"] ?>">
-                                                    <?= $value ?>
-                                                </a>
-                                            </li> <?php
-                                        } ?>
-                                    </ul>
-                                </div>
-                                <div class="dropdown align-center me-2">
-                                    <button class="btn btn-light border-dark dropdown-toggle" type="button" id="dropdownMenuButton1"
-                                        data-bs-toggle="dropdown" aria-expanded="false" name="department">
-                                        <?= $_GET["year"] ?>
-                                    </button>
-                                    <ul class="dropdown-menu" aria-labelledby="dropdownMenuButton1"> <?php
-                                        for ($i = 2018; $i <= $date->getYear(); $i++) { ?>
-                                            <li>
-                                                <a class="dropdown-item btn-smoke"
-                                                    href="daily_time_record.php?intern_id=<?= $_GET["intern_id"] ?>&month=<?= $_GET["month"] ?>&year=<?= $i ?>">
-                                                    <?= $i ?>
-                                                </a>
-                                            </li> <?php
-                                        } ?>
-                                    </ul>
-                                </div> <?php
-                            } ?>
-                        </div>
-                    </div> <?php
-                    
-                    $nto_array = array($_GET["intern_id"], "NTO");
-                    $db->query("SELECT COUNT(*) as count FROM attendance
-                    WHERE intern_id=:intern_id AND time_out=:time_out");
-                    $db->selectInternIdAndTimeOut($nto_array);
-                    $db->execute();
-                    $nto_value = $db->fetch(); ?>
-                                        
-                    <div class="w-fit ms-auto">
-                        <a class="btn btn-excel mb-2"
-                            href="preview_excel.php?intern_id=<?= strtoupper($_GET["intern_id"]) ?>"
-                            target="preview_excel.php?intern_id=<?= strtoupper($_GET["intern_id"]) ?>">
-                            Preview DTR as Excel
-                        </a>                            
-                        </button> <?php
-                        if ($nto_value["count"] == 0) { ?>
-                            <a class="btn btn-pdf mb-2"
-                                href="preview_pdf.php?intern_id=<?= strtoupper($_GET["intern_id"]) ?>"
-                                target="preview_pdf.php?intern_id=<?= strtoupper($_GET["intern_id"]) ?>">
-                                Preview DTR as PDF
-                            </a> <?php
-                        } else { ?>
-                            <a class="btn btn-pdf mb-2 disabled">
-                                Preview DTR as PDF
-                            </a> <?php
-                        } ?>
-                    </div>
-                </div> <?php
-                
-                if ($nto_value["count"] != 0) { ?>
-                    <div class="w-100">
-                        <p class="text-danger w-fit ms-auto fw-bold">Please settle the NTO first.</p>
-                    </div> <?php
                 } ?>
 
                 <table id="dtr" class="table fs-d text-center">
@@ -931,20 +1160,37 @@
                     <tbody> <?php
                         if (isset($_SESSION["intern_id"])) {           
                             if (!empty($_GET["month"]) && !empty($_GET["year"])) {
-                                $month_year = array($_GET["month"], $_GET["year"]);
+                                $date_text = date("Y-m-d", strtotime($_GET["month"]." 1, ".$_GET["year"]));
+                                $year = explode("-", $date_text)[0];
+                                $month = explode("-", $date_text)[1];
+                                $year_month = array($year, $month);
                                 
                                 $db->query("SELECT * FROM attendance WHERE intern_id=:intern_id AND
-                                att_date LIKE CONCAT(:month, '%', :year) ORDER BY id DESC");
-                                $db->setMonthYear($month_year);
+                                att_date LIKE CONCAT(:year, '-', :month, '%') ORDER BY att_date DESC, id DESC");
+                                $db->setYearMonth($year_month);
                             } else {
-                                $db->query("SELECT * FROM attendance WHERE intern_id=:intern_id ORDER BY id DESC");
+                                $db->query("SELECT * FROM attendance WHERE intern_id=:intern_id ORDER BY att_date DESC, id DESC");
                             }
                             $db->setInternId($_GET["intern_id"]);
                             $db->execute();
 
+                            $attendance_db = new Database();
+                            $attendance_db->query("SELECT intern_id, COUNT(*) AS count
+                            FROM attendance
+                            WHERE att_date=:att_date AND intern_id=:intern_id
+                            GROUP BY intern_id");
+                            $attendance_db->setInternId($_GET["intern_id"]);
+
                             $count = 0;
 
                             while ($row = $db->fetch()) {
+                                $attendance_db->setAttDate($row["att_date"]);
+                                $attendance_db->execute();
+
+                                $attendance_row = $attendance_db->fetch();
+
+                                $removeable_attendance = ($attendance_row["count"] > 1 && strlen($row["time_out"]) == 0) || $row["time_out"] == "NTO";
+
                                 $count++; ?>
                                 <tr> <?php
                                     if ($row["time_out"] != "NTO") { ?>
@@ -954,7 +1200,7 @@
                                                 <div class="modal-content">
                                                     <div class="modal-header">
                                                         <div class="modal-title" id="removeTimeOutModalLabel">
-                                                            <h5>Remove Time out</h5>
+                                                            <h5><?= date("F j, Y", strtotime($row["att_date"]))." | ".date("l", strtotime($row["att_date"])) ?></h5>
                                                         </div>
                                                         <button class="btn btn-danger btn-sm text-light" data-bs-dismiss="modal">
                                                             <i class="fa-solid fa-close"></i>
@@ -993,7 +1239,7 @@
                                             <div class="modal-content">
                                                 <div class="modal-header">
                                                     <div class="modal-title" id="gpsImageModalModalLabel">
-                                                        <h5><?= $row["att_date"]." | ".date("l", strtotime($row["att_date"])) ?></h5>
+                                                        <h5><?= date("F j, Y", strtotime($row["att_date"]))." | ".date("l", strtotime($row["att_date"])) ?></h5>
                                                     </div>
                                                     <button class="btn btn-danger btn-sm text-light" data-bs-dismiss="modal">
                                                         <i class="fa-solid fa-close"></i>
@@ -1090,10 +1336,91 @@
                                                 </div>
                                             </div>
                                         </div>
+                                    </div> <?php
+
+                                    if ($removeable_attendance) { ?>
+                                        <div class="modal fade" id="removeAttendanceModal<?= $row["id"] ?>" tabindex="-1"
+                                            aria-labelledby="removeAttendanceModalLabel" aria-hidden="true">
+                                            <div class="modal-dialog modal-dialog-centered">
+                                                <div class="modal-content">
+                                                    <div class="modal-header">
+                                                        <div class="modal-title" id="removeAttendanceModalLabel">
+                                                            <h5><?= date("F j, Y", strtotime($row["att_date"]))." | ".date("l", strtotime($row["att_date"])) ?></h5>
+                                                        </div>
+                                                        <button class="btn btn-danger btn-sm text-light" data-bs-dismiss="modal">
+                                                            <i class="fa-solid fa-close"></i>
+                                                        </button>
+                                                    </div>
+                                                    
+                                                    <form method="post">
+                                                        <div class="modal-body">
+                                                            <div class="text-center px-5">
+                                                                <h6 class="text-dark mb-0">
+                                                                    Do you want to remove the attendance? There is no undo function for this action.
+                                                                </h6>
+                                                                <input type="text" name="att_id" class="form-control text-center d-none"
+                                                                            value="<?= $row["id"] ?>" readonly>
+                                                                <input type="text" name="att_date" class="form-control text-center d-none"
+                                                                            value="<?= $row["att_date"] ?>" readonly>
+                                                            </div>
+                                                        </div>
+
+                                                        <div class="modal-footer">
+                                                            <button type="submit" name="removeAttendance" class="btn btn-danger">Remove Attendance</button>
+                                                        </div>
+                                                    </form>
+                                                </div>
+                                            </div>
+                                        </div> <?php
+                                    } ?>
+                                    
+                                    <div class="modal fade" id="editStatusModal<?= $row["id"] ?>" tabindex="-1"
+                                        aria-labelledby="editStatusModalLabel" aria-hidden="true">
+                                        <div class="modal-dialog modal-dialog-centered">
+                                            <div class="modal-content">
+                                                <div class="modal-header">
+                                                    <div class="modal-title" id="editStatusModalLabel">
+                                                        <h5><?= date("F j, Y", strtotime($row["att_date"]))." | ".date("l", strtotime($row["att_date"])) ?></h5>
+                                                    </div>
+                                                    <button class="btn btn-danger btn-sm text-light" data-bs-dismiss="modal">
+                                                        <i class="fa-solid fa-close"></i>
+                                                    </button>
+                                                </div>
+                                                
+                                                <form method="post">
+                                                    <div class="modal-body">
+                                                        <div class="row">
+                                                            <div class="col-12 user_input my-1">
+                                                                <label class="mb-2" for="status">Status</label>
+                                                                <select name="status" class="form-select">
+                                                                    <option value="0">Off-duty</option>
+                                                                    <option value="1" <?php
+                                                                        if ($row["time_out"] == "AE") { ?>
+                                                                            selected <?php
+                                                                        } ?>>Absent-Excused</option>
+                                                                    <option value="2" <?php
+                                                                        if ($row["time_out"] == "AU") { ?>
+                                                                            selected <?php
+                                                                        } ?>>Absent-Unexcused</option>
+                                                                </select>
+                                                            </div>
+                                                            <div class="text-center px-5">
+                                                                <input type="text" name="att_date" class="form-control text-center d-none"
+                                                                            value="<?= $row["att_date"] ?>" readonly>
+                                                            </div>
+                                                        </div>
+                                                    </div>
+
+                                                    <div class="modal-footer">
+                                                        <button type="submit" name="editStatus" class="btn btn-success">Submit</button>
+                                                    </div>
+                                                </form>
+                                            </div>
+                                        </div>
                                     </div>
 
                                     <th scope="row"><?= $count ?></th>
-                                    <td><?= $row["att_date"] ?></td>
+                                    <td><?= date("F j, Y", strtotime($row["att_date"])) ?></td>
                                     <td><?= date("l", strtotime($row["att_date"])); ?></td>
                                     <td> <?php
                                         if (strlen($row["time_in"]) > 0) {
@@ -1173,7 +1500,8 @@
                                     <td><?= $row["ot_hours"] ?></td>
                                     <td><?= $row["rendered_hours"] ?></td>
                                     <td>
-                                        <div class="d-flex justify-content-center">
+                                        <div class="d-flex justify-content-center"> <?php
+                                        if ($row["time_out"] != "AE" && $row["time_out"] != "AU") { ?>
                                             <div class="w-fit p-0 me-1" data-bs-toggle="tooltip" data-bs-placement="left"
                                                 title="View GPS Image">
                                                 <button class="btn btn-primary btn-sm"
@@ -1212,15 +1540,33 @@
                                                                 </a> <?php
                                                             } ?>
                                                     </div>
-                                                    <div class="w-fit p-0" data-bs-toggle="tooltip" data-bs-placement="left"
-                                                            title="Remove time out">
+                                                    <div class="w-fit p-0 me-1" data-bs-toggle="tooltip" data-bs-placement="left"
+                                                            title="Remove Time out">
                                                         <button class="btn btn-danger btn-sm"
                                                             data-bs-toggle="modal"  data-bs-target="#removeTimeOutModal<?= $row["id"] ?>">
                                                             <i class="fa-solid fa-xmark fs-a"></i>
                                                         </button>
                                                     </div>
                                                 </div> <?php
-                                            } ?>
+                                            }
+                                            if ($removeable_attendance) { ?>
+                                                <div class="w-fit p-0" data-bs-toggle="tooltip" data-bs-placement="left"
+                                                        title="Remove Attendance">
+                                                    <button class="btn btn-danger btn-sm"
+                                                        data-bs-toggle="modal"  data-bs-target="#removeAttendanceModal<?= $row["id"] ?>">
+                                                        <i class="fa-solid fa-trash fs-a"></i>
+                                                    </button>
+                                                </div> <?php
+                                            }
+                                        } else { ?>
+                                            <div class="w-fit p-0 me-1" data-bs-toggle="tooltip" data-bs-placement="left"
+                                                title="Edit Status">
+                                                <button class="btn btn-primary btn-sm" data-bs-toggle="modal" 
+                                                    data-bs-target="#editStatusModal<?= $row["id"] ?>">
+                                                    <i class="fa-solid fa-pen fs-a"></i>
+                                                </button>
+                                            </div> <?php
+                                        } ?>
                                         </div>
                                     </td>
                                 </tr> <?php
@@ -1263,7 +1609,7 @@
                                                 echo "All Departments";
                                             } else {
                                                 echo $_GET["department"];
-                                            }?>
+                                            } ?>
                                         </button>
                                         <ul class="dropdown-menu" aria-labelledby="dropdownMenuButton1">
                                             <li><a class="dropdown-item btn-smoke" <?php
@@ -1623,7 +1969,7 @@
                                                         echo "Highest Hours Left";
                                                         break;
                                                 }
-                                            }?>
+                                            } ?>
                                         </button>
                                         <ul class="dropdown-menu me-2z" aria-labelledby="dropdownMenuButton1" name="sort">
                                             <li><a class="dropdown-item btn-smoke" <?php

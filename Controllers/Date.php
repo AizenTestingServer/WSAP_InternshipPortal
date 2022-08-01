@@ -28,6 +28,10 @@
             return date("F j, Y");
         }
 
+        function getNumericDate() {
+            return date("Y-m-d");
+        }
+
         function getYear() {
             return date("Y");
         }

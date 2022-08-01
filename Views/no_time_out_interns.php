@@ -23,7 +23,7 @@
     $db->execute();
     $admin_roles_count = $db->rowCount();
 
-    $selected_date = $date->getDate();
+    $selected_date = $date->getNumericDate();
     if (!empty($_GET["date"])) {
         $selected_date = $_GET["date"];
     }
@@ -38,15 +38,15 @@
             if (strlen($parameters) > 1) { $parameters = $parameters."&"; }
             $parameters = $parameters."department=".$_GET["department"];
         }
-        
-        if (!empty($_GET["sort"])) {
-            if (strlen($parameters) > 1) { $parameters = $parameters."&"; }
-            $parameters = $parameters."sort=".$_GET["sort"];
-        }
 
         if (!empty($selected_date)) {
             if (strlen($parameters) > 1) { $parameters = $parameters."&"; }
             $parameters = $parameters."date=".$selected_date;
+        }
+        
+        if (!empty($_GET["sort"])) {
+            if (strlen($parameters) > 1) { $parameters = $parameters."&"; }
+            $parameters = $parameters."sort=".$_GET["sort"];
         }
 
         if (strlen($parameters) > 1) {
@@ -115,7 +115,7 @@
                         <div class="d-md-flex d-sm-inline-block">
                             <div class="w-md-fit w-sm-100 d-flex align-items-center mb-2 me-md-2 me-sm-0">
                                 <div class="input-group">
-                                    <input type="text" class="form-control" value="<?= $selected_date ?>" disabled>
+                                    <input type="text" class="form-control" value="<?= date("F j, Y", strtotime($selected_date)) ?>" disabled>
                                     <div class="input-group-append">
                                         <a class="btn btn-smoke" href="calendar.php?destination=no_time_out_interns">Select Date</a>
                                     </div>
@@ -131,7 +131,7 @@
                                             echo "All Departments";
                                         } else {
                                             echo $_GET["department"];
-                                        }?>
+                                        } ?>
                                     </button>
                                     <ul class="dropdown-menu" aria-labelledby="dropdownMenuButton1">
                                         <li><a class="dropdown-item btn-smoke" <?php
@@ -139,15 +139,15 @@
                                             if (!empty($_GET["search"])) {
                                                 $parameters = $parameters."search=".$_GET["search"];
                                             }
-                                            
-                                            if (!empty($_GET["sort"])) {
-                                                if (strlen($parameters) > 1) { $parameters = $parameters."&"; }
-                                                $parameters = $parameters."sort=".$_GET["sort"];
-                                            }
 
                                             if (!empty($selected_date)) {
                                                 if (strlen($parameters) > 1) { $parameters = $parameters."&"; }
                                                 $parameters = $parameters."date=".$selected_date;
+                                            }
+                                            
+                                            if (!empty($_GET["sort"])) {
+                                                if (strlen($parameters) > 1) { $parameters = $parameters."&"; }
+                                                $parameters = $parameters."sort=".$_GET["sort"];
                                             }
 
                                             if (strlen($parameters) > 1) { ?>
@@ -170,15 +170,15 @@
                                                     if (strlen($parameters) > 1) { $parameters = $parameters."&"; }
                                                     $parameters = $parameters."department=".$row["name"];
                                                 }
-                                                
-                                                if (!empty($_GET["sort"])) {
-                                                    if (strlen($parameters) > 1) { $parameters = $parameters."&"; }
-                                                    $parameters = $parameters."sort=".$_GET["sort"];
-                                                }
 
                                                 if (!empty($selected_date)) {
                                                     if (strlen($parameters) > 1) { $parameters = $parameters."&"; }
                                                     $parameters = $parameters."date=".$selected_date;
+                                                }
+                                                
+                                                if (!empty($_GET["sort"])) {
+                                                    if (strlen($parameters) > 1) { $parameters = $parameters."&"; }
+                                                    $parameters = $parameters."sort=".$_GET["sort"];
                                                 }
 
                                                 if (strlen($parameters) > 1) { ?>
@@ -205,7 +205,7 @@
                                                     echo "Z-A";
                                                     break;
                                             }
-                                        }?>
+                                        } ?>
                                     </button>
                                     <ul class="dropdown-menu" aria-labelledby="dropdownMenuButton1" name="sort">
                                         <li><a class="dropdown-item btn-smoke" <?php
@@ -240,13 +240,13 @@
                                                 $parameters = $parameters."department=".$_GET["department"];
                                             }
 
-                                            if (strlen($parameters) > 1) { $parameters = $parameters."&"; }
-                                            $parameters = $parameters."sort=1";
-
                                             if (!empty($selected_date)) {
                                                 if (strlen($parameters) > 1) { $parameters = $parameters."&"; }
                                                 $parameters = $parameters."date=".$selected_date;
                                             }
+
+                                            if (strlen($parameters) > 1) { $parameters = $parameters."&"; }
+                                            $parameters = $parameters."sort=1";
 
                                             if (strlen($parameters) > 1) { ?>
                                                 href="<?= "no_time_out_interns.php".$parameters ?>" <?php
@@ -263,14 +263,14 @@
                                                 if (strlen($parameters) > 1) { $parameters = $parameters."&"; }
                                                 $parameters = $parameters."department=".$_GET["department"];
                                             }
-                                            
-                                            if (strlen($parameters) > 1) { $parameters = $parameters."&"; }
-                                            $parameters = $parameters."sort=2";
 
                                             if (!empty($selected_date)) {
                                                 if (strlen($parameters) > 1) { $parameters = $parameters."&"; }
                                                 $parameters = $parameters."date=".$selected_date;
                                             }
+                                            
+                                            if (strlen($parameters) > 1) { $parameters = $parameters."&"; }
+                                            $parameters = $parameters."sort=2";
 
                                             if (strlen($parameters) > 1) { ?>
                                                 href="<?= "no_time_out_interns.php".$parameters ?>" <?php

@@ -28,7 +28,7 @@
 
     $intern_wsap_info = $db->fetch();
 
-    $i_am_active = isActiveIntern($intern_wsap_info["onboard_date"], $intern_wsap_info["offboard_date"], $date->getDate());
+    $i_am_active = isActiveIntern($intern_wsap_info["onboard_date"], $intern_wsap_info["offboard_date"], $date->getNumericDate());
 
     $db->query("SELECT COUNT(*) AS total_interns FROM intern_personal_information");
     $db->execute();
@@ -55,60 +55,6 @@
     $brand_count = 0;
     if ($value = $db->fetch()) {
         $brand_count = $value["brand_count"];
-    }
-
-    $db->query("SELECT roles.*
-    FROM roles
-    WHERE max_overtime_hours=(SELECT MAX(roles.max_overtime_hours)
-    FROM roles, intern_roles
-    WHERE roles.id = intern_roles.role_id AND
-    intern_roles.intern_id=:intern_id) AND
-    EXISTS (SELECT * FROM intern_roles
-    WHERE roles.id = intern_roles.role_id AND
-    intern_roles.intern_id=:intern_id)
-    ORDER BY admin_level DESC LIMIT 1");
-    $db->setInternId($_SESSION["intern_id"]);
-    $db->execute();
-
-    $max_overtime_hours = $db->fetch();
-
-    if ($db->rowCount() != 0) {
-        $overtime_hours_left = $max_overtime_hours["max_overtime_hours"];
-    } else {
-        $overtime_hours_left = 10;
-    }
-
-    $db->query("SELECT * FROM overtime_hours WHERE intern_id=:intern_id ORDER BY id DESC LIMIT 1");
-    $db->setInternId($_SESSION["intern_id"]);
-    $db->execute();
-
-    $overtime_hours = $db->fetch();
-
-    $day = "friday";
-
-	if (strtotime("today") < strtotime($day)) {
-	  $start_week_date = date("F j, Y", strtotime("last ".$day));
-	} else {
-	  $start_week_date = date("F j, Y", strtotime($day));
-	}
-
-    if ($db->rowCount() == 0 || $overtime_hours["start_week_date"] != $start_week_date) {
-        $overtime_data = array(
-            strtoupper($_SESSION["intern_id"]),
-            $start_week_date,
-            $overtime_hours_left
-        );
-
-        $db->query("INSERT INTO overtime_hours VALUES (null, :intern_id, :start_week_date, :overtime_hours_left)");
-        $db->setOvertimeData($overtime_data);
-        $db->execute();
-        $db->closeStmt();
-
-        $db->query("SELECT * FROM overtime_hours WHERE intern_id=:intern_id ORDER BY id DESC LIMIT 1");
-        $db->setInternId($_SESSION["intern_id"]);
-        $db->execute();
-
-        $overtime_hours = $db->fetch();
     }
 
     $db->query("SELECT * FROM attendance WHERE intern_id=:intern_id ORDER BY id DESC LIMIT 1;");
@@ -144,11 +90,11 @@
         $estimated_weekend_days = floor(($rendering_days/5) * 2);
         $rendering_days += $estimated_weekend_days;
 
-        if (!empty($row_lts_att) && $row_lts_att["att_date"] == $date->getDate() && !empty($row_lts_att["time_out"])) {
+        if (!empty($row_lts_att) && $row_lts_att["att_date"] == $date->getNumericDate() && !empty($row_lts_att["time_out"])) {
             $rendering_days += 1;
         }
 
-        $est_offboard_date = strtotime($date->getDate()." + ".$rendering_days." days");
+        $est_offboard_date = strtotime($date->getNumericDate()." + ".$rendering_days." days");
 
         if ($est_offboard_date >= strtotime("current monday") && $est_offboard_date <= strtotime("sunday")) {
             $offboarding_interns++;
@@ -297,27 +243,6 @@
                     </div>
                 </a>
 
-                <a class="clickable-card" href="attendance.php" draggable="false">
-                    <div class="summary-boxes">
-                        <div class="top">
-                            <div class="left">
-                                <div class="subheader my-2">
-                                    Overtime Hours Left since <?= $overtime_hours["start_week_date"] ?>
-                                </div>
-                                <div class="summary-total">
-                                    <h3><?= $overtime_hours["overtime_hours_left"] ?></h3>
-                                </div>
-                            </div>
-                            <div class="right">
-                                <i class="fa-solid fa-clock <?= $bg_color_class[2] ?> text-light circle"></i>
-                            </div>
-                        </div>
-                        <div class="bottom">
-
-                        </div>
-                    </div>
-                </a>
-
                 <a class="clickable-card" href="profile.php" draggable="false">
                     <div class="summary-boxes">
                         <div class="top">
@@ -336,7 +261,7 @@
                                 </div>
                             </div>
                             <div class="right">
-                                <i class="fa-solid fa-calendar <?= $bg_color_class[3] ?> text-light circle"></i>
+                                <i class="fa-solid fa-calendar <?= $bg_color_class[2] ?> text-light circle"></i>
                             </div>
                         </div>
                         <div class="bottom">
@@ -358,7 +283,7 @@
                                 </div>
                             </div>
                             <div class="right">
-                                <i class="fa-solid fa-calendar <?= $bg_color_class[4] ?> text-light circle"></i>
+                                <i class="fa-solid fa-calendar <?= $bg_color_class[3] ?> text-light circle"></i>
                             </div>
                         </div>
                         <div class="bottom">
@@ -392,18 +317,18 @@
                                         $estimated_weekend_days = floor(($rendering_days/5) * 2);
                                         $rendering_days += $estimated_weekend_days;
 
-                                        if (!empty($lts_att) && $lts_att["att_date"] == $date->getDate() && !empty($lts_att["time_out"])) {
+                                        if (!empty($lts_att) && $lts_att["att_date"] == $date->getNumericDate() && !empty($lts_att["time_out"])) {
                                             $rendering_days += 1;
                                         }
 
-                                        echo date("j M Y", strtotime($date->getDate()." + ".$rendering_days." days"));
+                                        echo date("j M Y", strtotime($date->getNumericDate()." + ".$rendering_days." days"));
                                     } else {
                                         echo date("j M Y", strtotime($intern_wsap_info["offboard_date"]));
                                     } ?></h5>
                                 </div>
                             </div>
                             <div class="right">
-                                <i class="fa-solid fa-graduation-cap <?= $bg_color_class[0] ?> text-light circle"></i>
+                                <i class="fa-solid fa-graduation-cap <?= $bg_color_class[4] ?> text-light circle"></i>
                             </div>
                         </div>
                         <div class="bottom">
@@ -424,7 +349,7 @@
                                 </div>
                             </div>
                             <div class="right">
-                                <i class="fa-solid fa-user-group <?= $bg_color_class[1] ?> text-light circle"></i>
+                                <i class="fa-solid fa-user-group <?= $bg_color_class[0] ?> text-light circle"></i>
                             </div>
                         </div>
                         <div class="bottom">
@@ -445,7 +370,7 @@
                                 </div>
                             </div>
                             <div class="right">
-                                <i class="fa-solid fa-user-tie <?= $bg_color_class[2] ?> text-light circle"></i>
+                                <i class="fa-solid fa-user-tie <?= $bg_color_class[1] ?> text-light circle"></i>
                             </div>
                         </div>
                         <div class="bottom">
@@ -466,7 +391,7 @@
                                 </div>
                             </div>
                             <div class="right">
-                                <i class="fa-solid fa-graduation-cap <?= $bg_color_class[3] ?> text-light circle"></i>
+                                <i class="fa-solid fa-graduation-cap <?= $bg_color_class[2] ?> text-light circle"></i>
                             </div>
                         </div>
                         <div class="bottom">
@@ -487,7 +412,7 @@
                                 </div>
                             </div>
                             <div class="right">
-                                <i class="fa-solid fa-globe <?= $bg_color_class[4] ?> text-light circle"></i>
+                                <i class="fa-solid fa-globe <?= $bg_color_class[3] ?> text-light circle"></i>
                             </div>
                         </div>
                         <div class="bottom">
@@ -626,7 +551,8 @@
                         $intern_db->execute();
 
                         while ($birthday_celebrant = $intern_db->fetch()) {
-                            if (date("m-d", strtotime($birthday_celebrant["birthdate"])) == date("m-d", $date->getDateValue())) {
+                            if (date("m-d", strtotime($birthday_celebrant["birthdate"])) == date("m-d", $date->getDateValue()) && 
+                            $birthday_celebrant["status"] == 1) {
                                 $record_count++; ?>
                                 <div class="task-box position-relative">
                                     <img src="../Assets/img/emojis/confetti-ball_1f38a.png" class="position-absolute"

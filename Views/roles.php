@@ -119,7 +119,7 @@
                                             echo "All Departments";
                                         } else {
                                             echo $_GET["department"];
-                                        }?>
+                                        } ?>
                                     </button>
                                     <ul class="dropdown-menu" aria-labelledby="dropdownMenuButton1">
                                         <li><a class="dropdown-item btn-smoke" <?php
@@ -186,7 +186,7 @@
                                             echo "All Brands";
                                         } else {
                                             echo $_GET["brand"];
-                                        }?>
+                                        } ?>
                                     </button>
                                     <ul class="dropdown-menu" aria-labelledby="dropdownMenuButton1">
                                         <li><a class="dropdown-item btn-smoke" <?php
@@ -266,7 +266,7 @@
                                                     echo "Lowest Level";
                                                     break;
                                             }
-                                        }?>
+                                        } ?>
                                     </button>
                                     <ul class="dropdown-menu me-2z" aria-labelledby="dropdownMenuButton1" name="sort">
                                         <li><a class="dropdown-item btn-smoke" <?php
@@ -406,7 +406,7 @@
                         unset($_SESSION["role_success"]);
                     ?>
                 </div> <?php
-            }?>
+            } ?>
             <table class="table fs-d text-center mt-2">
                 <thead>
                     <tr>
@@ -414,7 +414,6 @@
                         <th scope="col">Name</th>
                         <th scope="col">Brand</th>
                         <th scope="col">Department</th>
-                        <th scope="col">Max OT Hours</th>
                         <th scope="col">Admin</th>
                         <th scope="col">Level</th>
                     </tr>
@@ -496,7 +495,6 @@
                              } else {
                                 echo "No Department";
                              } ?></td>
-                            <td><?= $row["max_overtime_hours"] ?></td>
                             <td><?php
                                 if ($row["admin"] == 1) {
                                     echo "Yes";;
